@@ -1,0 +1,4 @@
+settings:
+  default_action: "transform"
+
+actions: []

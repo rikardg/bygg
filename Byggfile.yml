@@ -1,0 +1,25 @@
+settings:
+  default_action: "build_examples"
+
+actions:
+  - name: "build_examples"
+    message: "Built all examples"
+    dependencies:
+      - "build_trivial"
+      - "build_example"
+      - "build_taskrunner"
+
+  - name: "build_trivial"
+    message: "Built trivial example"
+    shell: "bygg -C examples/trivial"
+
+  - name: "build_example"
+    message: "Built parametric example"
+    shell: "bygg -C examples/parametric"
+
+  - name: "build_taskrunner"
+    message: "Built taskrunner example"
+    outputs: ["fnurgel"]
+    shell: |
+      bygg -C examples/taskrunner
+      touch fnurgel

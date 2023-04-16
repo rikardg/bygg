@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "_version.py"
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[project]
+name = "bygg"
+dynamic = ["dependencies", "version"]
+
+authors = [
+  { name="Rikard Gillemyr", email="rikard.gillemyr@gmail.com" },
+]
+description = "A small build system"
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+bygg = "bygg.main:main"
+gg = "bygg.main:main"
+
+[project.urls]
+"Homepage" = "https://github.com/rikardg/bygg"
+"Bug Tracker" = "https://github.com/rikardg/bygg/issues"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib", "tests/"]
+
+[tool.ruff]
+extend-select = ["I"]
+ignore = ["E501"]
+
+[tool.ruff.isort]
+order-by-type = true
+force-sort-within-sections = true

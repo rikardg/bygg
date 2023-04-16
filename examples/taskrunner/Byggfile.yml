@@ -1,0 +1,19 @@
+settings:
+  default_action: "touch a file"
+
+actions:
+  - name: "touch a file"
+    message: "I touched a file"
+    shell: "touch foo"
+    dependencies: ["ls", "do something more"]
+    is_entrypoint: true
+
+  - name: "ls"
+    shell: "ls -hal"
+
+  - name: "do something more"
+    message: "I did something more"
+    shell: |
+        echo "foo"
+        ls -hal ..
+        echo "bar"

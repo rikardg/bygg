@@ -1,0 +1,8 @@
+# Development
+black==23.1.0
+mypy==1.1.1
+nox==2022.11.21
+pip==23.0.1
+pytest==7.2.1
+ruff==0.0.247
+setuptools==67.4.0

@@ -1,0 +1,13 @@
+settings:
+  default_action: "sort"
+
+actions:
+  - name: "sort"
+    description: "Sort all test files. Also sets up test files if needed."
+    is_entrypoint: true
+    dependencies: ["sort_test_files"]
+
+  - name: "setup"
+    description: "Set up test files."
+    is_entrypoint: true
+    dependencies: ["setup_test_files"]
