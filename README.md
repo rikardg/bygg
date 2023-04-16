@@ -8,7 +8,7 @@ things to change and evolve. Comments and bug reports are welcome!_
 
 Bygg is a build system implemented in and configured using Python. It is
 general-purpose, but is aimed at those that use Python to glue together other
-sytems.
+systems.
 
 Bygg tries to get out of your way and be as thin as possible, while still
 providing correctness and minimal rebuilds.
@@ -72,7 +72,7 @@ Action(
 ```
 
 Bygg will check for the presence of `Byggfile.py` in the current directory. The
-actions above can be built with `build bygg1` and `bygg build2`, respectively.
+actions above can be built with `bygg build1` and `bygg build2`, respectively.
 
 ### Settings file
 
