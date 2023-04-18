@@ -1,0 +1,34 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v[0-9].[0-9]+.[0-9]+'
+      - 'v[0-9].[0-9]+.[0-9]+.dev[0-9]+'
+
+permissions:
+  contents: read
+
+env:
+  SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.ref_name }}
+  HATCH_INDEX_USER: __token__
+  HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pipx install hatch
+      - name: Build release
+        run: |
+          hatch build
+      - name: Publish release
+        run: |
+          hatch --no-interactive publish --repo main
