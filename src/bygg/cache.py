@@ -26,9 +26,9 @@ class Cache:
     def __init__(self, db_file: Path = DEFAULT_DB_FILE):
         self.data = CacheState({})
         self.db_file = db_file
-        make_sure_status_dir_exists()
 
     def load(self):
+        make_sure_status_dir_exists()
         try:
             with open(self.db_file, "rb") as f:
                 self.data = pickle.load(f)
