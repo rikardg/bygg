@@ -13,7 +13,40 @@ PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
 
 
+class PreCommand(msgspec.Struct, forbid_unknown_fields=True):
+    """Settings for a command to run before the virtual environment is created. Useful
+    e.g. for making sure that the right version of Python is installed."""
+
+    shell: Optional[str] = None
+
+
+class VenvSettings(msgspec.Struct, forbid_unknown_fields=True):
+    """Settings for the virtual environment."""
+
+    use_venv: Optional[bool] = None
+    """use_venv: Whether to use a virtual environment. Default is to not use a virtual environment."""
+    venv_path: Optional[str] = None
+    """venv_path: The path to the virtual environment. Defaults to <CONFIGPATH>.venv ."""
+    manage_venv: Optional[bool] = None
+    """manage_venv: Whether to create and manage the virtual environment. Default is to not
+    manage the virtual environment.
+    """
+    create_venv_command: Optional[str] = None
+    """create_venv_command: The command to use for creating the virtual environment. If
+    not specified and manage_venv is True, the venv package will be used."""
+    requirements_files: Optional[List[str]] = None
+    """requirements_files: A list of requirements files to install in the virtual
+    environment. Will be installed using `pip -r <FILENAME>`
+    """
+    requirements: Optional[List[str]] = None
+    """requirements: A list of packages to install in the virtual environment. Will be
+    installed using `pip install <PACKAGE>`
+    """
+
+
 class SettingsSection(msgspec.Struct, forbid_unknown_fields=True):
+    pre_command: Optional[PreCommand] = None
+    venv_settings: Optional[VenvSettings] = None
     default_action: Optional[str] = None
 
 
