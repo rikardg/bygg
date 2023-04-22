@@ -1,4 +1,4 @@
-name: Publish to PyPI
+name: Create release
 
 on:
   push:
@@ -9,13 +9,12 @@ on:
 permissions:
   contents: read
 
-env:
-  SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.ref_name }}
-  HATCH_INDEX_USER: __token__
-  HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
-
 jobs:
-  publish:
+  publish_pypi:
+    env:
+      SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.ref_name }}
+      HATCH_INDEX_USER: __token__
+      HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,3 +31,15 @@ jobs:
       - name: Publish release
         run: |
           hatch --no-interactive publish --repo main
+
+  publish_github:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          generate_release_notes: true
