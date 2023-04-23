@@ -15,6 +15,7 @@ from bygg.configuration import (
     YAML_INPUTFILE,
     ByggFile,
     apply_configuration,
+    dump_schema,
     load_python_build_file,
     read_config_file,
 )
@@ -186,10 +187,15 @@ def dispatcher(
     check_arg: bool,
     clean_arg: bool,
     list_arg: bool,
+    dump_schema_arg: bool,
 ):
     """
     A build tool written in Python, where all actions can be written in Python.
     """
+    if dump_schema_arg:
+        dump_schema()
+        sys.exit(0)
+
     if directory_arg:
         rich.print(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
@@ -297,6 +303,13 @@ List available actions:
         action="store_true",
         help="Always build all actions.",
     )
+    # Meta arguments:
+    meta_group = parser.add_argument_group("Meta arguments")
+    meta_group.add_argument(
+        "--dump-schema",
+        action="store_true",
+        help="Generate a JSONSchema for the Byggfile.yml files. Schema will be printed to stdout.",
+    )
 
     args = parser.parse_args()
 
@@ -309,6 +322,7 @@ List available actions:
             args.check,
             args.clean,
             args.list,
+            args.dump_schema,
         )
     except KeyboardInterrupt:
         rich.print("[red]Interrupted by user. Aborting.[/red]")
