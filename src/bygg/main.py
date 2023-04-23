@@ -10,11 +10,11 @@ from typing import List, Optional
 import rich
 import rich.status
 
+from bygg.apply_configuration import apply_configuration
 from bygg.configuration import (
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
     ByggFile,
-    apply_configuration,
     dump_schema,
     load_python_build_file,
     read_config_file,

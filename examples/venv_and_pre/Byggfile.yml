@@ -1,0 +1,14 @@
+settings:
+  pre_command:
+    message: "Installing the environment"
+    shell: "rtx install"
+  venv_settings:
+    manage_venv: True
+    use_venv: True
+    create_venv_command: "rtx exec python -- python -m venv .venv"
+    requirements:
+      - "rich"
+      - "typer"
+
+
+actions: []
