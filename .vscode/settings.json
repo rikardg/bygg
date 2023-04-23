@@ -1,0 +1,8 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "yaml.schemas": {
+    "schemas/Byggfile_yml_schema.json": "Byggfile.yml"
+  }
+}

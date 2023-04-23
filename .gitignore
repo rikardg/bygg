@@ -2,6 +2,5 @@
 .bygg/
 .pytest_cache/
 .venv/
-.vscode/
 __pycache__/
 **/action_digests.json
