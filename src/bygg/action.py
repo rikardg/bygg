@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, Iterable, Literal, Optional, Set, Tuple
 
-from bygg.types import CommandStatus
+from bygg.common_types import CommandStatus
 
 SchedulingType = Literal["in-process", "processpool"]
 
