@@ -1,5 +1,5 @@
 from bygg.action import ActionContext, action
-from bygg.types import CommandStatus
+from bygg.common_types import CommandStatus
 
 
 @action("testfile 2", message="testfile 2", outputs=["output2.txt"])

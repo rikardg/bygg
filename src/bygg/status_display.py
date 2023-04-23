@@ -7,8 +7,8 @@ import rich.status
 import rich.table
 
 from bygg.action import Action
+from bygg.common_types import CommandStatus
 from bygg.runner import JobStatus
-from bygg.types import CommandStatus
 
 console = rich.console.Console()
 

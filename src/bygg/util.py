@@ -3,7 +3,7 @@ import re
 import subprocess
 from typing import List, Optional, Set, Tuple
 
-from bygg.types import CommandStatus
+from bygg.common_types import CommandStatus
 
 
 def create_shell_command(shell_command: str, message: Optional[str] = None):
