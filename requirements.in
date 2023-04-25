@@ -1,0 +1,6 @@
+# Core
+dill==0.3.6
+msgspec==0.13.1
+multiprocess==0.70.14
+PyYAML==6.0 # msgspec requires this as an ambient
+rich==13.3.1
