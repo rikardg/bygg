@@ -5,7 +5,10 @@ settings:
   venv_settings:
     manage_venv: True
     use_venv: True
-    create_venv_command: "rtx exec python -- python -m venv .venv"
+    # Use if you don't have rtx:
+    create_venv_command: "python -m venv .venv"
+    # Use if you have and want to use rtx:
+    # create_venv_command: "rtx exec python@3.11.2 -- python -m venv .venv"
     requirements:
       - "rich"
       - "typer"
