@@ -66,23 +66,23 @@ directly.
     is_entrypoint: True
 )
 def a_build_command(ctx: Context):
-  # do stuff
-  ...
+    # do stuff
+    ...
 
 
 # Separate function + Action constructor:
 
 def also_a_build_command(ctx: Context):
-  # do stuff
-  ...
+    # do stuff
+    ...
 
 Action(
-  "build2",
-  inputs=["foo.in", "bar.in"],
-  outputs=["foo.out", "bar.out"],
-  dependencies=["another action"],
-  command=my_python_command
-  is_entrypoint=True
+    "build2",
+    inputs=["foo.in", "bar.in"],
+    outputs=["foo.out", "bar.out"],
+    dependencies=["another action"],
+    command=also_a_build_command
+    is_entrypoint=True
 )
 ```
 
