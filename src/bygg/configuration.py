@@ -84,3 +84,10 @@ def apply_configuration(configuration: ByggFile | None):
             dependencies=action.dependencies,
             command=shell_command,
         )
+
+
+def dump_schema():
+    import json
+
+    schema = msgspec.json.schema(ByggFile)
+    print(json.dumps(schema, indent=2))
