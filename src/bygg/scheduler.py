@@ -110,11 +110,21 @@ class Scheduler:
 
     def check_dirty(self, job_name: str) -> bool:
         """Check if a job needs to be built."""
+        print(f"Checking if {job_name} is dirty")
         if self.always_make:
             return True
 
         action = self.build_actions[job_name]
         cached_digests = self.cache.get_digests(job_name)
+
+        if (
+            len(action.inputs) == 0
+            and len(action.outputs) == 0
+            and not action.dynamic_dependency
+        ):
+            # An action with neither inputs nor outputs will always be built
+            # print(f"Job {job_name} is dirty (no inputs or outputs)")
+            return True
 
         if (
             not cached_digests
@@ -145,6 +155,7 @@ class Scheduler:
                 dd_result is None
                 or calculate_digest([dd_result]) != cached_digests.dynamic_digest
             ):
+                # print(f"Job {job_name} is dirty (dynamic dependency changed)")
                 return True
 
         # TODO handle files_were_missing here? abort?
