@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "ms-python.black-formatter",
+    // Can validate Byggfile.yml against the included schema:
+    "redhat.vscode-yaml"
+  ]
+}
