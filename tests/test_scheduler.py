@@ -367,9 +367,10 @@ def test_scheduler_dynamic_dependency_two_runs():
 
     jobs = scheduler.get_ready_jobs()
     assert len(jobs) == 0
+    assert scheduler.run_status() == "running"
 
-    # Asking again triggers the scheduler to realise whether it's done or not.
-    # TODO this behaviour should probably be changeed.
+    # Ask again since the job should have been skipped and the scheduler is still
+    # running:
     job = scheduler.get_ready_jobs()[0]
     assert job
     assert len(scheduler.job_graph) == 1

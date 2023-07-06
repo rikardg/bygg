@@ -169,8 +169,12 @@ class Scheduler:
 
     def get_ready_jobs(self, batch_size: int = 0) -> List[Job]:
         """
-        Create a batch of jobs and put them in the running pool. Returns all ready jobs if
-        batch_size is 0.
+        Create a batch of jobs and put them in the running pool. Returns all ready jobs
+        if batch_size is 0.
+
+        An empty job list may be returned even if there are more jobs left to run if all
+        jobs in the batch were skipped. Job runners should continue polling for more
+        jobs until the scheduler status is "finished".
         """
         if batch_size == 0 or len(self.ready_jobs) < batch_size:
             new_jobs = self.job_graph.get_ready_jobs(
