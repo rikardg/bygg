@@ -270,6 +270,48 @@ def test_scheduler_dynamic_dependency():
     Action(name="action2", dynamic_dependency=lambda: "foo")
 
     assert scheduler.run_status() == "not started"
+    scheduler.start_run("action1")
+    assert scheduler.run_status() == "running"
+
+    # check that the scheduler has the correct number of actions
+    assert len(scheduler.build_actions) == 2
+    assert len(scheduler.job_graph) == 2
+
+    job = scheduler.get_ready_jobs()[0]
+    assert job
+    assert job.name == "action2"
+    job.status = CommandStatus(0, "Executed successfully", None)
+    scheduler.job_finished(job)
+
+    # check again that the scheduler has the correct number of actions
+    assert len(scheduler.build_actions) == 2
+    assert len(scheduler.job_graph) == 1
+
+    job = scheduler.get_ready_jobs()[0]
+    assert job
+    assert len(scheduler.job_graph) == 1
+    job.status = CommandStatus(0, "Executed successfully", None)
+    scheduler.job_finished(job)
+
+    assert scheduler.run_status() == "finished"
+
+    assert len(scheduler.build_actions) == 2
+    assert len(scheduler.running_jobs) == 0
+
+
+def test_scheduler_dynamic_dependency_two_runs():
+    scheduler.__init__()
+    cache_file = get_closed_tmpfile()
+    scheduler.init_cache(cache_file)
+
+    Action(
+        name="action1",
+        dependencies=["action2"],
+        is_entrypoint=True,
+    )
+    Action(name="action2", dynamic_dependency=lambda: "foo")
+
+    assert scheduler.run_status() == "not started"
 
     scheduler.start_run("action1")
 
@@ -327,9 +369,14 @@ def test_scheduler_dynamic_dependency():
     assert len(jobs) == 0
 
     # Asking again triggers the scheduler to realise whether it's done or not.
-    # TODO this behavious should probably be changeed.
-    jobs = scheduler.get_ready_jobs()
-    assert len(scheduler.job_graph) == 0
+    # TODO this behaviour should probably be changeed.
+    job = scheduler.get_ready_jobs()[0]
+    assert job
+    assert len(scheduler.job_graph) == 1
+
+    job.status = CommandStatus(0, "Executed successfully", None)
+    scheduler.job_finished(job)
+
     assert scheduler.run_status() == "finished"
 
     assert len(scheduler.build_actions) == 2
