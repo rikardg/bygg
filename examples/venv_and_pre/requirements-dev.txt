@@ -1,0 +1,2 @@
+# Just an example package requirement for testing
+pip==23.1.2
