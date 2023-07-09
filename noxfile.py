@@ -29,3 +29,6 @@ def examples(session):
 
     with session.chdir("examples/trivial"):
         session.run("bygg")
+
+    # with session.chdir("examples/venv_and_pre"):
+    #     session.run("bygg", success_codes=[1])

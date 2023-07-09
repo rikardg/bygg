@@ -10,11 +10,11 @@ from typing import List, Optional
 import rich
 import rich.status
 
+from bygg.apply_configuration import apply_configuration
 from bygg.configuration import (
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
     ByggFile,
-    apply_configuration,
     dump_schema,
     load_python_build_file,
     read_config_file,
@@ -188,6 +188,7 @@ def dispatcher(
     clean_arg: bool,
     list_arg: bool,
     dump_schema_arg: bool,
+    is_restarted: bool,
 ):
     """
     A build tool written in Python, where all actions can be written in Python.
@@ -196,7 +197,7 @@ def dispatcher(
         dump_schema()
         sys.exit(0)
 
-    if directory_arg:
+    if directory_arg and not is_restarted:
         rich.print(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
 
@@ -205,7 +206,11 @@ def dispatcher(
         sys.exit(1)
 
     configuration = read_config_file()
-    apply_configuration(configuration)
+    restart_with = apply_configuration(configuration, is_restarted)
+
+    if restart_with is not None and not is_restarted:
+        exec_list = [restart_with, *sys.argv[1:], "--is_restarted"]
+        os.execv(exec_list[0], exec_list)
 
     resolved_actions = actions if actions else []
 
@@ -258,6 +263,7 @@ List available actions:
         default=None,
         help="Entrypoint actions to operate on.",
     )
+    parser.add_argument("--is_restarted", action="store_true", help=argparse.SUPPRESS)
     # Commands that operate on the build setup:
     build_setup_group = parser.add_argument_group(
         "Commands that operate on the build setup"
@@ -323,6 +329,7 @@ List available actions:
             args.clean,
             args.list,
             args.dump_schema,
+            args.is_restarted,
         )
     except KeyboardInterrupt:
         rich.print("[red]Interrupted by user. Aborting.[/red]")
