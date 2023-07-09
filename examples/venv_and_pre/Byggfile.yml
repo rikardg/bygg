@@ -1,0 +1,30 @@
+settings:
+  pre_command:
+    message: "Installing the environment"
+    # Use if you don't have rtx:
+    shell: echo "Dummy pre-command"
+    # Use if you have and want to use rtx:
+    # shell: "rtx install"
+  venv_settings:
+    manage_venv: True
+    use_venv: True
+    # Use if you don't have rtx:
+    create_venv_command: "python -m venv .venv"
+    # Use if you have and want to use rtx:
+    # create_venv_command: "rtx exec python@3.11.2 -- python -m venv .venv"
+    requirements_files:
+      - "requirements.txt"
+      - "requirements-dev.txt"
+    requirements:
+      - "../.."
+
+actions:
+  - name: "clean"
+    message: "Cleaning"
+    shell: "rm -Rf .venv"
+    is_entrypoint: true
+
+  - name: "nop"
+    message: "NOP"
+    shell: "true"
+    is_entrypoint: true

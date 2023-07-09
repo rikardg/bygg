@@ -78,3 +78,12 @@ def calculate_function_digest(fn: Callable) -> str:
     dis.dis(fn, file=out)
     function_dis_string = out.getvalue()
     return hashlib.new(DIGEST_TYPE, function_dis_string.encode()).hexdigest()
+
+
+def calculate_string_digest(s: str) -> str:
+    """
+    Calculate the digest of a string.
+    s: The string to calculate the digest of.
+    Returns: The digest of the string as a hex string.
+    """
+    return hashlib.new(DIGEST_TYPE, s.encode()).hexdigest()

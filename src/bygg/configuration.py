@@ -6,14 +6,42 @@ import msgspec
 import rich
 import rich.status
 
-from bygg.action import Action
-from bygg.util import create_shell_command
-
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
 
 
+class PreCommand(msgspec.Struct, forbid_unknown_fields=True):
+    """Settings for a command to run before the virtual environment is created. Useful
+    e.g. for making sure that the right version of Python is installed."""
+
+    message: Optional[str] = None
+    shell: Optional[str] = None
+
+
+class VenvSettings(msgspec.Struct, forbid_unknown_fields=True):
+    """Settings for the virtual environment."""
+
+    use_venv: Optional[bool] = None
+    """Whether to use a virtual environment. Default is to not use a virtual environment."""
+    venv_path: str = ".venv"
+    """The path to the virtual environment. Defaults to <CONFIGPATH>/.venv ."""
+    manage_venv: Optional[bool] = None
+    """Whether to create and manage the virtual environment. Default is to not manage
+    the virtual environment."""
+    create_venv_command: Optional[str] = None
+    """The command to use for creating the virtual environment. If not specified and
+    manage_venv is True, the venv package will be used."""
+    requirements_files: Optional[List[str]] = None
+    """A list of requirements files to install in the virtual environment. Will be
+    installed using `pip -r <FILENAME>`"""
+    requirements: Optional[List[str]] = None
+    """A list of packages to install in the virtual environment. Will be installed using
+    `pip install <PACKAGE>`"""
+
+
 class SettingsSection(msgspec.Struct, forbid_unknown_fields=True):
+    pre_command: Optional[PreCommand] = None
+    venv_settings: Optional[VenvSettings] = None
     default_action: Optional[str] = None
 
 
@@ -66,24 +94,6 @@ def read_config_file() -> ByggFile | None:
             f"[yellow]{YAML_INPUTFILE}[/yellow]:[/red bold] {e}"
         )
         sys.exit(1)
-
-
-def apply_configuration(configuration: ByggFile | None):
-    if not configuration:
-        return
-
-    for action in configuration.actions:
-        shell_command = (
-            create_shell_command(action.shell, action.message) if action.shell else None
-        )
-        Action(
-            action.name,
-            is_entrypoint=bool(action.is_entrypoint),
-            inputs=action.inputs,
-            outputs=action.outputs,
-            dependencies=action.dependencies,
-            command=shell_command,
-        )
 
 
 def dump_schema():
