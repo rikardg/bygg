@@ -23,9 +23,12 @@ def examples(session):
 
     with session.chdir("examples/parametric"):
         session.run("bygg")
+        session.run("bygg", "--clean")
 
     with session.chdir("examples/taskrunner"):
         session.run("bygg")
+        session.run("bygg", "--clean")
 
     with session.chdir("examples/trivial"):
         session.run("bygg")
+        session.run("bygg", "--clean")
