@@ -259,9 +259,10 @@ List available actions:
         help="Entrypoint actions to operate on.",
     )
     # Commands that operate on the build setup:
-    build_setup_group = parser.add_argument_group(
+    build_setup_wrapper_group = parser.add_argument_group(
         "Commands that operate on the build setup"
-    )
+    )  # add_mutually_exclusive_group doesn't accept a title, so wrap it in a regular group.
+    build_setup_group = build_setup_wrapper_group.add_mutually_exclusive_group()
     build_setup_group.add_argument(
         "-c",
         "--check",
