@@ -110,7 +110,6 @@ class Scheduler:
 
     def check_dirty(self, job_name: str) -> bool:
         """Check if a job needs to be built."""
-        print(f"Checking if {job_name} is dirty")
         if self.always_make:
             return True
 
