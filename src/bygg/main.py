@@ -176,6 +176,12 @@ def print_no_actions_text(configuration: ByggFile | None):
     return list_actions()
 
 
+def print_version():
+    import importlib.metadata
+
+    print(f"{__package__} {importlib.metadata.version(__package__)}")
+
+
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
 
 
@@ -188,12 +194,17 @@ def dispatcher(
     clean_arg: bool,
     list_arg: bool,
     dump_schema_arg: bool,
+    show_version_arg: bool,
 ):
     """
     A build tool written in Python, where all actions can be written in Python.
     """
     if dump_schema_arg:
         dump_schema()
+        sys.exit(0)
+
+    if show_version_arg:
+        print_version()
         sys.exit(0)
 
     if directory_arg:
@@ -257,6 +268,9 @@ List available actions:
         nargs="*",
         default=None,
         help="Entrypoint actions to operate on.",
+    )
+    parser.add_argument(
+        "-v", "--version", action="store_true", help="Show version string and exit."
     )
     # Commands that operate on the build setup:
     build_setup_wrapper_group = parser.add_argument_group(
@@ -324,6 +338,7 @@ List available actions:
             args.clean,
             args.list,
             args.dump_schema,
+            args.version,
         )
     except KeyboardInterrupt:
         rich.print("[red]Interrupted by user. Aborting.[/red]")
