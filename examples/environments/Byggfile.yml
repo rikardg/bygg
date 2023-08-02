@@ -1,0 +1,57 @@
+settings:
+  default_action: default_action
+
+actions:
+  - name: "clean_environments"
+    message: "Cleaning"
+    shell: |
+      rm -Rf .venv .venv1 .venv2
+    is_entrypoint: true
+
+  - name: "default_action"
+    message: "Running in default env"
+    dependencies: ["default_action_python"]
+    is_entrypoint: true
+
+  - name: "action1"
+    message: "Running in env1"
+    dependencies: ["action1_python"]
+    is_entrypoint: true
+    environment: "env1"
+
+  - name: "action2"
+    message: "Running in env2"
+    dependencies: ["action2_python"]
+    is_entrypoint: true
+    environment: "env2"
+
+environments:
+  env1:
+    byggfile: "Byggfile1.py"
+    inputs:
+      - "requirements1.txt"
+    venv_directory: .venv1
+    shell: |
+      python -m venv .venv1
+      .venv1/bin/pip install -r requirements1.txt
+      .venv1/bin/pip install -e ../../
+
+  env2:
+    byggfile: "Byggfile2.py"
+    inputs:
+      - "requirements2.txt"
+    venv_directory: .venv2
+    shell: |
+      python -m venv .venv2
+      .venv2/bin/pip install -r requirements2.txt
+      .venv2/bin/pip install -e ../../
+
+  default:
+    byggfile: "Byggfile.py"
+    inputs:
+      - requirements.txt
+    venv_directory: .venv
+    shell: |
+      python -m venv .venv
+      .venv/bin/pip install -r requirements.txt
+      .venv/bin/pip install -e ../../

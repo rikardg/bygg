@@ -1,0 +1,2 @@
+# Just an example package requirement for testing
+rich==13.3.5
