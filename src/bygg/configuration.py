@@ -1,13 +1,10 @@
 import os
 import sys
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import msgspec
 import rich
 import rich.status
-
-from bygg.action import Action
-from bygg.util import create_shell_command
 
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
@@ -37,17 +34,46 @@ class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
     outputs: Optional[List[str]] = None
     dependencies: Optional[List[str]] = None
     is_entrypoint: Optional[bool] = None
+    environment: Optional[str] = "default"
     shell: Optional[str] = None
 
 
-class ByggFile(msgspec.Struct):
+class Environment(msgspec.Struct, forbid_unknown_fields=True):
+    """
+    name: The name of the environment.
+
+    description: A description of the environment. Used in e.g. help messages.
+
+    byggfiles: A list of Byggfiles that use this environment.
+
+    inputs: A list of files that are used as input to the environment. Typically pip
+    requirements files, but can be any files.
+
+    venv_directory: The directory where the virtual environment is located. Will be
+    recreated by Bygg if any of the inputs are modified.
+
+    shell: The shell command for creating the environment.
+
+    entrypoints: A list of entrypoints that use this environment.
+    """
+
+    byggfile: str
+    inputs: List[str]
+    venv_directory: str
+    shell: str
+    description: Optional[str] = None
+    message: Optional[str] = None
+
+
+class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
     actions: List[ActionItem]
     settings: SettingsSection = msgspec.field(default_factory=SettingsSection)
+    environments: Dict[str, Environment] = msgspec.field(default_factory=dict)
 
 
-def load_python_build_file():
-    if os.path.isfile(PYTHON_INPUTFILE):
-        with open(PYTHON_INPUTFILE, "r") as f:
+def load_python_build_file(build_file: str):
+    if os.path.isfile(build_file):
+        with open(build_file, "r") as f:
             # modify load path to make the current directory importable
             preamble = "import sys\nsys.path.insert(0, '.')\n\n"
             exec(preamble + f.read(), globals())
@@ -66,24 +92,6 @@ def read_config_file() -> ByggFile | None:
             f"[yellow]{YAML_INPUTFILE}[/yellow]:[/red bold] {e}"
         )
         sys.exit(1)
-
-
-def apply_configuration(configuration: ByggFile | None):
-    if not configuration:
-        return
-
-    for action in configuration.actions:
-        shell_command = (
-            create_shell_command(action.shell, action.message) if action.shell else None
-        )
-        Action(
-            action.name,
-            is_entrypoint=bool(action.is_entrypoint),
-            inputs=action.inputs,
-            outputs=action.outputs,
-            dependencies=action.dependencies,
-            command=shell_command,
-        )
 
 
 def dump_schema():

@@ -1,22 +1,23 @@
 import argparse
+from dataclasses import dataclass
 from multiprocessing import cpu_count
 import os
 import shutil
 import stat
+import subprocess
 import sys
 import time
-from typing import List, Optional
+from typing import List
 
 import rich
 import rich.status
 
+from bygg.apply_configuration import apply_configuration
 from bygg.configuration import (
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
     ByggFile,
-    apply_configuration,
     dump_schema,
-    load_python_build_file,
     read_config_file,
 )
 from bygg.runner import runner
@@ -37,16 +38,8 @@ def init_status_listeners():
     runner.runner_status_listener = on_runner_status
 
 
-loading_python_build_file = rich.status.Status(
-    "[cyan]Executing Python build file", spinner="dots"
-)
-
-
 def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
     try:
-        with loading_python_build_file:
-            load_python_build_file()
-
         init_status_listeners()
 
         max_workers = get_job_count_limit() if job_count is None else job_count
@@ -95,9 +88,6 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
 
 def clean(actions: List[str]):
     try:
-        with loading_python_build_file:
-            load_python_build_file()
-
         init_status_listeners()
 
         for action in actions:
@@ -134,14 +124,6 @@ def clean(actions: List[str]):
 def check(actions: List[str]):
     print("check")
     t0 = time.time()
-    action_count = len(scheduler.build_actions)
-
-    with loading_python_build_file:
-        load_python_build_file()
-    rich.print(
-        f"{len(scheduler.build_actions) - action_count} actions registered in "
-        f"{time.time() - t0:.2f} seconds."
-    )
     init_status_listeners()
 
     for action in actions:
@@ -155,9 +137,6 @@ def check(actions: List[str]):
 
 
 def list_actions() -> bool:
-    with loading_python_build_file:
-        load_python_build_file()
-
     entrypoints = [x for x in scheduler.build_actions.values() if x.is_entrypoint]
 
     if entrypoints:
@@ -185,29 +164,25 @@ def print_version():
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
 
 
-def dispatcher(
-    actions: Optional[List[str]],
-    directory_arg: Optional[str],
-    jobs_arg: Optional[int],
-    always_make_arg: bool,
-    check_arg: bool,
-    clean_arg: bool,
-    list_arg: bool,
-    dump_schema_arg: bool,
-    show_version_arg: bool,
-):
+def dispatcher(args: argparse.Namespace):
     """
     A build tool written in Python, where all actions can be written in Python.
     """
-    if dump_schema_arg:
+    if args.dump_schema:
         dump_schema()
         sys.exit(0)
 
-    if show_version_arg:
+    if args.version:
         print_version()
         sys.exit(0)
 
-    if directory_arg:
+    directory = args.directory[0] if args.directory else None
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+
+    if directory and not is_restarted_with_env:
+        directory_arg = args.directory[0]
         rich.print(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
 
@@ -216,35 +191,113 @@ def dispatcher(
         sys.exit(1)
 
     configuration = read_config_file()
-    apply_configuration(configuration)
+    action_partitions = partition_actions(configuration, args.actions)
+
+    if not action_partitions:
+        status = print_no_actions_text(configuration)
+        if status:
+            sys.exit(0)
+        sys.exit(1)
+
+    for partition in action_partitions:
+        env = partition.environment_name
+        # Check if we should restart with another Python interpreter (e.g. from a
+        # virtualenv):
+        restart_with = apply_configuration(configuration, env, is_restarted_with_env)
+
+        if restart_with is not None and not is_restarted_with_env:
+            exec_list = construct_exec_list(args, restart_with, partition)
+            try:
+                process = subprocess.run(exec_list, encoding="utf-8")
+                if process.returncode != 0:
+                    sys.exit(process.returncode)
+            except FileNotFoundError:
+                rich.print(
+                    f"[red]Error: Could not restart with '{restart_with}'.[/red]\n"
+                    f"[yellow]Please make sure that bygg is in your pip requirements list for this environment.[/yellow]"
+                )
+                sys.exit(1)
+        else:
+            if args.check:
+                status = check(args.actions)
+            elif args.clean:
+                status = clean(args.actions)
+            elif args.list:
+                status = list_actions()
+            else:
+                jobs = int(args.jobs) if args.jobs else None
+                status = build(partition.actions, jobs, args.always_make)
+
+            if not status:
+                sys.exit(1)
+
+
+@dataclass
+class ActionPartition:
+    """
+    environment_name: The name of the environment that the actions should be run in.
+    None means the implicit default environment, i.e. typically the base process.
+
+    actions: The actions that should be run in the environment.
+    """
+
+    environment_name: str | None
+    actions: List[str]
+
+
+def construct_exec_list(
+    args: argparse.Namespace, restart_with: str, partition: ActionPartition
+):
+    exec_list = [restart_with, *partition.actions]
+    for k, v in vars(args).items():
+        if k == "actions":
+            continue
+        elif v is True:
+            exec_list.append(f"--{k}")
+        elif v:
+            exec_list.append(f"--{k} {v}")
+    if partition.environment_name:
+        exec_list.append("--is_restarted_with_env")
+        exec_list.append(partition.environment_name)
+    return exec_list
+
+
+def partition_actions(
+    configuration: ByggFile | None,
+    actions: List[str] | None,
+) -> List[ActionPartition] | None:
+    """
+    Partition the actions into groups that should be run in the same environment.
+    """
+
+    # TODO: Implement this.
 
     resolved_actions = actions if actions else []
 
-    if (
-        configuration is not None
-        and not actions
-        and configuration.settings.default_action is not None
-    ):
-        resolved_actions += [configuration.settings.default_action]
+    if configuration:
+        if not actions and configuration.settings.default_action is not None:
+            # Resolve to default action:
+            resolved_actions += [configuration.settings.default_action]
+            return [ActionPartition("default", resolved_actions)]
 
-    status = None
+        # Put consecutive actions with the same environment in the same partition:
+        action_partitions = []
+        action_dict = {a.name: a for a in configuration.actions}
+        current_partition: ActionPartition | None = None
+        for action in [action_dict[a] for a in resolved_actions]:
+            if (
+                current_partition is None
+                or current_partition.environment_name != action.environment
+            ):
+                current_partition = ActionPartition(action.environment, [action.name])
+                action_partitions.append(current_partition)
+            else:
+                current_partition.actions.append(action.name)
 
-    if not resolved_actions:
-        status = print_no_actions_text(configuration)
-    elif check_arg:
-        status = check(resolved_actions)
-    elif clean_arg:
-        status = clean(resolved_actions)
-    elif list_arg:
-        status = list_actions()
-    else:
-        status = build(resolved_actions, jobs_arg, always_make_arg)
-
-    if not status:
-        sys.exit(1)
+        return action_partitions
 
 
-def main():
+def create_argument_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""
@@ -271,6 +324,13 @@ List available actions:
     )
     parser.add_argument(
         "-v", "--version", action="store_true", help="Show version string and exit."
+    )
+    parser.add_argument(
+        "--is_restarted_with_env",
+        nargs=1,
+        type=str,
+        default=None,
+        help=argparse.SUPPRESS,
     )
     # Commands that operate on the build setup:
     build_setup_wrapper_group = parser.add_argument_group(
@@ -325,21 +385,15 @@ List available actions:
         action="store_true",
         help="Generate a JSON Schema for the Byggfile.yml files. The schema will be printed to stdout.",
     )
+    return parser
 
+
+def main():
+    parser = create_argument_parser()
     args = parser.parse_args()
 
     try:
-        return dispatcher(
-            args.actions,
-            args.directory[0] if args.directory else None,
-            int(args.jobs) if args.jobs else None,
-            args.always_make,
-            args.check,
-            args.clean,
-            args.list,
-            args.dump_schema,
-            args.version,
-        )
+        return dispatcher(args)
     except KeyboardInterrupt:
         rich.print("[red]Interrupted by user. Aborting.[/red]")
         return 1

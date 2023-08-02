@@ -94,7 +94,8 @@ actions above can be built with `bygg build1` and `bygg build2`, respectively.
 There is also experimental support for declaring actions in a settings file
 (currently YAML). This is intended primarily for configuring static settings
 like which virtual environment to use, but can also be used for declaring
-simple actions. See `examples/taskrunner/Byggfile.yml`.
+simple actions. See `examples/taskrunner/Byggfile.yml` and
+`examples/environments/Byggfile.yml`.
 
 ## Getting a local copy
 

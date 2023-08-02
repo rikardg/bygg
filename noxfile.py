@@ -32,3 +32,19 @@ def examples(session):
     with session.chdir("examples/trivial"):
         session.run("bygg")
         session.run("bygg", "--clean")
+
+    with session.chdir("examples/environments"):
+        session.run("bygg")
+        session.run("bygg", "clean_environments")
+
+        session.run("bygg", "default_action")
+        session.run("bygg", "clean_environments")
+
+        session.run("bygg", "action1")
+        session.run("bygg", "clean_environments")
+
+        session.run("bygg", "action2")
+        session.run("bygg", "clean_environments")
+
+        session.run("bygg", "action1", "default_action", "action2")
+        session.run("bygg", "clean_environments")
