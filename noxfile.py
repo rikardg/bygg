@@ -21,6 +21,10 @@ def basics(session):
 def examples(session):
     session.install(".")
 
+    with session.chdir("examples/only_python"):
+        session.run("bygg")
+        session.run("bygg", "--clean")
+
     with session.chdir("examples/parametric"):
         session.run("bygg")
         session.run("bygg", "--clean")

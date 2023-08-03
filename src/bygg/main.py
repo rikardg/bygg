@@ -194,7 +194,12 @@ def dispatcher(args: argparse.Namespace):
     action_partitions = partition_actions(configuration, args.actions)
 
     if not action_partitions:
-        status = print_no_actions_text(configuration)
+        if os.path.isfile(PYTHON_INPUTFILE):
+            # No configuration file, so load the Python build file directly.
+            apply_configuration(None, None, None)
+            status = do_dispatch(args, args.actions)
+        else:
+            status = print_no_actions_text(configuration)
         if status:
             sys.exit(0)
         sys.exit(1)
@@ -218,18 +223,23 @@ def dispatcher(args: argparse.Namespace):
                 )
                 sys.exit(1)
         else:
-            if args.check:
-                status = check(args.actions)
-            elif args.clean:
-                status = clean(args.actions)
-            elif args.list:
-                status = list_actions()
-            else:
-                jobs = int(args.jobs) if args.jobs else None
-                status = build(partition.actions, jobs, args.always_make)
-
+            status = do_dispatch(args, partition.actions)
             if not status:
                 sys.exit(1)
+
+
+def do_dispatch(args: argparse.Namespace, actions: List[str]) -> bool:
+    if args.list or not actions:
+        status = list_actions()
+    elif args.check:
+        status = check(actions)
+    elif args.clean:
+        status = clean(actions)
+    else:
+        jobs = int(args.jobs) if args.jobs else None
+        status = build(actions, jobs, args.always_make)
+
+    return status
 
 
 @dataclass

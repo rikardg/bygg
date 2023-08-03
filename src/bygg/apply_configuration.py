@@ -96,34 +96,34 @@ def apply_configuration(
     is_restarted_with_env: str | None,
 ) -> str | None:
     """Returns the path of the bygg install to restart with if a restart is needed."""
-    if not configuration:
-        return None
+    if configuration:
+        if not is_restarted_with_env and environment_name:
+            if environment_name in configuration.environments:
+                environment = configuration.environments[environment_name]
+                setup_environment(environment)
 
-    if not is_restarted_with_env and environment_name:
-        if environment_name in configuration.environments:
-            environment = configuration.environments[environment_name]
-            setup_environment(environment)
+                restart_with = should_restart_with(environment)
+                if restart_with is not None:
+                    return restart_with
 
-            restart_with = should_restart_with(environment)
-            if restart_with is not None:
-                return restart_with
+        for action in configuration.actions:
+            # TODO Hack until we can iterate over the dependency graph in scheduler.prepare_run:
+            if is_restarted_with_env and action.environment != is_restarted_with_env:
+                continue
 
-    for action in configuration.actions:
-        # TODO Hack until we can iterate over the dependency graph in scheduler.prepare_run:
-        if is_restarted_with_env and action.environment != is_restarted_with_env:
-            continue
-
-        shell_command = (
-            create_shell_command(action.shell, action.message) if action.shell else None
-        )
-        Action(
-            action.name,
-            is_entrypoint=bool(action.is_entrypoint),
-            inputs=action.inputs,
-            outputs=action.outputs,
-            dependencies=action.dependencies,
-            command=shell_command,
-        )
+            shell_command = (
+                create_shell_command(action.shell, action.message)
+                if action.shell
+                else None
+            )
+            Action(
+                action.name,
+                is_entrypoint=bool(action.is_entrypoint),
+                inputs=action.inputs,
+                outputs=action.outputs,
+                dependencies=action.dependencies,
+                command=shell_command,
+            )
 
     # Evaluate the Python build file:
 
