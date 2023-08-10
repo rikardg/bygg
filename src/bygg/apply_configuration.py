@@ -16,6 +16,7 @@ from bygg.configuration import (
     load_python_build_file,
 )
 from bygg.digest import calculate_string_digest
+from bygg.output import output_error, output_info, output_plain
 from bygg.scheduler import scheduler
 from bygg.util import create_shell_command
 
@@ -52,10 +53,10 @@ def setup_environment(environment: Environment):
     # now, remove the venv.
 
     if venv_path.exists():
-        rich.print(f"[blue]Replacing venv at {venv_path}[/blue]")
+        output_info(f"Replacing venv at {venv_path}")
         shutil.rmtree(venv_path)
 
-    rich.print("[blue]Setting up environment[/blue]")
+    output_info("Setting up environment")
     process = subprocess.run(
         environment.shell,
         shell=True,
@@ -64,12 +65,11 @@ def setup_environment(environment: Environment):
         encoding="utf-8",
     )
 
-    print(process.stdout)
+    output_plain(process.stdout)
 
     if process.returncode != 0:
-        rich.print(
-            f"[red bold]Error while creating virtual environment: [/red bold]{process.stdout}"
-        )
+        output_error("Error while creating virtual environment:")
+        output_plain(process.stdout)
         sys.exit(1)
 
     with open(environment_hash_file, "w") as f:
@@ -138,7 +138,7 @@ def apply_configuration(
 
     with loading_python_build_file:
         load_python_build_file(python_build_file)
-    rich.print(
+    output_info(
         f"{len(scheduler.build_actions) - action_count} actions registered in "
         f"{time.time() - t0:.2f} seconds."
     )
