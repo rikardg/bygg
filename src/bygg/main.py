@@ -20,6 +20,7 @@ from bygg.configuration import (
     dump_schema,
     read_config_file,
 )
+from bygg.output import output_error, output_info, output_ok, output_warning
 from bygg.runner import runner
 from bygg.scheduler import scheduler
 from bygg.status_display import on_job_status, on_runner_status, progress
@@ -46,7 +47,7 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
 
         for action in actions:
             t1 = time.time()
-            rich.print(f"Building action '{action}':")
+            output_info(f"Building action '{action}':")
 
             progress.start()
             scheduler.start_run(action, always_make=always_make)
@@ -56,12 +57,10 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
             scheduler.shutdown()
 
             if status:
-                rich.print(
-                    f"[green]Action '{action}' completed in {time.time() - t1:.2f} s."
-                )
+                output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
             else:
-                rich.print(
-                    f"[red]Action '{action}' failed after {time.time() - t1:.2f} s."
+                output_error(
+                    f"Action '{action}' failed after {time.time() - t1:.2f} s."
                 )
 
             # cs = build(action)
@@ -74,10 +73,10 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
             #     )
             # rich.print("=========================================")
     except KeyboardInterrupt:
-        rich.print("\n[yellow]Build was interrupted by user.[/yellow]")
+        output_warning("\n[yellow]Build was interrupted by user.[/yellow]")
         return False
     except KeyError as e:
-        rich.print(f"[red]Error: Action '{e}' not found.[/red]")
+        output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
         progress.stop()
@@ -91,7 +90,7 @@ def clean(actions: List[str]):
         init_status_listeners()
 
         for action in actions:
-            rich.print(f"Cleaning action '{action}':")
+            output_info(f"Cleaning action '{action}':")
             scheduler.prepare_run(action)
             for job_name in scheduler.job_graph.get_all_jobs():
                 job = scheduler.build_actions.get(job_name, None)
@@ -103,16 +102,16 @@ def clean(actions: List[str]):
                         if stat.S_ISREG(s.st_mode):
                             os.unlink(output)
                         elif stat.S_ISDIR(s.st_mode):
-                            rich.print(f"Removing directory: {output}")
+                            output_info(f"Removing directory: {output}")
                             shutil.rmtree(output)
                     except FileNotFoundError:
                         pass
             scheduler.shutdown()
     except KeyboardInterrupt:
-        rich.print("[yellow]Build was interrupted by user.[/yellow]")
+        output_warning("Build was interrupted by user.")
         return False
     except KeyError as e:
-        rich.print(f"[yellow]Error: Action '{e}' not found.[/yellow]")
+        output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
         progress.stop()
@@ -122,7 +121,7 @@ def clean(actions: List[str]):
 
 
 def check(actions: List[str]):
-    print("check")
+    output_info("check")
     t0 = time.time()
     init_status_listeners()
 
@@ -130,9 +129,9 @@ def check(actions: List[str]):
         t1 = time.time()
         with rich.status.Status(f"Preparing action '{action}':"):
             scheduler.prepare_run(action)
-        rich.print(f"Action '{action}' prepared in {time.time() - t1:.2f} s.")
+        output_info(f"Action '{action}' prepared in {time.time() - t1:.2f} s.")
 
-    rich.print(f"Total time for --check was {time.time() - t0:.2f} s.")
+    output_info(f"Total time for --check was {time.time() - t0:.2f} s.")
     return True
 
 
@@ -140,14 +139,14 @@ def list_actions() -> bool:
     entrypoints = [x for x in scheduler.build_actions.values() if x.is_entrypoint]
 
     if entrypoints:
-        rich.print("Available actions:")
+        output_info("Available actions:")
         for action in sorted(entrypoints, key=lambda x: x.name):
-            rich.print(f"  {action.name}")
+            output_info(f"  {action.name}")
         return True
     else:
         program_name = os.path.basename(sys.argv[0])
-        rich.print("[yellow]Loaded build files but no entrypoints were found.[/yellow]")
-        rich.print(f"[yellow]Type `{program_name} --help` for help.[/yellow]")
+        output_error("Loaded build files but no entrypoints were found.")
+        output_error(f"Type `{program_name} --help` for help.")
         return False
 
 
@@ -158,7 +157,7 @@ def print_no_actions_text(configuration: ByggFile | None):
 def print_version():
     import importlib.metadata
 
-    print(f"{__package__} {importlib.metadata.version(__package__)}")
+    output_info(f"{__package__} {importlib.metadata.version(__package__)}")
 
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
@@ -183,11 +182,11 @@ def dispatcher(args: argparse.Namespace):
 
     if directory and not is_restarted_with_env:
         directory_arg = args.directory[0]
-        rich.print(f"Entering directory '{directory_arg}'")
+        output_info(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
 
     if not os.path.isfile(PYTHON_INPUTFILE) and not os.path.isfile(YAML_INPUTFILE):
-        rich.print("No build files found.")
+        output_error("No build files found.")
         sys.exit(1)
 
     configuration = read_config_file()
@@ -217,9 +216,9 @@ def dispatcher(args: argparse.Namespace):
                 if process.returncode != 0:
                     sys.exit(process.returncode)
             except FileNotFoundError:
-                rich.print(
-                    f"[red]Error: Could not restart with '{restart_with}'.[/red]\n"
-                    f"[yellow]Please make sure that bygg is in your pip requirements list for this environment.[/yellow]"
+                output_error(f"Error: Could not restart with '{restart_with}'.")
+                output_warning(
+                    "Please make sure that bygg is in your pip requirements list for this environment."
                 )
                 sys.exit(1)
         else:
@@ -405,7 +404,7 @@ def main():
     try:
         return dispatcher(args)
     except KeyboardInterrupt:
-        rich.print("[red]Interrupted by user. Aborting.[/red]")
+        output_warning("Interrupted by user. Aborting.")
         return 1
 
 
