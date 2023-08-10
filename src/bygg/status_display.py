@@ -1,9 +1,7 @@
 from typing import Set
 
 import rich
-import rich.box
 import rich.progress
-import rich.status
 import rich.table
 
 from bygg.action import Action
