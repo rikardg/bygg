@@ -15,6 +15,12 @@ files = ["requirements.txt"]
 name = "bygg"
 dynamic = ["dependencies", "version"]
 
+# Replace the line above with the next two lines to use a static version number, e.g. if you don't
+# have the full git repo available:
+
+# dynamic = ["dependencies"]
+# version = "0.0.0.dev0"
+
 authors = [
   { name="Rikard Gillemyr", email="rikard.gillemyr@gmail.com" },
 ]
