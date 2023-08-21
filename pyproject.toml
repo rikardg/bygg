@@ -21,17 +21,15 @@ dynamic = ["dependencies", "version"]
 # dynamic = ["dependencies"]
 # version = "0.0.0.dev0"
 
-authors = [
-  { name="Rikard Gillemyr", email="rikard.gillemyr@gmail.com" },
-]
+authors = [{ name = "Rikard Gillemyr", email = "rikard.gillemyr@gmail.com" }]
 description = "A small build system"
 readme = "README.md"
-license = { file="LICENSE" }
+license = { file = "LICENSE" }
 requires-python = ">=3.11"
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 
 [project.scripts]
