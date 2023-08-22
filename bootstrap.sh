@@ -2,7 +2,7 @@
 
 if [ ! -d ./.venv ] ; then
   echo "Creating Python virtualenv:"
-  python -m venv .venv
+  python3 -m venv .venv
 fi
 
 echo "Installing dependencies:"
