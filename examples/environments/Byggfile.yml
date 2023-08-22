@@ -32,7 +32,7 @@ environments:
       - "requirements1.txt"
     venv_directory: .venv1
     shell: |
-      python -m venv .venv1
+      python3 -m venv .venv1
       .venv1/bin/pip install -r requirements1.txt
       .venv1/bin/pip install -e ../../
 
@@ -42,7 +42,7 @@ environments:
       - "requirements2.txt"
     venv_directory: .venv2
     shell: |
-      python -m venv .venv2
+      python3 -m venv .venv2
       .venv2/bin/pip install -r requirements2.txt
       .venv2/bin/pip install -e ../../
 
@@ -52,6 +52,6 @@ environments:
       - requirements.txt
     venv_directory: .venv
     shell: |
-      python -m venv .venv
+      python3 -m venv .venv
       .venv/bin/pip install -r requirements.txt
       .venv/bin/pip install -e ../../
