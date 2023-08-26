@@ -23,6 +23,7 @@ def examples(session):
 
     with session.chdir("examples/only_python"):
         session.run("bygg")
+        session.run("bygg", "hello")
         session.run("bygg", "--clean")
 
     with session.chdir("examples/parametric"):
