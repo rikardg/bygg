@@ -5,23 +5,10 @@ machines = [
   {
     :hostname => "fedora",
     :box => "fedora/38-cloud-base",
-    :shellscript => <<-'SCRIPT'
-      sudo dnf update -y
-      sudo dnf install -y git pipx python3-pip neovim kitty-terminfo zsh
-      cp /etc/skel/.zshrc /home/vagrant/.zshrc && chown vagrant:vagrant /home/vagrant/.zshrc && echo "export PATH=/home/vagrant/.local/bin:$PATH" >> /home/vagrant/.zshrc
-      cp /etc/skel/.bashrc /home/vagrant/.bashrc && chown vagrant:vagrant /home/vagrant/.bashrc && echo "export PATH=/home/vagrant/.local/bin:$PATH" >> /home/vagrant/.bashrc
-      SCRIPT
   },
   {
     :hostname => "debian",
     :box => "debian/bookworm64",
-    :shellscript => <<-'SCRIPT'
-      sudo apt update
-      sudo apt dist-upgrade -y
-      sudo apt install -y git pipx python3-pip python3-venv neovim kitty-terminfo zsh
-      cp /etc/zsh/newuser.zshrc.recommended /home/vagrant/.zshrc && chown vagrant:vagrant /home/vagrant/.zshrc && echo "export PATH=/home/vagrant/.local/bin:$PATH" >> /home/vagrant/.zshrc
-      cp /etc/skel/.bashrc /home/vagrant/.bashrc && chown vagrant:vagrant /home/vagrant/.bashrc && echo "export PATH=/home/vagrant/.local/bin:$PATH" >> /home/vagrant/.bashrc
-      SCRIPT
   },
 ]
 
@@ -37,8 +24,9 @@ Vagrant.configure(2) do |config|
       node.vm.box = machine[:box]
       node.vm.hostname = machine[:hostname]
       node.vm.provision "shell",
-        inline: machine[:shellscript]
-      node.vm.synced_folder ".", "/bygg", type: "rsync"
+        path: "Vagrantsetup.sh",
+        privileged: false
+      node.vm.synced_folder ".", "/home/vagrant/bygg", type: "rsync"
     end
   end
 end
