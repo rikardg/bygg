@@ -97,6 +97,46 @@ like which virtual environment to use, but can also be used for declaring
 simple actions. See `examples/taskrunner/Byggfile.yml` and
 `examples/environments/Byggfile.yml`.
 
+## Shell tab completions
+
+Bygg has support for Bash and Zsh tab completions of entrypoint actions. The completions will be loaded:
+
+- from `Byggfile.py` if if `Byggfile.yml` doesn't exist, or there are no environments declared in `Byggfile.yml`.
+- from `Byggfile.yml` -- in this case, no Python files will be loaded to look
+  for entrypoint actions.
+
+### Bygg is installed with pipx or pip
+
+Add the following lines to `.bashrc` or `.zshrc`:
+
+```shell
+`eval "$($(dirname $(readlink -f $(which bygg)))/register-python-argcomplete bygg)"`
+```
+
+### Bygg is installed in its own virtual environment managed by you
+
+Add the following line to `.bashrc` or `.zshrc`:
+
+```shell
+eval "$(.your_bygg_venv/bin/register-python-argcomplete .your_bygg_venv/bin/bygg)"
+```
+
+_Don't forget to open a new shell instance after you've made changes to the
+settings files._
+
+### Note for Zsh + argcomplete v2 users
+
+The recommended setup above uses the argcomplete that is installed with Bygg,
+since this version (starting with v3) has proper support for Zsh so that the
+action completions will show descriptions. If you for whatever reason need to
+use a lower version of argcomplete you need to load the Bash compatibility
+layer first, and then the Bygg completions:
+
+```shell
+autoload -U bashcompinit ; bashcompinit
+eval "$(register-python-argcomplete bygg)"
+```
+
 ## Getting a local copy
 
 If you want to try out the examples or even develop Bygg itself, Bygg can be

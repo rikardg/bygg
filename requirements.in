@@ -1,4 +1,5 @@
 # Core
+argcomplete==3.1.1
 dill==0.3.6
 msgspec==0.16.0
 multiprocess==0.70.14

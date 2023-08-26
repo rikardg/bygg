@@ -48,6 +48,7 @@ class Action(ActionContext):
     def __init__(
         self,
         name: str,
+        description: str | None = None,
         message: str | None = None,
         inputs: Optional[Iterable[str]] = None,
         outputs: Optional[Iterable[str]] = None,
@@ -60,6 +61,7 @@ class Action(ActionContext):
         from bygg.scheduler import scheduler
 
         self.name = name
+        self.description = description
         self.message = message
         self.inputs = {*inputs} if inputs else set()
         self.outputs = {*outputs} if outputs else set()

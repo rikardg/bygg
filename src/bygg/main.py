@@ -1,3 +1,5 @@
+# PYTHON_ARGCOMPLETE_OK
+
 import argparse
 from dataclasses import dataclass
 from multiprocessing import cpu_count
@@ -7,11 +9,13 @@ import stat
 import subprocess
 import sys
 import time
-from typing import List
+from typing import Any, List
 
+import argcomplete
 import rich
 import rich.status
 
+from bygg.action import Action
 from bygg.apply_configuration import apply_configuration
 from bygg.configuration import (
     PYTHON_INPUTFILE,
@@ -135,13 +139,27 @@ def check(actions: List[str]):
     return True
 
 
-def list_actions() -> bool:
-    entrypoints = [x for x in scheduler.build_actions.values() if x.is_entrypoint]
+def get_entrypoints(configuration: ByggFile | None) -> List[Action]:
+    entrypoints = []
+    if configuration:
+        entrypoints += [x for x in configuration.actions if x.is_entrypoint]
+
+    if not configuration or not configuration.environments:
+        entrypoints += [x for x in scheduler.build_actions.values() if x.is_entrypoint]
+
+    return entrypoints
+
+
+def list_actions(configuration: ByggFile | None) -> bool:
+    entrypoints = get_entrypoints(configuration)
 
     if entrypoints:
+        max_width = max([len(x.name) for x in entrypoints])
         output_info("Available actions:")
         for action in sorted(entrypoints, key=lambda x: x.name):
-            output_info(f"  {action.name}")
+            output_info(
+                f"  {action.name: <{max_width}} : {action.description if action.description else 'No description'}"
+            )
         return True
     else:
         program_name = os.path.basename(sys.argv[0])
@@ -151,7 +169,7 @@ def list_actions() -> bool:
 
 
 def print_no_actions_text(configuration: ByggFile | None):
-    return list_actions()
+    return list_actions(configuration)
 
 
 def print_version():
@@ -161,6 +179,11 @@ def print_version():
 
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
+
+
+def list_actions_and_exit(configuration: ByggFile | None):
+    status = list_actions(configuration)
+    sys.exit(0) if status else sys.exit(1)
 
 
 def dispatcher(args: argparse.Namespace):
@@ -190,12 +213,20 @@ def dispatcher(args: argparse.Namespace):
         sys.exit(1)
 
     configuration = read_config_file()
+
+    if args.list:
+        list_actions_and_exit(configuration)
+
     action_partitions = partition_actions(configuration, args.actions)
 
     if not action_partitions:
         if os.path.isfile(PYTHON_INPUTFILE):
             # No configuration file, so load the Python build file directly.
             apply_configuration(None, None, None)
+            # TODO will not be needed once we allow configuring default action also in
+            # Python.
+            if not args.actions:
+                list_actions_and_exit(configuration)
             status = do_dispatch(args, args.actions)
         else:
             status = print_no_actions_text(configuration)
@@ -228,9 +259,7 @@ def dispatcher(args: argparse.Namespace):
 
 
 def do_dispatch(args: argparse.Namespace, actions: List[str]) -> bool:
-    if args.list or not actions:
-        status = list_actions()
-    elif args.check:
+    if args.check:
         status = check(actions)
     elif args.clean:
         status = clean(actions)
@@ -306,6 +335,11 @@ def partition_actions(
         return action_partitions
 
 
+def entrypoint_completions(prefix, parsed_args, **kwargs):
+    entrypoints = get_entrypoints(read_config_file())
+    return {x.name: x.message for x in entrypoints}
+
+
 def create_argument_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -325,15 +359,24 @@ List available actions:
  %(prog)s --list
 """,
     )
-    parser.add_argument(
+
+    # Use Any to get around type checking for argcomplete:
+    actions_action: Any = parser.add_argument(
         "actions",
         nargs="*",
         default=None,
         help="Entrypoint actions to operate on.",
     )
+
+    actions_action.completer = entrypoint_completions
+
+    # Only add completions for the actions:
+    argcomplete.autocomplete(parser, exclude=["-h", "--help"])
+
     parser.add_argument(
         "-v", "--version", action="store_true", help="Show version string and exit."
     )
+
     parser.add_argument(
         "--is_restarted_with_env",
         nargs=1,
@@ -394,6 +437,7 @@ List available actions:
         action="store_true",
         help="Generate a JSON Schema for the Byggfile.yml files. The schema will be printed to stdout.",
     )
+
     return parser
 
 
