@@ -4,6 +4,7 @@ mypy==1.5.1
 nox==2023.4.22
 pip==23.1.2
 pip-tools==7.3.0
+pyright==1.1.325
 pytest==7.4.0
 ruff==0.0.286
 setuptools==68.0.0

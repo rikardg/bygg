@@ -1,4 +1,4 @@
-name: Run tests
+name: Code quality
 on:
   push:
     branches: [ "**" ]
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  nox:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -26,3 +26,20 @@ jobs:
     - name: Test with nox
       run: |
         nox
+
+  pyright:
+    runs-on: "ubuntu-latest"
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+    - name: Install dependencies
+      run: |
+        python3 -m venv .venv
+        .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+    - name: Type check with Pyright
+      run: |
+        . .venv/bin/activate
+        pyright examples/ src/ tests/
