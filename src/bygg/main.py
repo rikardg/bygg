@@ -2,7 +2,6 @@
 
 import argparse
 from dataclasses import dataclass
-from multiprocessing import cpu_count
 import os
 import shutil
 import stat
@@ -31,8 +30,12 @@ from bygg.status_display import on_job_status, on_runner_status, progress
 
 
 def get_job_count_limit():
-    # TODO use affinity instead (on U**X): https://stackoverflow.com/a/55423170
-    return cpu_count()
+    try:
+        # Use os.sched_getaffinity where available (on U**X):
+        # https://stackoverflow.com/a/55423170
+        return len(os.sched_getaffinity(0))
+    except AttributeError:
+        return os.cpu_count()
 
 
 def init_status_listeners():
