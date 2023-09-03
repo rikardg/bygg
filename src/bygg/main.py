@@ -35,7 +35,9 @@ def get_job_count_limit():
         # https://stackoverflow.com/a/55423170
         return len(os.sched_getaffinity(0))
     except AttributeError:
-        return os.cpu_count()
+        count = os.cpu_count()
+        assert count is not None
+        return count
 
 
 def init_status_listeners():
