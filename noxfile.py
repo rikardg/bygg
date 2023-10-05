@@ -3,21 +3,24 @@ import nox
 nox.options.error_on_external_run = True
 
 
-@nox.session(python=["3.11"])
+python_versions = ["3.11", "3.12"]
+
+
+@nox.session(python=python_versions)
 def tests(session):
     session.install("-r", "requirements.txt", "-r", "requirements-dev.txt")
     session.install(".")
     session.run("pytest")
 
 
-@nox.session(python=["3.11"])
+@nox.session(python=python_versions)
 def basics(session):
     session.install(".")
     session.run("bygg", success_codes=[1], silent=True)
     session.run("bygg", "--help", silent=True)
 
 
-@nox.session(python=["3.11"])
+@nox.session(python=python_versions)
 def examples(session):
     session.install(".")
 
