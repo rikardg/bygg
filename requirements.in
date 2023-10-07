@@ -1,7 +1,7 @@
 # Core
-argcomplete==3.1.1
-dill==0.3.6
+argcomplete==3.1.2
+dill==0.3.7
 msgspec==0.18.4
-multiprocess==0.70.14
+multiprocess==0.70.15
 PyYAML==6.0.1 # msgspec requires this as an ambient
-rich==13.4.2
+rich==13.6.0
