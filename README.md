@@ -178,12 +178,12 @@ With Bygg's virtual environment activated per above, tests can be run from the r
 pytest
 ```
 
-With the virtual environment _deactivated_, the full test suite (so far
-synonymous to just running `pytest` though) can be run with `nox`. Nox should
-be installed globally since it manages its own virtual environments:
+With the virtual environment _deactivated_, the full test suite can be run with
+[Nox](https://nox.thea.codes/en/stable/). Nox should be installed outside of
+the virtual environment since it manages its own virtual environments:
 
 ```shell
-pipx install nox
+pip install --user --upgrade nox
 ```
 
 After that, run tests with
