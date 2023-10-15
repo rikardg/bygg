@@ -7,6 +7,7 @@ from bygg.action import Action, CommandStatus
 from bygg.cache import Cache
 from bygg.dag import Dag, create_dag
 from bygg.digest import calculate_dependency_digest, calculate_digest
+from bygg.status_display import on_check_failed
 
 
 class Job:
@@ -49,6 +50,7 @@ class Scheduler:
 
     started: bool
     always_make: bool
+    check_inputs_outputs_set: Set[str] | None
 
     def __init__(self):
         self.cache = Cache()
@@ -60,6 +62,7 @@ class Scheduler:
         self.finished_jobs = {}
         self.started = False
         self.always_make = False
+        self.check_inputs_outputs_set = None
 
     def init_cache(self, cache_file: Path):
         self.cache = Cache(cache_file)
@@ -80,8 +83,11 @@ class Scheduler:
                 action.dependency_files.update(self.build_actions[dependency].outputs)
             # print(f"Action {action.name} inputs: {action._dependency_files}")
 
-    def start_run(self, entrypoint: str, *, always_make: bool = False):
+    def start_run(
+        self, entrypoint: str, *, always_make: bool = False, check: bool = False
+    ):
         self.always_make = always_make
+        self.check_inputs_outputs_set = set() if check else None
         self.prepare_run(entrypoint)
         self.cache.load()
         self.started = True
@@ -190,7 +196,7 @@ class Scheduler:
         if len(self.ready_jobs) == 0:
             return []
 
-        job_list = []
+        job_list: List[Job] = []
         for _ in range(
             len(self.ready_jobs)
             if batch_size == 0
@@ -200,6 +206,23 @@ class Scheduler:
             new_job = Job(action)
             self.running_jobs[new_job.name] = new_job
             job_list.append(new_job)
+
+        if self.check_inputs_outputs_set is not None:
+            # Check that no job has outputs that are inputs to an earlier job
+            self.check_inputs_outputs_set.update(
+                *[job.action.inputs for job in job_list],
+                *[job.action.dependency_files for job in job_list],
+            )
+            for job in job_list:
+                overlap = job.action.outputs & self.check_inputs_outputs_set
+                if overlap:
+                    plural = len(overlap) > 1
+                    on_check_failed(
+                        "check_inputs_outputs",
+                        job.action,
+                        f"Output{'s' if plural else ''} was declared as input{'s' if plural else ''} to earlier action: {', '.join(overlap)}",
+                        "error",
+                    )
 
         return job_list
 

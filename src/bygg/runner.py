@@ -1,14 +1,15 @@
 import os
 import signal
-from typing import Callable, List, Literal
+from typing import Callable, List
 
 import multiprocess.managers  # type: ignore
 from multiprocess.pool import ApplyResult, Pool  # type: ignore
 
 from bygg.action import Action, CommandStatus
+from bygg.common_types import JobStatus
 from bygg.scheduler import Job, scheduler
+from bygg.status_display import on_check_failed
 
-JobStatus = Literal["queued", "running", "finished", "failed", "stopped", "skipped"]
 JobStatusListener = Callable[[str, JobStatus, Action, CommandStatus | None], None]
 RunnerStatusListener = Callable[[str], None]
 
@@ -106,16 +107,18 @@ class ProcessRunner:
                 if not queued_job.ready():
                     scheduled_queue.append(queued_job)  # add it back to the queue
                 else:
-                    job_result = queued_job.get()
+                    job_result: Job = queued_job.get()
                     missing_files = self.check_for_missing_output_files(job_result)
                     if missing_files:
-                        # TODO This should be a job status, not a runner status
-                        self.runner_status_listener(
-                            f"[red]Job [bold]{job_result.name}[/bold] didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: [bold]{', '.join(missing_files)}"
+                        on_check_failed(
+                            "output_file_missing",
+                            job_result.action,
+                            f"Job [bold]{job_result.name}[/bold] didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: [bold]{', '.join(missing_files)}[/bold]",
+                            "error",
                         )
 
                     scheduler.job_finished(job_result)
-                    if job_result.status.rc == 0:
+                    if job_result.status is not None and job_result.status.rc == 0:
                         self.job_status_listener(
                             job_result.name,
                             "finished",

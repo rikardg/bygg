@@ -11,8 +11,6 @@ import time
 from typing import Any, List
 
 import argcomplete
-import rich
-import rich.status
 
 from bygg.action import Action
 from bygg.apply_configuration import apply_configuration
@@ -26,7 +24,13 @@ from bygg.configuration import (
 from bygg.output import output_error, output_info, output_ok, output_warning
 from bygg.runner import runner
 from bygg.scheduler import scheduler
-from bygg.status_display import on_job_status, on_runner_status, progress
+from bygg.status_display import (
+    failed_checks,
+    on_job_status,
+    on_runner_status,
+    output_check_results,
+    progress,
+)
 
 
 def get_job_count_limit():
@@ -48,7 +52,26 @@ def init_status_listeners():
     runner.runner_status_listener = on_runner_status
 
 
-def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
+def build(
+    actions: List[str],
+    job_count: int | None,
+    always_make: bool,
+    check: bool,
+) -> bool:
+    """
+    actions: The actions to build.
+
+    job_count: The number of jobs to run simultaneously. None means to use the number of
+    available cores.
+
+    always_make: If True, all actions will be built, even if they are up to date.
+
+    check: If True, apply various checks:
+
+    * Check that the inputs and outputs of all actions will be checked for consistency.
+      A job that runs later must not have files as output that are inputs to a job that
+      runs earlier.
+    """
     try:
         init_status_listeners()
 
@@ -59,7 +82,11 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
             output_info(f"Building action '{action}':")
 
             progress.start()
-            scheduler.start_run(action, always_make=always_make)
+            scheduler.start_run(
+                action,
+                always_make=always_make,
+                check=check,
+            )
             status = runner.start(max_workers)
             progress.disable
             progress.stop()
@@ -90,6 +117,9 @@ def build(actions: List[str], job_count: int | None, always_make: bool) -> bool:
     finally:
         progress.stop()
         scheduler.shutdown()
+
+    if check and failed_checks:
+        return output_check_results()
 
     return True
 
@@ -126,21 +156,6 @@ def clean(actions: List[str]):
         progress.stop()
         scheduler.shutdown()
 
-    return True
-
-
-def check(actions: List[str]):
-    output_info("check")
-    t0 = time.time()
-    init_status_listeners()
-
-    for action in actions:
-        t1 = time.time()
-        with rich.status.Status(f"Preparing action '{action}':"):
-            scheduler.prepare_run(action)
-        output_info(f"Action '{action}' prepared in {time.time() - t1:.2f} s.")
-
-    output_info(f"Total time for --check was {time.time() - t0:.2f} s.")
     return True
 
 
@@ -264,13 +279,13 @@ def dispatcher(args: argparse.Namespace):
 
 
 def do_dispatch(args: argparse.Namespace, actions: List[str]) -> bool:
-    if args.check:
-        status = check(actions)
-    elif args.clean:
+    # Analysis implies building:
+    always_make = args.always_make or args.check
+    if args.clean:
         status = clean(actions)
     else:
         jobs = int(args.jobs) if args.jobs else None
-        status = build(actions, jobs, args.always_make)
+        status = build(actions, jobs, always_make, args.check)
 
     return status
 
@@ -395,12 +410,6 @@ List available actions:
     )  # add_mutually_exclusive_group doesn't accept a title, so wrap it in a regular group.
     build_setup_group = build_setup_wrapper_group.add_mutually_exclusive_group()
     build_setup_group.add_argument(
-        "-c",
-        "--check",
-        action="store_true",
-        help="Check the specified actions.",
-    )
-    build_setup_group.add_argument(
         "--clean",
         action="store_true",
         help="Clean the outputs of the specified actions.",
@@ -435,6 +444,18 @@ List available actions:
         action="store_true",
         help="Always build all actions.",
     )
+
+    # Analyse and verify:
+    analyse_group = parser.add_argument_group(
+        "Analyse and verify",
+        "Arguments in this group will add more analysis to the build process. Actions will be built and the analysis result will be reported.",
+    )
+    analyse_group.add_argument(
+        "--check",
+        action="store_true",
+        help="Perform various checks on the action tree. Implies -B",
+    )
+
     # Meta arguments:
     meta_group = parser.add_argument_group("Meta arguments")
     meta_group.add_argument(
