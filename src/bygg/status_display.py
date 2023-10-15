@@ -1,12 +1,13 @@
-from typing import Set
+from dataclasses import dataclass
+from typing import List, Literal, Set
 
 import rich
 import rich.progress
 import rich.table
 
 from bygg.action import Action
-from bygg.common_types import CommandStatus
-from bygg.runner import JobStatus
+from bygg.common_types import CommandStatus, JobStatus, Severity
+from bygg.output import output_error, output_warning
 
 console = rich.console.Console()
 
@@ -83,3 +84,52 @@ def on_job_status(
         print_job_ended(name, job_status, action, status)
         if name in running_jobs:
             running_jobs.remove(name)
+
+
+CheckRule = Literal["check_inputs_outputs", "output_file_missing"]
+"""
+The different rules that can be checked.
+
+    check_inputs_outputs: Check that earlier actions don't need outputs from subsequent
+    actions.
+
+    output_file_missing: Check that actions create the files that they declare as
+    outputs.
+"""
+
+
+@dataclass
+class CheckStatus:
+    rule_name: CheckRule
+    action: Action
+    status_text: str
+    severity: Severity
+
+
+failed_checks: List[CheckStatus] = []
+
+
+def on_check_failed(
+    rule_name: CheckRule, action: Action, status_text: str, severity: Severity
+):
+    failed_checks.append(CheckStatus(rule_name, action, status_text, severity))
+
+
+def output_check_results():
+    status = True
+    output_error("The following checks reported issues:")
+    for c in failed_checks:
+        compound_status = f"{c.rule_name} :: {c.action.name} :: {c.status_text}"
+        match c.severity:
+            case "error":
+                status = False
+                output_error(compound_status)
+            case "warning":
+                status = False
+                output_warning(compound_status)
+            case "info":
+                continue
+            case _:
+                raise ValueError(f"Unhandled severity {c.severity}")
+
+    return status

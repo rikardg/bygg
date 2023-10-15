@@ -56,3 +56,8 @@ def examples(session):
 
         session.run("bygg", "action1", "default_action", "action2")
         session.run("bygg", "clean_environments")
+
+    with session.chdir("examples/checks"):
+        session.run("bygg")
+        session.run("bygg", "--check", success_codes=[1])
+        session.run("bygg", "all_checks", "--check", success_codes=[1])

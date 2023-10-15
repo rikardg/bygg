@@ -1,0 +1,52 @@
+settings:
+  default_action: all_checks
+
+actions:
+  - name: "all_checks"
+    description: |
+      Run all test actions declared in this file. Should trigger all tested checks when run with
+      --check.
+    is_entrypoint: true
+    dependencies:
+      - check_inputs_outputs
+      - output_file_missing
+
+  # Circular dependencies
+  - name: "circular_A"
+    outputs: ["foo"]
+    shell: |
+      touch foo
+
+  - name: "circular_B"
+    dependencies: ["circular_A"]
+    inputs: ["foo"]
+    outputs: ["bar"]
+    shell: |
+      touch bar
+
+  - name: "circular_C"
+    dependencies: ["circular_B"]
+    inputs: ["bar"]
+    outputs: ["foo"]
+
+  - name: "check_inputs_outputs"
+    description: |
+      Example where a later action has the input of an earlier one as its output. This should
+      trigger check_inputs_outputs when run with --check.
+    is_entrypoint: true
+    dependencies: ["circular_C"]
+
+  # Actions that don't create their outputs
+  - name: "output_file_missing"
+    description: |
+      Example that doesn't create the outputs that it declares. This should trigger
+      output_file_missing when run with --check.
+    is_entrypoint: true
+    dependencies: ["no_outputs_A"]
+    inputs: ["no_outputs_A"]
+    outputs: ["no_outputs"]
+    shell: "true"
+
+  - name: "no_outputs_A"
+    outputs: ["no_outputs_A"]
+    shell: "true"
