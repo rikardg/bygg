@@ -1,5 +1,5 @@
 from collections import deque
-from typing import Any, Dict, Iterable, List, Set
+from typing import Any, Dict, Iterable, List
 
 from bygg.action import Action
 
@@ -28,53 +28,71 @@ class Dag:
         ...
 
 
-class GraphlibDag(Dag):
-    nodes: Set[str]
-
+class GtDag(Dag):
     def __init__(self):
-        import graphlib
+        import graph
 
-        self.graph = graphlib.TopologicalSorter()
-        self.nodes = set()
+        self.graph = graph.Graph()
 
     def __len__(self):
-        return len(self.nodes)
+        nodes = self.graph.nodes()
+        if nodes is None:
+            return 0
+        return len(nodes)
 
     def clear(self):
-        import graphlib
-
-        self.graph = graphlib.TopologicalSorter()
-        self.nodes = set()
+        nodes = self.graph.nodes()
+        if nodes is None:
+            return
+        for n in nodes:
+            self.graph.del_node(n)
 
     def remove_node(self, node: str):
-        self.graph.done(node)
-        self.nodes.remove(node)
+        self.graph.del_node(node)
 
     def build_action_graph(self, build_actions: Dict[str, Action], action: Action):
         """Build the action graph."""
         queue = deque([action])
         while len(queue) > 0:
             a = queue.popleft()
-            self.graph.add(a.name)
-            self.nodes.add(a.name)
+            self.graph.add_node(a.name)
             for dependency in a.dependencies:
                 dependency_action = build_actions.get(dependency)
                 if not dependency_action:
                     raise ValueError(f"Action '{dependency}' not found")
                 queue.append(dependency_action)
-                self.graph.add(a.name, dependency)
-        self.graph.prepare()
+                self.graph.add_edge(a.name, dependency)
 
     def get_ready_jobs(
         self,
         finished_jobs: Dict[str, Any],
         running_jobs: Dict[str, Any],
     ) -> List[str]:
-        return list(self.graph.get_ready())
+        nodes = self.graph.nodes()
+        if nodes is None:
+            return []
+        if len(nodes) == 1 and (
+            nodes[0] not in finished_jobs and nodes[0] not in running_jobs
+        ):
+            return nodes
+
+        new_nodes = self.graph.nodes(out_degree=0)
+        if new_nodes is None:
+            return []
+
+        new_jobs = [
+            n for n in new_nodes if n not in finished_jobs and n not in running_jobs
+        ]
+
+        # print(f"new jobs: {len(new_jobs)}")
+        return new_jobs
 
     def get_all_jobs(self) -> Iterable[str]:
-        return list(self.nodes)
+        nodes = self.graph.nodes()
+        if nodes is None:
+            return []
+        return nodes
 
 
 def create_dag() -> Dag:
-    return GraphlibDag()
+    return GtDag()
