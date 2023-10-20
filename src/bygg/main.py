@@ -7,6 +7,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import textwrap
 import time
 from typing import Any, List
 
@@ -21,7 +22,15 @@ from bygg.configuration import (
     dump_schema,
     read_config_file,
 )
-from bygg.output import output_error, output_info, output_ok, output_warning
+from bygg.output import (
+    TerminalStyle as TS,
+)
+from bygg.output import (
+    output_error,
+    output_info,
+    output_ok,
+    output_warning,
+)
 from bygg.runner import runner
 from bygg.scheduler import scheduler
 from bygg.status_display import (
@@ -170,22 +179,63 @@ def get_entrypoints(configuration: ByggFile | None) -> List[Action]:
     return entrypoints
 
 
+list_actions_style = "B"
+
+
 def list_actions(configuration: ByggFile | None) -> bool:
     entrypoints = get_entrypoints(configuration)
 
-    if entrypoints:
-        max_width = max([len(x.name) for x in entrypoints])
-        output_info("Available actions:")
-        for action in sorted(entrypoints, key=lambda x: x.name):
-            output_info(
-                f"  {action.name: <{max_width}} : {action.description if action.description else 'No description'}"
-            )
-        return True
-    else:
+    if not entrypoints:
         program_name = os.path.basename(sys.argv[0])
         output_error("Loaded build files but no entrypoints were found.")
         output_error(f"Type `{program_name} --help` for help.")
         return False
+
+    terminal_cols, terminal_rows = shutil.get_terminal_size()
+    output = [f"{TS.BOLD}Available actions:{TS.RESET}"]
+
+    if list_actions_style == "A":
+        output.append("")
+        section_indent = 0
+        separator = " : "
+        max_name_width = max([len(x.name) for x in entrypoints])
+        width = min(terminal_cols, 80)
+        subsequent_indent = " " * (section_indent + max_name_width + len(separator))
+        for action in sorted(entrypoints, key=lambda x: x.name):
+            description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description if action.description else 'No description'}"
+            output.extend(
+                textwrap.wrap(
+                    description,
+                    width=width,
+                    initial_indent=" " * section_indent,
+                    subsequent_indent=subsequent_indent,
+                )
+            )
+            output.append("")
+
+    if list_actions_style == "B":
+        output.append("")
+        for action in sorted(entrypoints, key=lambda x: x.name):
+            output.append(f"{TS.BOLD}{action.name}{TS.RESET}")
+            output.append(
+                textwrap.fill(
+                    action.description if action.description else "No description",
+                    initial_indent="    ",
+                    subsequent_indent="    ",
+                )
+            )
+            output.append("")
+
+    if len(output) > terminal_rows:
+        from rich.console import Console
+
+        console = Console()
+        with console.pager():
+            console.print("\n".join(output))
+    else:
+        print("\n".join(output))
+
+    return True
 
 
 def print_no_actions_text(configuration: ByggFile | None):
