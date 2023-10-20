@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ ! -d ./.venv ] ; then
   echo "Creating Python virtualenv:"
   python3 -m venv .venv
