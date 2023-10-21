@@ -38,7 +38,6 @@ from bygg.status_display import (
     on_job_status,
     on_runner_status,
     output_check_results,
-    progress,
 )
 
 
@@ -90,15 +89,12 @@ def build(
             t1 = time.time()
             output_info(f"Building action '{action}':")
 
-            progress.start()
             scheduler.start_run(
                 action,
                 always_make=always_make,
                 check=check,
             )
             status = runner.start(max_workers)
-            progress.disable
-            progress.stop()
             scheduler.shutdown()
 
             if status:
@@ -108,23 +104,13 @@ def build(
                     f"Action '{action}' failed after {time.time() - t1:.2f} s."
                 )
 
-            # cs = build(action)
-            # if cs is None:
-            #     rich.print(f"Action '{action}' is up to date.")
-            # else:
-            #     rich.print(f"Action '{action}' completed with return code {cs.rc}.")
-            #     rich.print(
-            #         f"{len(cs.changed_files)} files changed in {time() - t1:.2f} s."
-            #     )
-            # rich.print("=========================================")
     except KeyboardInterrupt:
-        output_warning("\n[yellow]Build was interrupted by user.[/yellow]")
+        output_warning("\nBuild was interrupted by user.")
         return False
     except KeyError as e:
         output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
-        progress.stop()
         scheduler.shutdown()
 
     if check and failed_checks:
@@ -162,7 +148,6 @@ def clean(actions: List[str]):
         output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
-        progress.stop()
         scheduler.shutdown()
 
     return True
@@ -226,14 +211,7 @@ def list_actions(configuration: ByggFile | None) -> bool:
             )
             output.append("")
 
-    if len(output) > terminal_rows:
-        from rich.console import Console
-
-        console = Console()
-        with console.pager():
-            console.print("\n".join(output))
-    else:
-        print("\n".join(output))
+    print("\n".join(output))
 
     return True
 

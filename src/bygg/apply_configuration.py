@@ -2,11 +2,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-import time
 from typing import List
-
-import rich
-import rich.status
 
 from bygg.action import Action
 from bygg.configuration import (
@@ -17,7 +13,6 @@ from bygg.configuration import (
 )
 from bygg.digest import calculate_string_digest
 from bygg.output import output_error, output_info, output_plain
-from bygg.scheduler import scheduler
 from bygg.util import create_shell_command
 
 
@@ -29,11 +24,6 @@ def calculate_environment_hash(environment: Environment) -> str:
             with open(input, "r") as f:
                 requirements += f.readlines()
     return calculate_string_digest(" ".join(requirements))
-
-
-loading_python_build_file = rich.status.Status(
-    "[cyan]Executing Python build file", spinner="dots"
-)
 
 
 def setup_environment(environment: Environment):
@@ -133,14 +123,6 @@ def apply_configuration(
         if environment:
             python_build_file = environment.byggfile
 
-    t0 = time.time()
-    action_count = len(scheduler.build_actions)
-
-    with loading_python_build_file:
-        load_python_build_file(python_build_file)
-    output_info(
-        f"{len(scheduler.build_actions) - action_count} actions registered in "
-        f"{time.time() - t0:.2f} seconds."
-    )
+    load_python_build_file(python_build_file)
 
     return None
