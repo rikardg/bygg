@@ -6,6 +6,7 @@ isatty = sys.stdout.isatty()
 class TerminalStyle:
     """Terminal Text Styling"""
 
+    CLEARLINE = "\033[2K\r" if isatty else ""
     RESET = "\033[0m" if isatty else ""
     BOLD = "\033[1m" if isatty else ""
     DIM = "\033[2m" if isatty else ""
@@ -41,8 +42,32 @@ class TerminalStyle:
         RESET = "\033[49m" if isatty else ""
 
 
+class Symbols:
+    GREEN_CHECKMARK = f"{TerminalStyle.Fg.GREEN}✓{TerminalStyle.Fg.RESET}"
+    RED_X = f"{ TerminalStyle.Fg.RED }✗{TerminalStyle.Fg.RESET}"
+    INFO = f"{TerminalStyle.Fg.BLUE}🛈{TerminalStyle.Fg.RESET}"
+
+
+def output_with_status_line(bottom: str | None, scroll: str | None):
+    """
+    Outputs a line of text at the bottom of the terminal which is cleared and reprinted,
+    and another line of text that scrolls up.
+
+    Only prints the latter if the terminal is not a tty.
+    """
+    if not isatty:
+        print(scroll)
+        return
+
+    print(TerminalStyle.CLEARLINE, end="")
+
+    if scroll is not None:
+        print(scroll)
+    print(bottom if bottom is not None else "", end="\r")
+
+
 def output_info(s: str):
-    print(f"{TerminalStyle.Fg.BLUE}{s}{TerminalStyle.Fg.RESET}")
+    print(f"{Symbols.INFO} {s}")
 
 
 def output_warning(s: str):

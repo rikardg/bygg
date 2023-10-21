@@ -1,89 +1,68 @@
-from dataclasses import dataclass
-from typing import List, Literal, Set
+from __future__ import annotations
 
-import rich
-import rich.progress
-import rich.table
+from dataclasses import dataclass
+import shutil
+from typing import TYPE_CHECKING, List, Literal
 
 from bygg.action import Action
 from bygg.common_types import CommandStatus, JobStatus, Severity
-from bygg.output import output_error, output_warning
-
-console = rich.console.Console()
-
-progress: rich.progress.Progress = rich.progress.Progress(
-    rich.progress.SpinnerColumn(
-        table_column=rich.table.Column(ratio=None),
-        spinner_name="bouncingBar",
-        style="blue",
-    ),
-    rich.progress.TimeElapsedColumn(table_column=rich.table.Column(ratio=None)),
-    rich.progress.TextColumn(
-        "[cyan]{task.description}",
-        table_column=rich.table.Column(ratio=1),
-    ),
-    transient=True,
-    console=console,
+from bygg.output import (
+    Symbols,
+    output_error,
+    output_info,
+    output_warning,
+    output_with_status_line,
 )
 
-task_id = None
+if TYPE_CHECKING:
+    from bygg.scheduler import Job
 
 
 def on_runner_status(message: str):
-    console.print(f"[blue]{message}")
+    output_info(message)
 
 
-running_jobs: Set[str] = set()
-processed_jobs = 0
+running_jobs: set[str] = set()
+
+
+def format_queued_jobs_line() -> str:
+    terminal_cols, _ = shutil.get_terminal_size()
+    output = f"{' '.join(running_jobs)}"
+    if len(output) > terminal_cols:
+        output = output[: terminal_cols - 3] + "..."
+    return output
+
+
+max_name_length = 0
 
 
 def print_job_ended(
     name: str, job_status: JobStatus, action: Action, status: CommandStatus | None
 ):
-    job_prefix = "[red]✗[/red]" if job_status == "failed" else "[green]✓[/green]"
-    status_color = "red" if job_status == "failed" else "green"
-
+    global max_name_length
+    max_name_length = max(len(name), max_name_length)
+    failed_or_stopped = job_status in ("failed", "stopped")
+    symbol = Symbols.RED_X if failed_or_stopped else Symbols.GREEN_CHECKMARK
     status_message = status.message if status and status.message else ""
-
-    table = rich.table.Table(show_header=False, pad_edge=False, box=None)
-    table.add_column()
-    table.add_row(
-        f"{job_prefix} [{status_color}]{name}[/{status_color}]"
-        f"{': [cyan]' + status_message + '[/cyan]' }"
-        f"{' (start) ---' if status and status.output else ''}"
+    output_with_status_line(
+        format_queued_jobs_line(),
+        f"{symbol} {name:<{max_name_length}} : {status_message}",
     )
-    if status and status.output:
-        table.add_row(status.output)
-        table.add_row(f"--- [{status_color}]{name}[/{status_color}] (end) ---")
-        table.add_row()
-
-    console.print(table)
 
 
 def on_job_status(
     name: str, job_status: JobStatus, action: Action, status: CommandStatus | None
 ):
-    global processed_jobs
-    global task_id
-    if task_id is None:
-        task_id = progress.add_task("[blue]Building[/blue]")
-
-    if job_status == "failed":
-        processed_jobs += 1
-        if name in running_jobs:
-            running_jobs.remove(name)
-        print_job_ended(name, job_status, action, status)
-    elif job_status == "running":
-        running_jobs.add(name)
-        progress.update(
-            task_id,
-            description=f"[blue]Finished [yellow]{processed_jobs}[/yellow] jobs.[/blue]",
-        )
-    else:
-        processed_jobs += 1
-        print_job_ended(name, job_status, action, status)
-        if name in running_jobs:
-            running_jobs.remove(name)
+    match job_status:
+        case "skipped":
+            pass
+        case "running":
+            running_jobs.add(name)
+        case s if s in ("failed", "finished", "stopped"):
+            running_jobs.discard(name)
+            print_job_ended(name, job_status, action, status)
+        case _:
+            raise ValueError(f"Unhandled job status {job_status}")
 
 
 CheckRule = Literal["check_inputs_outputs", "output_file_missing"]

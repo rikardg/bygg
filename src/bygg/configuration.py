@@ -3,8 +3,9 @@ import sys
 from typing import Dict, List, Optional
 
 import msgspec
-import rich
-import rich.status
+
+from bygg.output import Symbols, output_plain
+from bygg.output import TerminalStyle as TS
 
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
@@ -87,9 +88,12 @@ def read_config_file() -> ByggFile | None:
         with open(YAML_INPUTFILE, "r") as f:
             return msgspec.yaml.decode(f.read(), type=ByggFile)
     except Exception as e:
-        rich.print(
-            "[red bold]Error while reading configuration file "
-            f"[yellow]{YAML_INPUTFILE}[/yellow]:[/red bold] {e}"
+        output_plain(
+            Symbols.RED_X
+            + TS.Fg.RED
+            + " Error while reading configuration file "
+            + TS.Fg.RESET
+            + f"{TS.BOLD}{YAML_INPUTFILE}{TS.RESET}. {e}"
         )
         sys.exit(1)
 

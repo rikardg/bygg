@@ -7,6 +7,7 @@ from multiprocess.pool import ApplyResult, Pool  # type: ignore
 
 from bygg.action import Action, CommandStatus
 from bygg.common_types import JobStatus
+from bygg.output import TerminalStyle as TS
 from bygg.scheduler import Job, scheduler
 from bygg.status_display import on_check_failed
 
@@ -24,7 +25,7 @@ class ProcessRunner:
 
     def start(self, max_workers: int = 1) -> bool:
         self.runner_status_listener(
-            f"[blue]Starting process runner with {max_workers} threads"
+            f"Starting process runner with {max_workers} threads"
         )
 
         def init_worker():
@@ -113,7 +114,7 @@ class ProcessRunner:
                         on_check_failed(
                             "output_file_missing",
                             job_result.action,
-                            f"Job [bold]{job_result.name}[/bold] didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: [bold]{', '.join(missing_files)}[/bold]",
+                            f"Job {TS.BOLD}{job_result.name}{TS.RESET} didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: {TS.BOLD}{', '.join(missing_files)}{TS.RESET}",
                             "error",
                         )
 

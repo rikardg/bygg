@@ -47,4 +47,9 @@ jobs:
       - name: Type check with Pyright
         run: |
           . .venv/bin/activate
-          pyright examples/ src/ tests/
+          pyright src/ tests/
+
+          # Some examples use Rich in their virtual environments, so install this for Pyright to stay
+          # calm. Errors with regards to use of this dependency will be detected by nox.
+          pip install rich
+          pyright examples/
