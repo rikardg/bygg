@@ -37,11 +37,9 @@ providing correctness and minimal rebuilds.
 
 ## Installation
 
-_Bygg currently requires Python 3.11. Support for earlier versions should be
-straightforward but hasn't been prioritised; feel free to open an issue if you
-need it._
+_Bygg currently requires Python 3.11 or 3.12._
 
-Install globally with
+Install with
 
 `pip install bygg`
 or
@@ -110,7 +108,7 @@ Bygg has support for Bash and Zsh tab completions of entrypoint actions. The com
 Add the following lines to `.bashrc` or `.zshrc`:
 
 ```shell
-`eval "$($(dirname $(readlink -f $(which bygg)))/register-python-argcomplete bygg)"`
+eval "$($(dirname $(readlink -f $(which bygg)))/register-python-argcomplete bygg)"
 ```
 
 ### Bygg is installed in its own virtual environment managed by you
@@ -165,7 +163,7 @@ for details.
 The target can be cleaned with
 
 ```shell
-bygg transform --clean` .
+bygg transform --clean
 ```
 
 ## Development
