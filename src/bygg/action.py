@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Callable, Iterable, Literal, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Set, Tuple
 
 from bygg.common_types import CommandStatus
+
+if TYPE_CHECKING:
+    from bygg.scheduler import Scheduler
 
 SchedulingType = Literal["in-process", "processpool"]
 
@@ -42,6 +47,8 @@ class Action(ActionContext):
 
     """
 
+    scheduler: Scheduler | None = None
+
     command: Command | None
     dependency_files: Set[str]
 
@@ -58,8 +65,6 @@ class Action(ActionContext):
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
     ):
-        from bygg.scheduler import scheduler
-
         self.name = name
         self.description = description
         self.message = message
@@ -73,7 +78,8 @@ class Action(ActionContext):
 
         self.dependency_files = set()
 
-        scheduler.build_actions[name] = self
+        assert self.scheduler
+        self.scheduler.build_actions[name] = self
 
     def __repr__(self):
         return f"""Action(name={self.name}, inputs=({

@@ -8,7 +8,7 @@ from multiprocess.pool import ApplyResult, Pool  # type: ignore
 from bygg.action import Action, CommandStatus
 from bygg.common_types import JobStatus
 from bygg.output import TerminalStyle as TS
-from bygg.scheduler import Job, scheduler
+from bygg.scheduler import Job, Scheduler
 from bygg.status_display import on_check_failed
 
 JobStatusListener = Callable[[str, JobStatus, Action, CommandStatus | None], None]
@@ -16,10 +16,12 @@ RunnerStatusListener = Callable[[str], None]
 
 
 class ProcessRunner:
+    scheduler: Scheduler
     job_status_listener: JobStatusListener
     runner_status_listener: RunnerStatusListener
 
-    def __init__(self):
+    def __init__(self, scheduler: Scheduler):
+        self.scheduler = scheduler
         self.job_status_listener = lambda *args: None
         self.runner_status_listener = lambda *args: None
 
@@ -49,14 +51,14 @@ class ProcessRunner:
 
             while True:
                 if len(backlog) < 2 * max_workers and (
-                    jobs := scheduler.get_ready_jobs()
+                    jobs := self.scheduler.get_ready_jobs()
                 ):
                     backlog += jobs
 
                 if (
                     len(scheduled_queue) == 0
                     and len(backlog) == 0
-                    and scheduler.run_status() == "finished"
+                    and self.scheduler.run_status() == "finished"
                 ):
                     return True
 
@@ -71,7 +73,7 @@ class ProcessRunner:
                                 f"{'No command, skipping'}",
                                 None,
                             )
-                            scheduler.job_finished(job)
+                            self.scheduler.job_finished(job)
                             self.job_status_listener(
                                 job.name, "skipped", job.action, job.status
                             )
@@ -84,7 +86,7 @@ class ProcessRunner:
                                 job.name, "running", job.action, None
                             )
                             job.status = job.action.command(job.action)
-                            scheduler.job_finished(job)
+                            self.scheduler.job_finished(job)
                             self.job_status_listener(
                                 job.name,
                                 "finished" if job.status.rc == 0 else "failed",
@@ -118,7 +120,7 @@ class ProcessRunner:
                             "error",
                         )
 
-                    scheduler.job_finished(job_result)
+                    self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:
                         self.job_status_listener(
                             job_result.name,
@@ -155,7 +157,3 @@ def run_job(job: Job, qq):
     except Exception as e:
         job.status = CommandStatus(1, "Job failed with exception.", f"{e}")
     return job
-
-
-# runner = SingleThreadedRunner()
-runner = ProcessRunner()

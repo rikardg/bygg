@@ -3,7 +3,7 @@ from pathlib import Path
 from tempfile import mkstemp
 
 from bygg.action import Action, CommandStatus
-from bygg.scheduler import scheduler
+from bygg.scheduler import Scheduler
 
 
 def get_closed_tmpfile() -> Path:
@@ -13,6 +13,7 @@ def get_closed_tmpfile() -> Path:
 
 
 def test_scheduler_single_action():
+    scheduler = Scheduler()
     scheduler.__init__()
     scheduler.init_cache(get_closed_tmpfile())
 
@@ -41,6 +42,7 @@ def test_scheduler_single_action():
 
 
 def test_scheduler_nonbranching():
+    scheduler = Scheduler()
     scheduler.__init__()
     scheduler.init_cache(get_closed_tmpfile())
 
@@ -110,6 +112,7 @@ def test_scheduler_nonbranching():
 
 
 def test_scheduler_branching():
+    scheduler = Scheduler()
     scheduler.__init__()
     scheduler.init_cache(get_closed_tmpfile())
 
@@ -187,6 +190,7 @@ def test_scheduler_branching():
 
 
 def test_scheduler_branching_one_failed():
+    scheduler = Scheduler()
     scheduler.__init__()
     scheduler.init_cache(get_closed_tmpfile())
 
@@ -258,6 +262,7 @@ def test_scheduler_branching_one_failed():
 
 
 def test_scheduler_dynamic_dependency():
+    scheduler = Scheduler()
     scheduler.__init__()
     cache_file = get_closed_tmpfile()
     scheduler.init_cache(cache_file)
@@ -300,6 +305,7 @@ def test_scheduler_dynamic_dependency():
 
 
 def test_scheduler_dynamic_dependency_two_runs():
+    scheduler = Scheduler()
     scheduler.__init__()
     cache_file = get_closed_tmpfile()
     scheduler.init_cache(cache_file)

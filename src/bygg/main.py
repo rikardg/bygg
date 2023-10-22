@@ -31,14 +31,22 @@ from bygg.output import (
     output_ok,
     output_warning,
 )
-from bygg.runner import runner
-from bygg.scheduler import scheduler
+from bygg.runner import ProcessRunner
+from bygg.scheduler import Scheduler
 from bygg.status_display import (
     failed_checks,
     on_job_status,
     on_runner_status,
     output_check_results,
 )
+
+
+@dataclass
+class ByggContext:
+    """Container for various state"""
+
+    runner: ProcessRunner
+    scheduler: Scheduler
 
 
 def get_job_count_limit():
@@ -52,15 +60,19 @@ def get_job_count_limit():
         return count
 
 
-def init_status_listeners():
-    """
-    Set up status listeners.
-    """
+def init_bygg_context():
+    scheduler = Scheduler()
+    runner = ProcessRunner(scheduler)
+
+    # Set up status listeners
     runner.job_status_listener = on_job_status
     runner.runner_status_listener = on_runner_status
 
+    return ByggContext(runner, scheduler)
+
 
 def build(
+    ctx: ByggContext,
     actions: List[str],
     job_count: int | None,
     always_make: bool,
@@ -81,21 +93,19 @@ def build(
       runs earlier.
     """
     try:
-        init_status_listeners()
-
         max_workers = get_job_count_limit() if job_count is None else job_count
 
         for action in actions:
             t1 = time.time()
             output_info(f"Building action '{action}':")
 
-            scheduler.start_run(
+            ctx.scheduler.start_run(
                 action,
                 always_make=always_make,
                 check=check,
             )
-            status = runner.start(max_workers)
-            scheduler.shutdown()
+            status = ctx.runner.start(max_workers)
+            ctx.scheduler.shutdown()
 
             if status:
                 output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
@@ -111,7 +121,7 @@ def build(
         output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
-        scheduler.shutdown()
+        ctx.scheduler.shutdown()
 
     if check and failed_checks:
         return output_check_results()
@@ -119,15 +129,13 @@ def build(
     return True
 
 
-def clean(actions: List[str]):
+def clean(ctx: ByggContext, actions: List[str]):
     try:
-        init_status_listeners()
-
         for action in actions:
             output_info(f"Cleaning action '{action}':")
-            scheduler.prepare_run(action)
-            for job_name in scheduler.job_graph.get_all_jobs():
-                job = scheduler.build_actions.get(job_name, None)
+            ctx.scheduler.prepare_run(action)
+            for job_name in ctx.scheduler.job_graph.get_all_jobs():
+                job = ctx.scheduler.build_actions.get(job_name, None)
                 if job is None:
                     continue
                 for output in job.outputs:
@@ -140,7 +148,7 @@ def clean(actions: List[str]):
                             shutil.rmtree(output)
                     except FileNotFoundError:
                         pass
-            scheduler.shutdown()
+            ctx.scheduler.shutdown()
     except KeyboardInterrupt:
         output_warning("Build was interrupted by user.")
         return False
@@ -148,18 +156,20 @@ def clean(actions: List[str]):
         output_error(f"Error: Action '{e}' not found.")
         return False
     finally:
-        scheduler.shutdown()
+        ctx.scheduler.shutdown()
 
     return True
 
 
-def get_entrypoints(configuration: ByggFile | None) -> List[Action]:
+def get_entrypoints(ctx: ByggContext, configuration: ByggFile | None) -> List[Action]:
     entrypoints = []
     if configuration:
         entrypoints += [x for x in configuration.actions if x.is_entrypoint]
 
     if not configuration or not configuration.environments:
-        entrypoints += [x for x in scheduler.build_actions.values() if x.is_entrypoint]
+        entrypoints += [
+            x for x in ctx.scheduler.build_actions.values() if x.is_entrypoint
+        ]
 
     return entrypoints
 
@@ -167,8 +177,8 @@ def get_entrypoints(configuration: ByggFile | None) -> List[Action]:
 list_actions_style = "B"
 
 
-def list_actions(configuration: ByggFile | None) -> bool:
-    entrypoints = get_entrypoints(configuration)
+def list_actions(ctx: ByggContext, configuration: ByggFile | None) -> bool:
+    entrypoints = get_entrypoints(ctx, configuration)
 
     if not entrypoints:
         program_name = os.path.basename(sys.argv[0])
@@ -216,8 +226,8 @@ def list_actions(configuration: ByggFile | None) -> bool:
     return True
 
 
-def print_no_actions_text(configuration: ByggFile | None):
-    return list_actions(configuration)
+def print_no_actions_text(ctx: ByggContext, configuration: ByggFile | None):
+    return list_actions(ctx, configuration)
 
 
 def print_version():
@@ -229,8 +239,8 @@ def print_version():
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
 
 
-def list_actions_and_exit(configuration: ByggFile | None):
-    status = list_actions(configuration)
+def list_actions_and_exit(ctx: ByggContext, configuration: ByggFile | None):
+    status = list_actions(ctx, configuration)
     sys.exit(0) if status else sys.exit(1)
 
 
@@ -261,9 +271,10 @@ def dispatcher(args: argparse.Namespace):
         sys.exit(1)
 
     configuration = read_config_file()
+    ctx = init_bygg_context()
 
     if args.list:
-        list_actions_and_exit(configuration)
+        list_actions_and_exit(ctx, configuration)
 
     action_partitions = partition_actions(configuration, args.actions)
 
@@ -274,10 +285,10 @@ def dispatcher(args: argparse.Namespace):
             # TODO will not be needed once we allow configuring default action also in
             # Python.
             if not args.actions:
-                list_actions_and_exit(configuration)
-            status = do_dispatch(args, args.actions)
+                list_actions_and_exit(ctx, configuration)
+            status = do_dispatch(ctx, args, args.actions)
         else:
-            status = print_no_actions_text(configuration)
+            status = print_no_actions_text(ctx, configuration)
         if status:
             sys.exit(0)
         sys.exit(1)
@@ -301,19 +312,19 @@ def dispatcher(args: argparse.Namespace):
                 )
                 sys.exit(1)
         else:
-            status = do_dispatch(args, partition.actions)
+            status = do_dispatch(ctx, args, partition.actions)
             if not status:
                 sys.exit(1)
 
 
-def do_dispatch(args: argparse.Namespace, actions: List[str]) -> bool:
+def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: List[str]) -> bool:
     # Analysis implies building:
     always_make = args.always_make or args.check
     if args.clean:
-        status = clean(actions)
+        status = clean(ctx, actions)
     else:
         jobs = int(args.jobs) if args.jobs else None
-        status = build(actions, jobs, always_make, args.check)
+        status = build(ctx, actions, jobs, always_make, args.check)
 
     return status
 
@@ -384,7 +395,8 @@ def partition_actions(
 
 
 def entrypoint_completions(prefix, parsed_args, **kwargs):
-    entrypoints = get_entrypoints(read_config_file())
+    ctx = init_bygg_context()
+    entrypoints = get_entrypoints(ctx, read_config_file())
     return {x.name: x.message for x in entrypoints}
 
 
