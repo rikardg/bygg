@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 import shutil
-from typing import TYPE_CHECKING, List, Literal
+from typing import List, Literal
 
 from bygg.action import Action
 from bygg.common_types import CommandStatus, JobStatus, Severity
@@ -13,9 +11,6 @@ from bygg.output import (
     output_warning,
     output_with_status_line,
 )
-
-if TYPE_CHECKING:
-    from bygg.scheduler import Job
 
 
 def on_runner_status(message: str):
