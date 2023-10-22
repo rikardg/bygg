@@ -1,7 +1,16 @@
 from bygg.action import Action, ActionContext, CommandStatus
+from bygg.scheduler import Scheduler
+import pytest
 
 
-def test_Action_setup_empty():
+@pytest.fixture
+def init_scheduler():
+    Scheduler()
+    yield
+    Action.scheduler = None
+
+
+def test_Action_setup_empty(init_scheduler):
     action = Action(name="empty Action", inputs=None, outputs=None, dependencies=None)
     assert action.name == "empty Action"
     assert action.inputs == set()
@@ -11,7 +20,7 @@ def test_Action_setup_empty():
     assert action.command is None
 
 
-def test_Action_setup_with_dependencies():
+def test_Action_setup_with_dependencies(init_scheduler):
     action = Action(
         name="test Action",
         inputs=["input1", "input2"],
@@ -27,7 +36,7 @@ def test_Action_setup_with_dependencies():
     assert action.command is None
 
 
-def test_Action_with_python_cmd():
+def test_Action_with_python_cmd(init_scheduler):
     def test_command(ctx: ActionContext):
         if not ctx.inputs:
             return CommandStatus(1, "No inputs.", None)

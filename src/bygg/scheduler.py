@@ -53,6 +53,7 @@ class Scheduler:
     check_inputs_outputs_set: Set[str] | None
 
     def __init__(self):
+        Action.scheduler = self
         self.cache = Cache()
         self.build_actions = {}
         self.job_graph = create_dag()
@@ -251,6 +252,3 @@ class Scheduler:
             )
         else:
             self.cache.remove_digests(job.name)
-
-
-scheduler = Scheduler()
