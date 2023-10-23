@@ -29,7 +29,7 @@ jobs:
         run: |
           nox
 
-  pyright:
+  pyright_and_ruff:
     strategy:
       matrix:
         python_version: ["3.11", "3.12"]
@@ -44,6 +44,8 @@ jobs:
         run: |
           python3 -m venv .venv
           .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+      - name: Run Ruff
+        run: ".venv/bin/ruff src/ tests/ examples/"
       - name: Type check with Pyright
         run: |
           . .venv/bin/activate
