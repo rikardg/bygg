@@ -18,7 +18,6 @@ def test_cache_load_non_existing():
 
 def test_cache_load_empty():
     fd, path = mkstemp()
-    print(path)
     cache = Cache(Path(path))
     cache.load()
     assert cache.data is not None
