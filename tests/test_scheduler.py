@@ -4,6 +4,7 @@ from tempfile import mkstemp
 
 from bygg.action import Action, CommandStatus
 from bygg.scheduler import Scheduler
+import pytest
 
 
 def get_closed_tmpfile() -> Path:
@@ -12,10 +13,18 @@ def get_closed_tmpfile() -> Path:
     return Path(path)
 
 
-def test_scheduler_single_action():
+@pytest.fixture
+def scheduler_fixture():
     scheduler = Scheduler()
     scheduler.__init__()
-    scheduler.init_cache(get_closed_tmpfile())
+    cache_file = get_closed_tmpfile()
+    scheduler.init_cache(cache_file)
+    yield (scheduler, cache_file)
+    scheduler.shutdown()
+
+
+def test_scheduler_single_action(scheduler_fixture):
+    scheduler, _ = scheduler_fixture
 
     Action(
         name="action1",
@@ -41,10 +50,8 @@ def test_scheduler_single_action():
     assert scheduler.run_status() == "finished"
 
 
-def test_scheduler_nonbranching():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    scheduler.init_cache(get_closed_tmpfile())
+def test_scheduler_nonbranching(scheduler_fixture):
+    scheduler, _ = scheduler_fixture
 
     Action(
         name="action1",
@@ -111,10 +118,8 @@ def test_scheduler_nonbranching():
     assert len(scheduler.finished_jobs) == 4
 
 
-def test_scheduler_branching():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    scheduler.init_cache(get_closed_tmpfile())
+def test_scheduler_branching(scheduler_fixture):
+    scheduler, _ = scheduler_fixture
 
     Action(
         name="action1",
@@ -189,10 +194,8 @@ def test_scheduler_branching():
     assert len(scheduler.finished_jobs) == 4
 
 
-def test_scheduler_branching_one_failed():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    scheduler.init_cache(get_closed_tmpfile())
+def test_scheduler_branching_one_failed(scheduler_fixture):
+    scheduler, _ = scheduler_fixture
 
     Action(
         name="action1",
@@ -261,11 +264,8 @@ def test_scheduler_branching_one_failed():
     assert len(scheduler.finished_jobs) == 3
 
 
-def test_scheduler_dynamic_dependency():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    cache_file = get_closed_tmpfile()
-    scheduler.init_cache(cache_file)
+def test_scheduler_dynamic_dependency(scheduler_fixture):
+    scheduler, _ = scheduler_fixture
 
     Action(
         name="action1",
@@ -304,11 +304,8 @@ def test_scheduler_dynamic_dependency():
     assert len(scheduler.running_jobs) == 0
 
 
-def test_scheduler_dynamic_dependency_two_runs():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    cache_file = get_closed_tmpfile()
-    scheduler.init_cache(cache_file)
+def test_scheduler_dynamic_dependency_two_runs(scheduler_fixture):
+    scheduler, cache_file = scheduler_fixture
 
     Action(
         name="action1",
