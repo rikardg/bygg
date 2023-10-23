@@ -19,7 +19,7 @@ TEST_FILES_PER_LEVEL = 50
 GENERATE_LOAD = False
 
 # Sleep in each job. Reduces throughput; useful to check logging and output.
-ADD_SLEEP = True
+ADD_SLEEP = False if "CI" in os.environ else True
 
 # Execute touch <outfile> in a shell.
 USE_SHELL_COMMAND = False
