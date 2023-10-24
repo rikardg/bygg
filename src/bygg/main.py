@@ -29,6 +29,7 @@ from bygg.output import (
     output_error,
     output_info,
     output_ok,
+    output_plain,
     output_warning,
 )
 from bygg.runner import ProcessRunner
@@ -276,7 +277,13 @@ def dispatcher(args: argparse.Namespace):
     if args.list:
         list_actions_and_exit(ctx, configuration)
 
-    action_partitions = partition_actions(configuration, args.actions)
+    try:
+        action_partitions = partition_actions(configuration, args.actions)
+    except KeyError as e:
+        output_plain(
+            f"Could not find action {TS.BOLD}{e}{TS.RESET}. List available actions with {TS.BOLD}--list{TS.RESET}."
+        )
+        sys.exit(1)
 
     if not action_partitions:
         if os.path.isfile(PYTHON_INPUTFILE):
@@ -366,9 +373,6 @@ def partition_actions(
     """
     Partition the actions into groups that should be run in the same environment.
     """
-
-    # TODO: Implement this.
-
     resolved_actions = actions if actions else []
 
     if configuration:
