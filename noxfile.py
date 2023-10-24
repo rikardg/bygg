@@ -27,18 +27,22 @@ def examples(session):
     with session.chdir("examples/only_python"):
         session.run("bygg")
         session.run("bygg", "hello")
+        session.run("bygg", "hello", "--tree")
         session.run("bygg", "--clean")
 
     with session.chdir("examples/parametric"):
         session.run("bygg")
+        session.run("bygg", "--tree")
         session.run("bygg", "--clean")
 
     with session.chdir("examples/taskrunner"):
         session.run("bygg")
+        session.run("bygg", "--tree")
         session.run("bygg", "--clean")
 
     with session.chdir("examples/trivial"):
         session.run("bygg")
+        session.run("bygg", "--tree")
         session.run("bygg", "--clean")
 
     with session.chdir("examples/environments"):
@@ -55,9 +59,12 @@ def examples(session):
         session.run("bygg", "clean_environments")
 
         session.run("bygg", "action1", "default_action", "action2")
+        session.run("bygg", "action1", "default_action", "action2", "--tree")
         session.run("bygg", "clean_environments")
 
     with session.chdir("examples/checks"):
         session.run("bygg")
         session.run("bygg", "--check", success_codes=[1])
+        session.run("bygg", "--tree")
         session.run("bygg", "all_checks", "--check", success_codes=[1])
+        session.run("bygg", "all_checks", "--tree")

@@ -40,6 +40,7 @@ from bygg.status_display import (
     on_runner_status,
     output_check_results,
 )
+from bygg.tree import display_tree
 
 
 @dataclass
@@ -329,6 +330,8 @@ def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: List[str]) 
     always_make = args.always_make or args.check
     if args.clean:
         status = clean(ctx, actions)
+    elif args.tree:
+        status = display_tree(ctx.scheduler, actions)
     else:
         jobs = int(args.jobs) if args.jobs else None
         status = build(ctx, actions, jobs, always_make, args.check)
@@ -498,6 +501,11 @@ List available actions:
         "--check",
         action="store_true",
         help="Perform various checks on the action tree. Implies -B",
+    )
+    analyse_group.add_argument(
+        "--tree",
+        action="store_true",
+        help="Display the dependency tree starting from the specified action(s).",
     )
 
     # Meta arguments:
