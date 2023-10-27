@@ -1,0 +1,29 @@
+# serializer version: 1
+# name: test_tree_branching_actions
+  '''
+  
+  action1
+  ├── action2
+  │   └── action4
+  └── action3
+      └── action4
+  
+  '''
+# ---
+# name: test_tree_four_nonbranching_actions
+  '''
+  
+  action1
+  └── action2
+      └── action3
+          └── action4
+  
+  '''
+# ---
+# name: test_tree_single_action
+  '''
+  
+  action1
+  
+  '''
+# ---
