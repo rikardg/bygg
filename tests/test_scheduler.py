@@ -1,35 +1,8 @@
-import os
-from pathlib import Path
-from tempfile import mkstemp
-
 from bygg.action import Action, CommandStatus
-from bygg.scheduler import Scheduler
-import pytest
 
 
-def get_closed_tmpfile() -> Path:
-    fd, path = mkstemp()
-    os.close(fd)
-    return Path(path)
-
-
-@pytest.fixture
-def scheduler_fixture():
-    scheduler = Scheduler()
-    scheduler.__init__()
-    cache_file = get_closed_tmpfile()
-    scheduler.init_cache(cache_file)
-    yield (scheduler, cache_file)
-    scheduler.shutdown()
-
-
-def test_scheduler_single_action(scheduler_fixture):
-    scheduler, _ = scheduler_fixture
-
-    Action(
-        name="action1",
-        is_entrypoint=True,
-    )
+def test_scheduler_single_action(scheduler_single_action):
+    scheduler, _ = scheduler_single_action
 
     assert scheduler.run_status() == "not started"
 
@@ -50,26 +23,8 @@ def test_scheduler_single_action(scheduler_fixture):
     assert scheduler.run_status() == "finished"
 
 
-def test_scheduler_nonbranching(scheduler_fixture):
-    scheduler, _ = scheduler_fixture
-
-    Action(
-        name="action1",
-        dependencies=["action2"],
-        is_entrypoint=True,
-    )
-    Action(
-        name="action2",
-        dependencies=["action3"],
-    )
-    Action(
-        name="action3",
-        dependencies=["action4"],
-    )
-    Action(
-        name="action4",
-        dependencies=[],
-    )
+def test_scheduler_nonbranching(scheduler_four_nonbranching_actions):
+    scheduler, _ = scheduler_four_nonbranching_actions
 
     assert scheduler.run_status() == "not started"
 
@@ -118,26 +73,8 @@ def test_scheduler_nonbranching(scheduler_fixture):
     assert len(scheduler.finished_jobs) == 4
 
 
-def test_scheduler_branching(scheduler_fixture):
-    scheduler, _ = scheduler_fixture
-
-    Action(
-        name="action1",
-        dependencies=["action2", "action3"],
-        is_entrypoint=True,
-    )
-    Action(
-        name="action2",
-        dependencies=["action4"],
-    )
-    Action(
-        name="action3",
-        dependencies=["action4"],
-    )
-    Action(
-        name="action4",
-        dependencies=[],
-    )
+def test_scheduler_branching(scheduler_branching_actions):
+    scheduler, _ = scheduler_branching_actions
 
     assert scheduler.run_status() == "not started"
 
@@ -194,26 +131,8 @@ def test_scheduler_branching(scheduler_fixture):
     assert len(scheduler.finished_jobs) == 4
 
 
-def test_scheduler_branching_one_failed(scheduler_fixture):
-    scheduler, _ = scheduler_fixture
-
-    Action(
-        name="action1",
-        dependencies=["action2", "action3"],
-        is_entrypoint=True,
-    )
-    Action(
-        name="action2",
-        dependencies=["action4"],
-    )
-    Action(
-        name="action3",
-        dependencies=["action4"],
-    )
-    Action(
-        name="action4",
-        dependencies=[],
-    )
+def test_scheduler_branching_one_failed(scheduler_branching_actions):
+    scheduler, _ = scheduler_branching_actions
 
     assert scheduler.run_status() == "not started"
 
