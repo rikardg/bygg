@@ -1,5 +1,4 @@
 # Development
-black==23.10.1
 mypy==1.6.1
 nox==2023.4.22
 pip==23.1.2
