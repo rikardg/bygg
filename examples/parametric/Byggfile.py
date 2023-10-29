@@ -18,7 +18,8 @@ TEST_FILES_PER_LEVEL = 50
 # Do something more than just sort lines in files. This will calculate primenumbers.
 GENERATE_LOAD = False
 
-# Sleep in each job. Reduces throughput; useful to check logging and output.
+# Sleep in each job. Reduces throughput; useful to check logging and output. Don't sleep
+# in CI.
 ADD_SLEEP = False if "CI" in os.environ else True
 
 # Execute touch <outfile> in a shell.
