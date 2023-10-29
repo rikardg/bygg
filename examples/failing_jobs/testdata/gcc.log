@@ -1,0 +1,33 @@
+# Simulated GCC Log
+
+main.c: In function ‘main’:
+main.c:5:5: warning: implicit declaration of function ‘foo’ [-Wimplicit-function-declaration]
+    foo();
+    ^~~
+main.c:5:5: warning: unused variable ‘a’ [-Wunused-variable]
+    int a = 5;
+    ^~~
+main.c:6:5: warning: unused variable ‘b’ [-Wunused-variable]
+    int b = 10;
+    ^~~
+main.c:7:5: warning: unused variable ‘c’ [-Wunused-variable]
+    int c = a + b;
+    ^~~
+main.c:8:5: warning: unused variable ‘d’ [-Wunused-variable]
+    int d = c * 2;
+    ^~~
+main.c:9:5: warning: unused variable ‘e’ [-Wunused-variable]
+    int e = d / 3;
+    ^~~
+main.c:10:5: warning: unused variable ‘f’ [-Wunused-variable]
+    int f = e % 2;
+    ^~~
+main.c:11:5: warning: unused variable ‘g’ [-Wunused-variable]
+    int g = f + 1;
+    ^~~
+main.c:12:5: warning: unused variable ‘h’ [-Wunused-variable]
+    int h = g - 1;
+    ^~~
+main.c:13:5: error: expected declaration or statement at end of input
+    return 0;
+    ^~~~~~

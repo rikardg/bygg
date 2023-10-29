@@ -1,0 +1,19 @@
+# Simulated Make Log
+
+Building target: my_program
+
+Compiling source file main.c...
+gcc -c main.c -o main.o
+
+Compiling source file utils.c...
+gcc -c utils.c -o utils.o
+utils.c: In function 'int divide(int, int)':
+utils.c:6: warning: division by zero [-Wdiv-by-zero]
+
+Compiling source file module.cpp...
+g++ -c module.cpp -o module.o
+module.cpp: In function 'void someFunction()':
+module.cpp:12: error: 'undeclaredVar' was not declared in this scope
+
+Makefile:12: recipe for target 'my_program' failed
+make: *** [my_program] Error 1

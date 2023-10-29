@@ -19,11 +19,13 @@ class ProcessRunner:
     scheduler: Scheduler
     job_status_listener: JobStatusListener
     runner_status_listener: RunnerStatusListener
+    failed_jobs: List[Job]
 
     def __init__(self, scheduler: Scheduler):
         self.scheduler = scheduler
         self.job_status_listener = lambda *args: None
         self.runner_status_listener = lambda *args: None
+        self.failed_jobs = []
 
     def start(self, max_workers: int = 1) -> bool:
         self.runner_status_listener(
@@ -49,18 +51,24 @@ class ProcessRunner:
                         job_msg.name, "running", job_msg.action, None
                     )
 
+            # If a job fails, we want to stop scheduling new jobs and just wait for the
+            # ones that are already running to finish.
+            early_out = False
+
             while True:
-                if len(backlog) < 2 * max_workers and (
-                    jobs := self.scheduler.get_ready_jobs()
+                if (
+                    not early_out
+                    and len(backlog) < 2 * max_workers
+                    and (jobs := self.scheduler.get_ready_jobs())
                 ):
                     backlog += jobs
 
                 if (
                     len(scheduled_queue) == 0
                     and len(backlog) == 0
-                    and self.scheduler.run_status() == "finished"
+                    and (self.scheduler.run_status() == "finished" or early_out)
                 ):
-                    return True
+                    return not early_out
 
                 # Keep the scheduled queue relatively short since we're polling
                 batch_size = max_workers * 2
@@ -129,15 +137,15 @@ class ProcessRunner:
                             job_result.status,
                         )
                     else:
+                        self.failed_jobs.append(job_result)
                         self.job_status_listener(
                             job_result.name,
                             "failed",
                             job_result.action,
                             job_result.status,
                         )
-                        self.runner_status_listener("Aborting.")
                         poll_msg_queue()
-                        return False
+                        early_out = True
 
     def check_for_missing_output_files(self, job: Job) -> List[str]:
         missing_files: List[str] = []

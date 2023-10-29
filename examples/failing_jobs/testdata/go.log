@@ -1,0 +1,11 @@
+# Simulated Go Compiler Log
+
+Compiling package: example_package
+
+./main.go:5:15: warning: unused import "fmt"
+./main.go:6:9: warning: unused variable "unusedVar"
+./main.go:8:18: warning: type assertion in non-type context
+./main.go:10:11: warning: variable "x" declared and not used
+
+./util.go:4:20: warning: exported function SomeFunction should have a comment or be unexported
+./util.go:12:1: error: undefined: undeclaredVar
