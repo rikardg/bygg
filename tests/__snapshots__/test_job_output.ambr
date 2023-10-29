@@ -1,0 +1,118 @@
+# serializer version: 1
+# name: test_highlight_warning
+  '''
+  
+  main.c: In function ‘main’:
+  main.c:5:5: [START_WARNING]warning:[END_WARNING] implicit declaration of function ‘foo’ [-Wimplicit-function-declaration]
+      foo();
+      ^~~
+  main.c:5:5: [START_WARNING]warning:[END_WARNING] unused variable ‘a’ [-Wunused-variable]
+      int a = 5;
+      ^~~
+  main.c:6:5: [START_WARNING]warning:[END_WARNING] unused variable ‘b’ [-Wunused-variable]
+      int b = 10;
+      ^~~
+  main.c:7:5: [START_WARNING]warning:[END_WARNING] unused variable ‘c’ [-Wunused-variable]
+      int c = a + b;
+      ^~~
+  main.c:9:5: [START_ERROR]error:[END_ERROR] expected declaration or statement at end of input
+      return 0;
+      ^~~~~~
+  '''
+# ---
+# name: test_highlight_warning_logfiles[gcc.log]
+  '''
+  # Simulated GCC Log
+  
+  main.c: In function ‘main’:
+  main.c:5:5: [START_WARNING]warning:[END_WARNING] implicit declaration of function ‘foo’ [-Wimplicit-function-declaration]
+      foo();
+      ^~~
+  main.c:5:5: [START_WARNING]warning:[END_WARNING] unused variable ‘a’ [-Wunused-variable]
+      int a = 5;
+      ^~~
+  main.c:6:5: [START_WARNING]warning:[END_WARNING] unused variable ‘b’ [-Wunused-variable]
+      int b = 10;
+      ^~~
+  main.c:7:5: [START_WARNING]warning:[END_WARNING] unused variable ‘c’ [-Wunused-variable]
+      int c = a + b;
+      ^~~
+  main.c:8:5: [START_WARNING]warning:[END_WARNING] unused variable ‘d’ [-Wunused-variable]
+      int d = c * 2;
+      ^~~
+  main.c:9:5: [START_WARNING]warning:[END_WARNING] unused variable ‘e’ [-Wunused-variable]
+      int e = d / 3;
+      ^~~
+  main.c:10:5: [START_WARNING]warning:[END_WARNING] unused variable ‘f’ [-Wunused-variable]
+      int f = e % 2;
+      ^~~
+  main.c:11:5: [START_WARNING]warning:[END_WARNING] unused variable ‘g’ [-Wunused-variable]
+      int g = f + 1;
+      ^~~
+  main.c:12:5: [START_WARNING]warning:[END_WARNING] unused variable ‘h’ [-Wunused-variable]
+      int h = g - 1;
+      ^~~
+  main.c:13:5: [START_ERROR]error:[END_ERROR] expected declaration or statement at end of input
+      return 0;
+      ^~~~~~
+  '''
+# ---
+# name: test_highlight_warning_logfiles[go.log]
+  '''
+  # Simulated Go Compiler Log
+  
+  Compiling package: example_package
+  
+  ./main.go:5:15: [START_WARNING]warning:[END_WARNING] unused import "fmt"
+  ./main.go:6:9: [START_WARNING]warning:[END_WARNING] unused variable "unusedVar"
+  ./main.go:8:18: [START_WARNING]warning:[END_WARNING] type assertion in non-type context
+  ./main.go:10:11: [START_WARNING]warning:[END_WARNING] variable "x" declared and not used
+  
+  ./util.go:4:20: [START_WARNING]warning:[END_WARNING] exported function SomeFunction should have a comment or be unexported
+  ./util.go:12:1: [START_ERROR]error:[END_ERROR] undefined: undeclaredVar
+  '''
+# ---
+# name: test_highlight_warning_logfiles[make.log]
+  '''
+  # Simulated Make Log
+  
+  Building target: my_program
+  
+  Compiling source file main.c...
+  gcc -c main.c -o main.o
+  
+  Compiling source file utils.c...
+  gcc -c utils.c -o utils.o
+  utils.c: In function 'int divide(int, int)':
+  utils.c:6: [START_WARNING]warning:[END_WARNING] division by zero [-Wdiv-by-zero]
+  
+  Compiling source file module.cpp...
+  g++ -c module.cpp -o module.o
+  module.cpp: In function 'void someFunction()':
+  module.cpp:12: [START_ERROR]error:[END_ERROR] 'undeclaredVar' was not declared in this scope
+  
+  Makefile:12: recipe for target 'my_program' failed
+  make: *** [my_program] Error 1
+  '''
+# ---
+# name: test_highlight_warning_logfiles[npm.log]
+  '''
+  # Simulated npm Log
+  
+  npm WARN package.json YourProjectName@1.0.0 No repository field.
+  npm WARN deprecated some-package@1.2.3: This package has been deprecated. Please use the latest version.
+  npm WARN optional dep failed, continuing @optional/package@4.5.6
+  npm ERR! code E404
+  npm ERR! 404 Not Found - GET https://registry.npmjs.org/nonexistent-package - Not found
+  
+  npm ERR! A complete log of this run can be found in:
+  npm ERR!     /home/user/.npm/_logs/2023-10-27T14_32_15_617Z-debug.log
+  
+  npm WARN optional dep failed, continuing @optional/package@4.5.6
+  npm ERR! code E403
+  npm ERR! 403 Forbidden - PUT https://registry.npmjs.org/some-package - You do not have permission to publish "some-package". Are you logged in?
+  
+  npm ERR! A complete log of this run can be found in:
+  npm ERR!     /home/user/.npm/_logs/2023-10-27T14_32_30_509Z-debug.log
+  '''
+# ---

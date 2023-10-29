@@ -22,6 +22,7 @@ from bygg.configuration import (
     dump_schema,
     read_config_file,
 )
+from bygg.job_output import output_job_logs
 from bygg.output import (
     TerminalStyle as TS,
 )
@@ -115,6 +116,8 @@ def build(
                 output_error(
                     f"Action '{action}' failed after {time.time() - t1:.2f} s."
                 )
+                output_job_logs(ctx.runner.failed_jobs)
+                return False
 
     except KeyboardInterrupt:
         output_warning("\nBuild was interrupted by user.")

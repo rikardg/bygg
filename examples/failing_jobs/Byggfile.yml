@@ -1,0 +1,24 @@
+settings:
+  default_action: all
+
+actions:
+  - name: "all"
+    description: Run all test jobs. They will fail.
+    is_entrypoint: true
+    dependencies: ["gcc", "npm", "go", "make"]
+
+  - name: "gcc"
+    description: Simulate a failing gcc build.
+    shell: cat testdata/gcc.log && false
+
+  - name: "npm"
+    description: Simulate a failing npm build.
+    shell: cat testdata/npm.log && false
+
+  - name: "go"
+    description: Simulate a failing go build.
+    shell: cat testdata/go.log && false
+
+  - name: "make"
+    description: Simulate a failing make run.
+    shell: cat testdata/make.log && false
