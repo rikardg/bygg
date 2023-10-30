@@ -7,26 +7,22 @@ actions:
     message: "Cleaning"
     shell: |
       rm -Rf .venv .venv1 .venv2
-    is_entrypoint: true
 
   - name: "default_action"
     description: "The default action. Runs in the default environment."
     message: "Running in default env"
     dependencies: ["default_action_python"]
-    is_entrypoint: true
 
   - name: "action1"
     description: "Action that runs in env1."
     message: "Running in env1"
     dependencies: ["action1_python"]
-    is_entrypoint: true
     environment: "env1"
 
   - name: "action2"
     description: "Action that runs in env2."
     message: "Running in env2"
     dependencies: ["action2_python"]
-    is_entrypoint: true
     environment: "env2"
 
 environments:
