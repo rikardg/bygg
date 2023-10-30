@@ -6,14 +6,15 @@ actions:
     message: "I touched a file"
     shell: "touch foo"
     dependencies: ["ls", "do something more"]
-    is_entrypoint: true
 
   - name: "ls"
+    is_entrypoint: false
     shell: "ls -hal"
 
   - name: "do something more"
+    is_entrypoint: false
     message: "I did something more"
     shell: |
-        echo "foo"
-        ls -hal ..
-        echo "bar"
+      echo "foo"
+      ls -hal ..
+      echo "bar"

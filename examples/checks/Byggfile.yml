@@ -6,18 +6,19 @@ actions:
     description: |
       Run all test actions declared in this file. Should trigger all tested checks when run with
       --check.
-    is_entrypoint: true
     dependencies:
       - check_inputs_outputs
       - output_file_missing
 
   # Circular dependencies
   - name: "circular_A"
+    is_entrypoint: false
     outputs: ["foo"]
     shell: |
       touch foo
 
   - name: "circular_B"
+    is_entrypoint: false
     dependencies: ["circular_A"]
     inputs: ["foo"]
     outputs: ["bar"]
@@ -25,6 +26,7 @@ actions:
       touch bar
 
   - name: "circular_C"
+    is_entrypoint: false
     dependencies: ["circular_B"]
     inputs: ["bar"]
     outputs: ["foo"]
@@ -33,7 +35,6 @@ actions:
     description: |
       Example where a later action has the input of an earlier one as its output. This should
       trigger check_inputs_outputs when run with --check.
-    is_entrypoint: true
     dependencies: ["circular_C"]
 
   # Actions that don't create their outputs
@@ -41,12 +42,12 @@ actions:
     description: |
       Example that doesn't create the outputs that it declares. This should trigger
       output_file_missing when run with --check.
-    is_entrypoint: true
     dependencies: ["no_outputs_A"]
     inputs: ["no_outputs_A"]
     outputs: ["no_outputs"]
     shell: "true"
 
   - name: "no_outputs_A"
+    is_entrypoint: false
     outputs: ["no_outputs_A"]
     shell: "true"
