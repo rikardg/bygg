@@ -380,11 +380,18 @@ def construct_exec_list(
     exec_list = [restart_with, *partition.actions]
     for k, v in vars(args).items():
         if k == "actions":
+            # Actions are already in exec_list
+            continue
+        if v is False or v is None:
+            # These are arguments that were not given
             continue
         elif v is True:
             exec_list.append(f"--{k}")
-        elif v:
-            exec_list.append(f"--{k} {v}")
+        elif len(k) > 1 and v:
+            exec_list.append(f"--{k}={v}")
+        else:
+            # Could happen if we add another type of argument
+            assert False
     if partition.environment_name:
         exec_list.append("--is_restarted_with_env")
         exec_list.append(partition.environment_name)
