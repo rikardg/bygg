@@ -15,6 +15,7 @@ import argcomplete
 
 from bygg.action import Action
 from bygg.apply_configuration import apply_configuration
+from bygg.argument_unparsing import unparse_args
 from bygg.configuration import (
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
@@ -268,10 +269,13 @@ def list_actions_and_exit(ctx: ByggContext, configuration: ByggFile | None):
     sys.exit(0) if status else sys.exit(1)
 
 
-def dispatcher(args: argparse.Namespace):
+def dispatcher():
     """
     A build tool written in Python, where all actions can be written in Python.
     """
+    parser = create_argument_parser()
+    args = parser.parse_args()
+
     if args.dump_schema:
         dump_schema()
         sys.exit(0)
@@ -330,7 +334,12 @@ def dispatcher(args: argparse.Namespace):
         restart_with = apply_configuration(configuration, env, is_restarted_with_env)
 
         if restart_with is not None and not is_restarted_with_env:
-            exec_list = construct_exec_list(args, restart_with, partition)
+            exec_list = [restart_with, *partition.actions] + unparse_args(
+                parser, args, drop=["actions"]
+            )
+            if partition.environment_name:
+                exec_list += ["--is_restarted_with_env", partition.environment_name]
+
             try:
                 process = subprocess.run(exec_list, encoding="utf-8")
                 if process.returncode != 0:
@@ -372,30 +381,6 @@ class ActionPartition:
 
     environment_name: str | None
     actions: List[str]
-
-
-def construct_exec_list(
-    args: argparse.Namespace, restart_with: str, partition: ActionPartition
-):
-    exec_list = [restart_with, *partition.actions]
-    for k, v in vars(args).items():
-        if k == "actions":
-            # Actions are already in exec_list
-            continue
-        if v is False or v is None:
-            # These are arguments that were not given
-            continue
-        elif v is True:
-            exec_list.append(f"--{k}")
-        elif len(k) > 1 and v:
-            exec_list.append(f"--{k}={v}")
-        else:
-            # Could happen if we add another type of argument
-            assert False
-    if partition.environment_name:
-        exec_list.append("--is_restarted_with_env")
-        exec_list.append(partition.environment_name)
-    return exec_list
 
 
 def partition_actions(
@@ -549,11 +534,8 @@ List available actions:
 
 
 def main():
-    parser = create_argument_parser()
-    args = parser.parse_args()
-
     try:
-        return dispatcher(args)
+        return dispatcher()
     except KeyboardInterrupt:
         output_warning("Interrupted by user. Aborting.")
         return 1
