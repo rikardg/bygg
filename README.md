@@ -7,6 +7,7 @@ _a Python build system that gets out of your way_
 [![PyPI](https://img.shields.io/pypi/v/bygg?flat)](https://pypi.org/project/bygg/)
 [![GitHub Release Date](https://img.shields.io/github/release-date/rikardg/bygg)](https://github.com/rikardg/bygg/releases)
 [![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/rikardg/bygg/code_quality.yml?branch=master&flat)](https://github.com/rikardg/bygg/actions?query=branch%3Amaster+)
+![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Frikardg%2Fbygg%2Fmaster%2Fpyproject.toml)
 [![GitHub](https://img.shields.io/github/license/rikardg/bygg)](LICENSE)
 
 [Installation](#installation) • [Usage](#usage) • [Development](#development)
