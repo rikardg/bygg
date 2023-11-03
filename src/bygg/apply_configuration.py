@@ -55,8 +55,6 @@ def setup_environment(environment: Environment):
         encoding="utf-8",
     )
 
-    output_plain(process.stdout)
-
     if process.returncode != 0:
         output_error("Error while creating virtual environment:")
         output_plain(process.stdout)
