@@ -1,0 +1,17 @@
+# serializer version: 1
+# name: test_call
+  '''
+  foo
+  bar
+  baz
+  
+  '''
+# ---
+# name: test_subprocess_tty_print
+  '''
+  'foo
+  bar
+  baz'
+  
+  '''
+# ---
