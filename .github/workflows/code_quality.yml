@@ -55,3 +55,19 @@ jobs:
           # calm. Errors with regards to use of this dependency will be detected by nox.
           pip install rich
           pyright examples/
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+      - name: install
+        run: ./bootstrap.py
+      - uses: pypa/gh-action-pip-audit@v1.0.8
+        with:
+          virtual-environment: .venv/
+          inputs: requirements.txt requirements-dev.txt
+          require-hashes: true
