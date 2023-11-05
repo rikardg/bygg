@@ -142,11 +142,11 @@ If you want to try out the examples or even develop Bygg itself, Bygg can be
 tried out and worked on without installing it globally:
 
 First, clone this repo and cd into it, then execute the commands below.
-`bootstrap.sh` creates a virtual environment and installs Bygg into it together
+`bootstrap.py` creates a virtual environment and installs Bygg into it together
 with its dependencies.
 
 ```shell
-./bootstrap.sh
+./bootstrap.py
 . .venv/bin/activate
 ```
 
