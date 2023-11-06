@@ -42,6 +42,7 @@ def examples(session):
 
     with session.chdir("examples/trivial"):
         session.run("bygg")
+        session.run("bygg", "transform")
         session.run("bygg", "--tree")
         session.run("bygg", "--clean")
 

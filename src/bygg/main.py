@@ -305,7 +305,9 @@ def dispatcher():
         list_actions_and_exit(ctx, configuration)
 
     try:
-        action_partitions = partition_actions(configuration, args.actions)
+        action_partitions = (
+            partition_actions(configuration, args.actions) if configuration else None
+        )
     except KeyError as e:
         output_plain(
             f"Could not find action {TS.BOLD}{e}{TS.RESET}. List available actions with {TS.BOLD}--list{TS.RESET}."
@@ -384,7 +386,7 @@ class ActionPartition:
 
 
 def partition_actions(
-    configuration: ByggFile | None,
+    configuration: ByggFile,
     actions: List[str] | None,
 ) -> List[ActionPartition] | None:
     """
@@ -392,12 +394,12 @@ def partition_actions(
     """
     resolved_actions = actions if actions else []
 
-    if configuration:
-        if not actions and configuration.settings.default_action is not None:
-            # Resolve to default action:
-            resolved_actions += [configuration.settings.default_action]
-            return [ActionPartition("default", resolved_actions)]
+    if not actions and configuration.settings.default_action is not None:
+        # Resolve to default action:
+        resolved_actions += [configuration.settings.default_action]
+        return [ActionPartition("default", resolved_actions)]
 
+    if configuration.actions:
         # Put consecutive actions with the same environment in the same partition:
         action_partitions = []
         action_dict = {a.name: a for a in configuration.actions}
