@@ -23,8 +23,8 @@ things to change and evolve. Feedback and bug reports are welcome!_
 ## Introduction
 
 Bygg is a build system implemented in and configured using Python. It is
-general-purpose, but is aimed at those that use Python to glue together other
-systems.
+general-purpose, but is aimed at those that (want to) use Python to glue
+together other systems.
 
 Bygg tries to get out of your way and be as thin as possible, while still
 providing correctness and minimal rebuilds.
@@ -61,7 +61,7 @@ directly.
 @action(
     "build1",
     inputs=["foo.in", "bar.in"],
-    outputs=["foo.out", "bar.out"]
+    outputs=["foo.out", "bar.out"],
     is_entrypoint: True
 )
 def a_build_command(ctx: Context):
@@ -80,7 +80,7 @@ Action(
     inputs=["foo.in", "bar.in"],
     outputs=["foo.out", "bar.out"],
     dependencies=["another action"],
-    command=also_a_build_command
+    command=also_a_build_command,
     is_entrypoint=True
 )
 ```
@@ -90,11 +90,11 @@ actions above can be built with `bygg build1` and `bygg build2`, respectively.
 
 ### Settings file
 
-There is also experimental support for declaring actions in a settings file
-(currently YAML). This is intended primarily for configuring static settings
-like which virtual environment to use, but can also be used for declaring
-simple actions. See `examples/taskrunner/Byggfile.yml` and
-`examples/environments/Byggfile.yml`.
+There is also support for declaring actions in a YAML settings file,
+`Byggfile.yml`. This is intended primarily for configuring static settings like
+which virtual environment to use and their respective entrypoints, but can also
+be used for declaring other (static) actions. See
+`examples/taskrunner/Byggfile.yml` and `examples/environments/Byggfile.yml`.
 
 ## Shell tab completions
 
