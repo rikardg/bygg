@@ -301,9 +301,6 @@ def dispatcher():
     configuration = read_config_file()
     ctx = init_bygg_context()
 
-    if args.list:
-        list_actions_and_exit(ctx, configuration)
-
     try:
         action_partitions = (
             partition_actions(configuration, args.actions) if configuration else None
@@ -320,7 +317,7 @@ def dispatcher():
             apply_configuration(None, None, None)
             # TODO will not be needed once we allow configuring default action also in
             # Python.
-            if not args.actions:
+            if not args.actions or args.list:
                 list_actions_and_exit(ctx, configuration)
             status = do_dispatch(ctx, args, args.actions)
         else:
@@ -328,6 +325,9 @@ def dispatcher():
         if status:
             sys.exit(0)
         sys.exit(1)
+
+    if args.list:
+        list_actions_and_exit(ctx, configuration)
 
     for partition in action_partitions:
         env = partition.environment_name
