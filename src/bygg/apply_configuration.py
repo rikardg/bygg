@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -5,12 +6,7 @@ import sys
 from typing import List
 
 from bygg.action import Action
-from bygg.configuration import (
-    PYTHON_INPUTFILE,
-    ByggFile,
-    Environment,
-    load_python_build_file,
-)
+from bygg.configuration import PYTHON_INPUTFILE, ByggFile, Environment
 from bygg.digest import calculate_string_digest
 from bygg.output import output_error, output_info, output_plain
 from bygg.util import create_shell_command
@@ -124,3 +120,11 @@ def apply_configuration(
     load_python_build_file(python_build_file)
 
     return None
+
+
+def load_python_build_file(build_file: str):
+    if os.path.isfile(build_file):
+        with open(build_file, "r") as f:
+            # modify load path to make the current directory importable
+            preamble = "import sys\nsys.path.insert(0, '.')\n\n"
+            exec(preamble + f.read(), globals())
