@@ -1,0 +1,959 @@
+# serializer version: 1
+# name: test_list[checks]
+  '''
+  Available actions:
+  
+  all_checks (default)
+      Run all test actions declared in this file. Should trigger all
+      tested checks when run with --check.
+  
+  check_inputs_outputs
+      Example where a later action has the input of an earlier one as
+      its output. This should trigger check_inputs_outputs when run with
+      --check.
+  
+  output_file_missing
+      Example that doesn't create the outputs that it declares. This
+      should trigger output_file_missing when run with --check.
+  
+  
+  '''
+# ---
+# name: test_list[environments]
+  '''
+  Available actions:
+  
+  default_action (default)
+      The default action. Runs in the default environment.
+  
+  action1
+      Action that runs in env1.
+  
+  action2
+      Action that runs in env2.
+  
+  clean_environments
+      Clean all environments
+  
+  
+  '''
+# ---
+# name: test_list[failing_jobs]
+  '''
+  Available actions:
+  
+  all (default)
+      Run all test jobs. They will fail.
+  
+  gcc
+      Simulate a failing gcc build.
+  
+  go
+      Simulate a failing go build.
+  
+  make
+      Simulate a failing make run.
+  
+  npm
+      Simulate a failing npm build.
+  
+  
+  '''
+# ---
+# name: test_list[only_python]
+  '''
+  Available actions:
+  
+  hello
+      No description
+  
+  
+  '''
+# ---
+# name: test_list[parametric]
+  '''
+  Available actions:
+  
+  sort (default)
+      Sort all test files. Also sets up test files if needed.
+  
+  setup
+      Set up test files.
+  
+  
+  '''
+# ---
+# name: test_list[taskrunner]
+  '''
+  Available actions:
+  
+  touch a file (default)
+      No description
+  
+  
+  '''
+# ---
+# name: test_list[trivial]
+  '''
+  Loaded build files but no entrypoints were found.
+  Type `bygg --help` for help.
+  
+  '''
+# ---
+# name: test_list_directory[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  Available actions:
+  
+  all_checks (default)
+      Run all test actions declared in this file. Should trigger all
+      tested checks when run with --check.
+  
+  check_inputs_outputs
+      Example where a later action has the input of an earlier one as
+      its output. This should trigger check_inputs_outputs when run with
+      --check.
+  
+  output_file_missing
+      Example that doesn't create the outputs that it declares. This
+      should trigger output_file_missing when run with --check.
+  
+  
+  '''
+# ---
+# name: test_list_directory[environments]
+  '''
+  🛈 Entering directory 'examples/environments'
+  Available actions:
+  
+  default_action (default)
+      The default action. Runs in the default environment.
+  
+  action1
+      Action that runs in env1.
+  
+  action2
+      Action that runs in env2.
+  
+  clean_environments
+      Clean all environments
+  
+  
+  '''
+# ---
+# name: test_list_directory[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  Available actions:
+  
+  all (default)
+      Run all test jobs. They will fail.
+  
+  gcc
+      Simulate a failing gcc build.
+  
+  go
+      Simulate a failing go build.
+  
+  make
+      Simulate a failing make run.
+  
+  npm
+      Simulate a failing npm build.
+  
+  
+  '''
+# ---
+# name: test_list_directory[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  Available actions:
+  
+  hello
+      No description
+  
+  
+  '''
+# ---
+# name: test_list_directory[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  Available actions:
+  
+  sort (default)
+      Sort all test files. Also sets up test files if needed.
+  
+  setup
+      Set up test files.
+  
+  
+  '''
+# ---
+# name: test_list_directory[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  Available actions:
+  
+  touch a file (default)
+      No description
+  
+  
+  '''
+# ---
+# name: test_list_directory[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  Loaded build files but no entrypoints were found.
+  Type `bygg --help` for help.
+  
+  '''
+# ---
+# name: test_tree[checks]
+  '''
+  
+  all_checks
+  ├── check_inputs_outputs
+  │   └── circular_C
+  │       └── circular_B
+  │           └── circular_A
+  └── output_file_missing
+      └── no_outputs_A
+  
+  '''
+# ---
+# name: test_tree[environments]
+  '''
+  
+  default_action
+  └── default_action_python
+  🛈 Setting up environment
+  
+  '''
+# ---
+# name: test_tree[failing_jobs]
+  '''
+  
+  all
+  ├── gcc
+  ├── go
+  ├── make
+  └── npm
+  
+  '''
+# ---
+# name: test_tree[only_python]
+  '''
+  Available actions:
+  
+  hello
+      No description
+  
+  
+  '''
+# ---
+# name: test_tree[parametric]
+  '''
+  
+  sort
+  └── sort_test_files
+      ├── t/l0f0.txt
+      │   ├── t/l0f0.txt.in
+      │   └── t/l1f0.txt
+      │       ├── t/l1f0.txt.in
+      │       └── t/l2f0.txt
+      │           └── t/l2f0.txt.in
+      ├── t/l0f1.txt
+      │   ├── t/l0f1.txt.in
+      │   └── t/l1f1.txt
+      │       ├── t/l1f1.txt.in
+      │       └── t/l2f1.txt
+      │           └── t/l2f1.txt.in
+      ├── t/l0f10.txt
+      │   ├── t/l0f10.txt.in
+      │   └── t/l1f10.txt
+      │       ├── t/l1f10.txt.in
+      │       └── t/l2f10.txt
+      │           └── t/l2f10.txt.in
+      ├── t/l0f11.txt
+      │   ├── t/l0f11.txt.in
+      │   └── t/l1f11.txt
+      │       ├── t/l1f11.txt.in
+      │       └── t/l2f11.txt
+      │           └── t/l2f11.txt.in
+      ├── t/l0f12.txt
+      │   ├── t/l0f12.txt.in
+      │   └── t/l1f12.txt
+      │       ├── t/l1f12.txt.in
+      │       └── t/l2f12.txt
+      │           └── t/l2f12.txt.in
+      ├── t/l0f13.txt
+      │   ├── t/l0f13.txt.in
+      │   └── t/l1f13.txt
+      │       ├── t/l1f13.txt.in
+      │       └── t/l2f13.txt
+      │           └── t/l2f13.txt.in
+      ├── t/l0f14.txt
+      │   ├── t/l0f14.txt.in
+      │   └── t/l1f14.txt
+      │       ├── t/l1f14.txt.in
+      │       └── t/l2f14.txt
+      │           └── t/l2f14.txt.in
+      ├── t/l0f15.txt
+      │   ├── t/l0f15.txt.in
+      │   └── t/l1f15.txt
+      │       ├── t/l1f15.txt.in
+      │       └── t/l2f15.txt
+      │           └── t/l2f15.txt.in
+      ├── t/l0f16.txt
+      │   ├── t/l0f16.txt.in
+      │   └── t/l1f16.txt
+      │       ├── t/l1f16.txt.in
+      │       └── t/l2f16.txt
+      │           └── t/l2f16.txt.in
+      ├── t/l0f17.txt
+      │   ├── t/l0f17.txt.in
+      │   └── t/l1f17.txt
+      │       ├── t/l1f17.txt.in
+      │       └── t/l2f17.txt
+      │           └── t/l2f17.txt.in
+      ├── t/l0f18.txt
+      │   ├── t/l0f18.txt.in
+      │   └── t/l1f18.txt
+      │       ├── t/l1f18.txt.in
+      │       └── t/l2f18.txt
+      │           └── t/l2f18.txt.in
+      ├── t/l0f19.txt
+      │   ├── t/l0f19.txt.in
+      │   └── t/l1f19.txt
+      │       ├── t/l1f19.txt.in
+      │       └── t/l2f19.txt
+      │           └── t/l2f19.txt.in
+      ├── t/l0f2.txt
+      │   ├── t/l0f2.txt.in
+      │   └── t/l1f2.txt
+      │       ├── t/l1f2.txt.in
+      │       └── t/l2f2.txt
+      │           └── t/l2f2.txt.in
+      ├── t/l0f20.txt
+      │   ├── t/l0f20.txt.in
+      │   └── t/l1f20.txt
+      │       ├── t/l1f20.txt.in
+      │       └── t/l2f20.txt
+      │           └── t/l2f20.txt.in
+      ├── t/l0f21.txt
+      │   ├── t/l0f21.txt.in
+      │   └── t/l1f21.txt
+      │       ├── t/l1f21.txt.in
+      │       └── t/l2f21.txt
+      │           └── t/l2f21.txt.in
+      ├── t/l0f22.txt
+      │   ├── t/l0f22.txt.in
+      │   └── t/l1f22.txt
+      │       ├── t/l1f22.txt.in
+      │       └── t/l2f22.txt
+      │           └── t/l2f22.txt.in
+      ├── t/l0f23.txt
+      │   ├── t/l0f23.txt.in
+      │   └── t/l1f23.txt
+      │       ├── t/l1f23.txt.in
+      │       └── t/l2f23.txt
+      │           └── t/l2f23.txt.in
+      ├── t/l0f24.txt
+      │   ├── t/l0f24.txt.in
+      │   └── t/l1f24.txt
+      │       ├── t/l1f24.txt.in
+      │       └── t/l2f24.txt
+      │           └── t/l2f24.txt.in
+      ├── t/l0f25.txt
+      │   ├── t/l0f25.txt.in
+      │   └── t/l1f25.txt
+      │       ├── t/l1f25.txt.in
+      │       └── t/l2f25.txt
+      │           └── t/l2f25.txt.in
+      ├── t/l0f26.txt
+      │   ├── t/l0f26.txt.in
+      │   └── t/l1f26.txt
+      │       ├── t/l1f26.txt.in
+      │       └── t/l2f26.txt
+      │           └── t/l2f26.txt.in
+      ├── t/l0f27.txt
+      │   ├── t/l0f27.txt.in
+      │   └── t/l1f27.txt
+      │       ├── t/l1f27.txt.in
+      │       └── t/l2f27.txt
+      │           └── t/l2f27.txt.in
+      ├── t/l0f28.txt
+      │   ├── t/l0f28.txt.in
+      │   └── t/l1f28.txt
+      │       ├── t/l1f28.txt.in
+      │       └── t/l2f28.txt
+      │           └── t/l2f28.txt.in
+      ├── t/l0f29.txt
+      │   ├── t/l0f29.txt.in
+      │   └── t/l1f29.txt
+      │       ├── t/l1f29.txt.in
+      │       └── t/l2f29.txt
+      │           └── t/l2f29.txt.in
+      ├── t/l0f3.txt
+      │   ├── t/l0f3.txt.in
+      │   └── t/l1f3.txt
+      │       ├── t/l1f3.txt.in
+      │       └── t/l2f3.txt
+      │           └── t/l2f3.txt.in
+      ├── t/l0f30.txt
+      │   ├── t/l0f30.txt.in
+      │   └── t/l1f30.txt
+      │       ├── t/l1f30.txt.in
+      │       └── t/l2f30.txt
+      │           └── t/l2f30.txt.in
+      ├── t/l0f31.txt
+      │   ├── t/l0f31.txt.in
+      │   └── t/l1f31.txt
+      │       ├── t/l1f31.txt.in
+      │       └── t/l2f31.txt
+      │           └── t/l2f31.txt.in
+      ├── t/l0f32.txt
+      │   ├── t/l0f32.txt.in
+      │   └── t/l1f32.txt
+      │       ├── t/l1f32.txt.in
+      │       └── t/l2f32.txt
+      │           └── t/l2f32.txt.in
+      ├── t/l0f33.txt
+      │   ├── t/l0f33.txt.in
+      │   └── t/l1f33.txt
+      │       ├── t/l1f33.txt.in
+      │       └── t/l2f33.txt
+      │           └── t/l2f33.txt.in
+      ├── t/l0f34.txt
+      │   ├── t/l0f34.txt.in
+      │   └── t/l1f34.txt
+      │       ├── t/l1f34.txt.in
+      │       └── t/l2f34.txt
+      │           └── t/l2f34.txt.in
+      ├── t/l0f35.txt
+      │   ├── t/l0f35.txt.in
+      │   └── t/l1f35.txt
+      │       ├── t/l1f35.txt.in
+      │       └── t/l2f35.txt
+      │           └── t/l2f35.txt.in
+      ├── t/l0f36.txt
+      │   ├── t/l0f36.txt.in
+      │   └── t/l1f36.txt
+      │       ├── t/l1f36.txt.in
+      │       └── t/l2f36.txt
+      │           └── t/l2f36.txt.in
+      ├── t/l0f37.txt
+      │   ├── t/l0f37.txt.in
+      │   └── t/l1f37.txt
+      │       ├── t/l1f37.txt.in
+      │       └── t/l2f37.txt
+      │           └── t/l2f37.txt.in
+      ├── t/l0f38.txt
+      │   ├── t/l0f38.txt.in
+      │   └── t/l1f38.txt
+      │       ├── t/l1f38.txt.in
+      │       └── t/l2f38.txt
+      │           └── t/l2f38.txt.in
+      ├── t/l0f39.txt
+      │   ├── t/l0f39.txt.in
+      │   └── t/l1f39.txt
+      │       ├── t/l1f39.txt.in
+      │       └── t/l2f39.txt
+      │           └── t/l2f39.txt.in
+      ├── t/l0f4.txt
+      │   ├── t/l0f4.txt.in
+      │   └── t/l1f4.txt
+      │       ├── t/l1f4.txt.in
+      │       └── t/l2f4.txt
+      │           └── t/l2f4.txt.in
+      ├── t/l0f40.txt
+      │   ├── t/l0f40.txt.in
+      │   └── t/l1f40.txt
+      │       ├── t/l1f40.txt.in
+      │       └── t/l2f40.txt
+      │           └── t/l2f40.txt.in
+      ├── t/l0f41.txt
+      │   ├── t/l0f41.txt.in
+      │   └── t/l1f41.txt
+      │       ├── t/l1f41.txt.in
+      │       └── t/l2f41.txt
+      │           └── t/l2f41.txt.in
+      ├── t/l0f42.txt
+      │   ├── t/l0f42.txt.in
+      │   └── t/l1f42.txt
+      │       ├── t/l1f42.txt.in
+      │       └── t/l2f42.txt
+      │           └── t/l2f42.txt.in
+      ├── t/l0f43.txt
+      │   ├── t/l0f43.txt.in
+      │   └── t/l1f43.txt
+      │       ├── t/l1f43.txt.in
+      │       └── t/l2f43.txt
+      │           └── t/l2f43.txt.in
+      ├── t/l0f44.txt
+      │   ├── t/l0f44.txt.in
+      │   └── t/l1f44.txt
+      │       ├── t/l1f44.txt.in
+      │       └── t/l2f44.txt
+      │           └── t/l2f44.txt.in
+      ├── t/l0f45.txt
+      │   ├── t/l0f45.txt.in
+      │   └── t/l1f45.txt
+      │       ├── t/l1f45.txt.in
+      │       └── t/l2f45.txt
+      │           └── t/l2f45.txt.in
+      ├── t/l0f46.txt
+      │   ├── t/l0f46.txt.in
+      │   └── t/l1f46.txt
+      │       ├── t/l1f46.txt.in
+      │       └── t/l2f46.txt
+      │           └── t/l2f46.txt.in
+      ├── t/l0f47.txt
+      │   ├── t/l0f47.txt.in
+      │   └── t/l1f47.txt
+      │       ├── t/l1f47.txt.in
+      │       └── t/l2f47.txt
+      │           └── t/l2f47.txt.in
+      ├── t/l0f48.txt
+      │   ├── t/l0f48.txt.in
+      │   └── t/l1f48.txt
+      │       ├── t/l1f48.txt.in
+      │       └── t/l2f48.txt
+      │           └── t/l2f48.txt.in
+      ├── t/l0f49.txt
+      │   ├── t/l0f49.txt.in
+      │   └── t/l1f49.txt
+      │       ├── t/l1f49.txt.in
+      │       └── t/l2f49.txt
+      │           └── t/l2f49.txt.in
+      ├── t/l0f5.txt
+      │   ├── t/l0f5.txt.in
+      │   └── t/l1f5.txt
+      │       ├── t/l1f5.txt.in
+      │       └── t/l2f5.txt
+      │           └── t/l2f5.txt.in
+      ├── t/l0f6.txt
+      │   ├── t/l0f6.txt.in
+      │   └── t/l1f6.txt
+      │       ├── t/l1f6.txt.in
+      │       └── t/l2f6.txt
+      │           └── t/l2f6.txt.in
+      ├── t/l0f7.txt
+      │   ├── t/l0f7.txt.in
+      │   └── t/l1f7.txt
+      │       ├── t/l1f7.txt.in
+      │       └── t/l2f7.txt
+      │           └── t/l2f7.txt.in
+      ├── t/l0f8.txt
+      │   ├── t/l0f8.txt.in
+      │   └── t/l1f8.txt
+      │       ├── t/l1f8.txt.in
+      │       └── t/l2f8.txt
+      │           └── t/l2f8.txt.in
+      └── t/l0f9.txt
+          ├── t/l0f9.txt.in
+          └── t/l1f9.txt
+              ├── t/l1f9.txt.in
+              └── t/l2f9.txt
+                  └── t/l2f9.txt.in
+  
+  '''
+# ---
+# name: test_tree[taskrunner]
+  '''
+  
+  touch a file
+  ├── do something more
+  └── ls
+  
+  '''
+# ---
+# name: test_tree[trivial]
+  '''
+  
+  transform
+  ├── dynamic
+  ├── foo
+  ├── testfile 1
+  └── testfile 2
+  
+  '''
+# ---
+# name: test_tree_directory[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  
+  all_checks
+  ├── check_inputs_outputs
+  │   └── circular_C
+  │       └── circular_B
+  │           └── circular_A
+  └── output_file_missing
+      └── no_outputs_A
+  
+  '''
+# ---
+# name: test_tree_directory[environments]
+  '''
+  
+  default_action
+  └── default_action_python
+  🛈 Entering directory 'examples/environments'
+  🛈 Setting up environment
+  
+  '''
+# ---
+# name: test_tree_directory[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  
+  all
+  ├── gcc
+  ├── go
+  ├── make
+  └── npm
+  
+  '''
+# ---
+# name: test_tree_directory[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  Available actions:
+  
+  hello
+      No description
+  
+  
+  '''
+# ---
+# name: test_tree_directory[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  
+  sort
+  └── sort_test_files
+      ├── t/l0f0.txt
+      │   ├── t/l0f0.txt.in
+      │   └── t/l1f0.txt
+      │       ├── t/l1f0.txt.in
+      │       └── t/l2f0.txt
+      │           └── t/l2f0.txt.in
+      ├── t/l0f1.txt
+      │   ├── t/l0f1.txt.in
+      │   └── t/l1f1.txt
+      │       ├── t/l1f1.txt.in
+      │       └── t/l2f1.txt
+      │           └── t/l2f1.txt.in
+      ├── t/l0f10.txt
+      │   ├── t/l0f10.txt.in
+      │   └── t/l1f10.txt
+      │       ├── t/l1f10.txt.in
+      │       └── t/l2f10.txt
+      │           └── t/l2f10.txt.in
+      ├── t/l0f11.txt
+      │   ├── t/l0f11.txt.in
+      │   └── t/l1f11.txt
+      │       ├── t/l1f11.txt.in
+      │       └── t/l2f11.txt
+      │           └── t/l2f11.txt.in
+      ├── t/l0f12.txt
+      │   ├── t/l0f12.txt.in
+      │   └── t/l1f12.txt
+      │       ├── t/l1f12.txt.in
+      │       └── t/l2f12.txt
+      │           └── t/l2f12.txt.in
+      ├── t/l0f13.txt
+      │   ├── t/l0f13.txt.in
+      │   └── t/l1f13.txt
+      │       ├── t/l1f13.txt.in
+      │       └── t/l2f13.txt
+      │           └── t/l2f13.txt.in
+      ├── t/l0f14.txt
+      │   ├── t/l0f14.txt.in
+      │   └── t/l1f14.txt
+      │       ├── t/l1f14.txt.in
+      │       └── t/l2f14.txt
+      │           └── t/l2f14.txt.in
+      ├── t/l0f15.txt
+      │   ├── t/l0f15.txt.in
+      │   └── t/l1f15.txt
+      │       ├── t/l1f15.txt.in
+      │       └── t/l2f15.txt
+      │           └── t/l2f15.txt.in
+      ├── t/l0f16.txt
+      │   ├── t/l0f16.txt.in
+      │   └── t/l1f16.txt
+      │       ├── t/l1f16.txt.in
+      │       └── t/l2f16.txt
+      │           └── t/l2f16.txt.in
+      ├── t/l0f17.txt
+      │   ├── t/l0f17.txt.in
+      │   └── t/l1f17.txt
+      │       ├── t/l1f17.txt.in
+      │       └── t/l2f17.txt
+      │           └── t/l2f17.txt.in
+      ├── t/l0f18.txt
+      │   ├── t/l0f18.txt.in
+      │   └── t/l1f18.txt
+      │       ├── t/l1f18.txt.in
+      │       └── t/l2f18.txt
+      │           └── t/l2f18.txt.in
+      ├── t/l0f19.txt
+      │   ├── t/l0f19.txt.in
+      │   └── t/l1f19.txt
+      │       ├── t/l1f19.txt.in
+      │       └── t/l2f19.txt
+      │           └── t/l2f19.txt.in
+      ├── t/l0f2.txt
+      │   ├── t/l0f2.txt.in
+      │   └── t/l1f2.txt
+      │       ├── t/l1f2.txt.in
+      │       └── t/l2f2.txt
+      │           └── t/l2f2.txt.in
+      ├── t/l0f20.txt
+      │   ├── t/l0f20.txt.in
+      │   └── t/l1f20.txt
+      │       ├── t/l1f20.txt.in
+      │       └── t/l2f20.txt
+      │           └── t/l2f20.txt.in
+      ├── t/l0f21.txt
+      │   ├── t/l0f21.txt.in
+      │   └── t/l1f21.txt
+      │       ├── t/l1f21.txt.in
+      │       └── t/l2f21.txt
+      │           └── t/l2f21.txt.in
+      ├── t/l0f22.txt
+      │   ├── t/l0f22.txt.in
+      │   └── t/l1f22.txt
+      │       ├── t/l1f22.txt.in
+      │       └── t/l2f22.txt
+      │           └── t/l2f22.txt.in
+      ├── t/l0f23.txt
+      │   ├── t/l0f23.txt.in
+      │   └── t/l1f23.txt
+      │       ├── t/l1f23.txt.in
+      │       └── t/l2f23.txt
+      │           └── t/l2f23.txt.in
+      ├── t/l0f24.txt
+      │   ├── t/l0f24.txt.in
+      │   └── t/l1f24.txt
+      │       ├── t/l1f24.txt.in
+      │       └── t/l2f24.txt
+      │           └── t/l2f24.txt.in
+      ├── t/l0f25.txt
+      │   ├── t/l0f25.txt.in
+      │   └── t/l1f25.txt
+      │       ├── t/l1f25.txt.in
+      │       └── t/l2f25.txt
+      │           └── t/l2f25.txt.in
+      ├── t/l0f26.txt
+      │   ├── t/l0f26.txt.in
+      │   └── t/l1f26.txt
+      │       ├── t/l1f26.txt.in
+      │       └── t/l2f26.txt
+      │           └── t/l2f26.txt.in
+      ├── t/l0f27.txt
+      │   ├── t/l0f27.txt.in
+      │   └── t/l1f27.txt
+      │       ├── t/l1f27.txt.in
+      │       └── t/l2f27.txt
+      │           └── t/l2f27.txt.in
+      ├── t/l0f28.txt
+      │   ├── t/l0f28.txt.in
+      │   └── t/l1f28.txt
+      │       ├── t/l1f28.txt.in
+      │       └── t/l2f28.txt
+      │           └── t/l2f28.txt.in
+      ├── t/l0f29.txt
+      │   ├── t/l0f29.txt.in
+      │   └── t/l1f29.txt
+      │       ├── t/l1f29.txt.in
+      │       └── t/l2f29.txt
+      │           └── t/l2f29.txt.in
+      ├── t/l0f3.txt
+      │   ├── t/l0f3.txt.in
+      │   └── t/l1f3.txt
+      │       ├── t/l1f3.txt.in
+      │       └── t/l2f3.txt
+      │           └── t/l2f3.txt.in
+      ├── t/l0f30.txt
+      │   ├── t/l0f30.txt.in
+      │   └── t/l1f30.txt
+      │       ├── t/l1f30.txt.in
+      │       └── t/l2f30.txt
+      │           └── t/l2f30.txt.in
+      ├── t/l0f31.txt
+      │   ├── t/l0f31.txt.in
+      │   └── t/l1f31.txt
+      │       ├── t/l1f31.txt.in
+      │       └── t/l2f31.txt
+      │           └── t/l2f31.txt.in
+      ├── t/l0f32.txt
+      │   ├── t/l0f32.txt.in
+      │   └── t/l1f32.txt
+      │       ├── t/l1f32.txt.in
+      │       └── t/l2f32.txt
+      │           └── t/l2f32.txt.in
+      ├── t/l0f33.txt
+      │   ├── t/l0f33.txt.in
+      │   └── t/l1f33.txt
+      │       ├── t/l1f33.txt.in
+      │       └── t/l2f33.txt
+      │           └── t/l2f33.txt.in
+      ├── t/l0f34.txt
+      │   ├── t/l0f34.txt.in
+      │   └── t/l1f34.txt
+      │       ├── t/l1f34.txt.in
+      │       └── t/l2f34.txt
+      │           └── t/l2f34.txt.in
+      ├── t/l0f35.txt
+      │   ├── t/l0f35.txt.in
+      │   └── t/l1f35.txt
+      │       ├── t/l1f35.txt.in
+      │       └── t/l2f35.txt
+      │           └── t/l2f35.txt.in
+      ├── t/l0f36.txt
+      │   ├── t/l0f36.txt.in
+      │   └── t/l1f36.txt
+      │       ├── t/l1f36.txt.in
+      │       └── t/l2f36.txt
+      │           └── t/l2f36.txt.in
+      ├── t/l0f37.txt
+      │   ├── t/l0f37.txt.in
+      │   └── t/l1f37.txt
+      │       ├── t/l1f37.txt.in
+      │       └── t/l2f37.txt
+      │           └── t/l2f37.txt.in
+      ├── t/l0f38.txt
+      │   ├── t/l0f38.txt.in
+      │   └── t/l1f38.txt
+      │       ├── t/l1f38.txt.in
+      │       └── t/l2f38.txt
+      │           └── t/l2f38.txt.in
+      ├── t/l0f39.txt
+      │   ├── t/l0f39.txt.in
+      │   └── t/l1f39.txt
+      │       ├── t/l1f39.txt.in
+      │       └── t/l2f39.txt
+      │           └── t/l2f39.txt.in
+      ├── t/l0f4.txt
+      │   ├── t/l0f4.txt.in
+      │   └── t/l1f4.txt
+      │       ├── t/l1f4.txt.in
+      │       └── t/l2f4.txt
+      │           └── t/l2f4.txt.in
+      ├── t/l0f40.txt
+      │   ├── t/l0f40.txt.in
+      │   └── t/l1f40.txt
+      │       ├── t/l1f40.txt.in
+      │       └── t/l2f40.txt
+      │           └── t/l2f40.txt.in
+      ├── t/l0f41.txt
+      │   ├── t/l0f41.txt.in
+      │   └── t/l1f41.txt
+      │       ├── t/l1f41.txt.in
+      │       └── t/l2f41.txt
+      │           └── t/l2f41.txt.in
+      ├── t/l0f42.txt
+      │   ├── t/l0f42.txt.in
+      │   └── t/l1f42.txt
+      │       ├── t/l1f42.txt.in
+      │       └── t/l2f42.txt
+      │           └── t/l2f42.txt.in
+      ├── t/l0f43.txt
+      │   ├── t/l0f43.txt.in
+      │   └── t/l1f43.txt
+      │       ├── t/l1f43.txt.in
+      │       └── t/l2f43.txt
+      │           └── t/l2f43.txt.in
+      ├── t/l0f44.txt
+      │   ├── t/l0f44.txt.in
+      │   └── t/l1f44.txt
+      │       ├── t/l1f44.txt.in
+      │       └── t/l2f44.txt
+      │           └── t/l2f44.txt.in
+      ├── t/l0f45.txt
+      │   ├── t/l0f45.txt.in
+      │   └── t/l1f45.txt
+      │       ├── t/l1f45.txt.in
+      │       └── t/l2f45.txt
+      │           └── t/l2f45.txt.in
+      ├── t/l0f46.txt
+      │   ├── t/l0f46.txt.in
+      │   └── t/l1f46.txt
+      │       ├── t/l1f46.txt.in
+      │       └── t/l2f46.txt
+      │           └── t/l2f46.txt.in
+      ├── t/l0f47.txt
+      │   ├── t/l0f47.txt.in
+      │   └── t/l1f47.txt
+      │       ├── t/l1f47.txt.in
+      │       └── t/l2f47.txt
+      │           └── t/l2f47.txt.in
+      ├── t/l0f48.txt
+      │   ├── t/l0f48.txt.in
+      │   └── t/l1f48.txt
+      │       ├── t/l1f48.txt.in
+      │       └── t/l2f48.txt
+      │           └── t/l2f48.txt.in
+      ├── t/l0f49.txt
+      │   ├── t/l0f49.txt.in
+      │   └── t/l1f49.txt
+      │       ├── t/l1f49.txt.in
+      │       └── t/l2f49.txt
+      │           └── t/l2f49.txt.in
+      ├── t/l0f5.txt
+      │   ├── t/l0f5.txt.in
+      │   └── t/l1f5.txt
+      │       ├── t/l1f5.txt.in
+      │       └── t/l2f5.txt
+      │           └── t/l2f5.txt.in
+      ├── t/l0f6.txt
+      │   ├── t/l0f6.txt.in
+      │   └── t/l1f6.txt
+      │       ├── t/l1f6.txt.in
+      │       └── t/l2f6.txt
+      │           └── t/l2f6.txt.in
+      ├── t/l0f7.txt
+      │   ├── t/l0f7.txt.in
+      │   └── t/l1f7.txt
+      │       ├── t/l1f7.txt.in
+      │       └── t/l2f7.txt
+      │           └── t/l2f7.txt.in
+      ├── t/l0f8.txt
+      │   ├── t/l0f8.txt.in
+      │   └── t/l1f8.txt
+      │       ├── t/l1f8.txt.in
+      │       └── t/l2f8.txt
+      │           └── t/l2f8.txt.in
+      └── t/l0f9.txt
+          ├── t/l0f9.txt.in
+          └── t/l1f9.txt
+              ├── t/l1f9.txt.in
+              └── t/l2f9.txt
+                  └── t/l2f9.txt.in
+  
+  '''
+# ---
+# name: test_tree_directory[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  
+  touch a file
+  ├── do something more
+  └── ls
+  
+  '''
+# ---
+# name: test_tree_directory[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  
+  transform
+  ├── dynamic
+  ├── foo
+  ├── testfile 1
+  └── testfile 2
+  
+  '''
+# ---

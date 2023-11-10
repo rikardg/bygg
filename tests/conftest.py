@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import shutil
 from tempfile import mkstemp
 
 from bygg.action import Action
@@ -75,3 +76,19 @@ def scheduler_branching_actions(scheduler_fixture):
         dependencies=[],
     )
     return scheduler_fixture
+
+
+# .git is needed for hatch to be able to extract version when doing pip install
+# from the sub environments
+clean_bygg_tree_exclusions = ("__pycache__", ".bygg", ".venv*", "foo", "bar", "t")
+
+
+@pytest.fixture
+def clean_bygg_tree(tmp_path):
+    clean_path = tmp_path / "bygg"
+    shutil.copytree(
+        Path("."),
+        clean_path,
+        ignore=shutil.ignore_patterns(*clean_bygg_tree_exclusions),
+    )
+    return clean_path
