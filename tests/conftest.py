@@ -80,7 +80,15 @@ def scheduler_branching_actions(scheduler_fixture):
 
 # .git is needed for hatch to be able to extract version when doing pip install
 # from the sub environments
-clean_bygg_tree_exclusions = ("__pycache__", ".bygg", ".venv*", "foo", "bar", "t")
+clean_bygg_tree_exclusions = (
+    "__pycache__",
+    ".bygg",
+    ".nox",
+    ".venv*",
+    "foo",
+    "bar",
+    "t",
+)
 
 
 @pytest.fixture
