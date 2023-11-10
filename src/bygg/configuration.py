@@ -73,14 +73,6 @@ class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
     environments: Dict[str, Environment] = msgspec.field(default_factory=dict)
 
 
-def load_python_build_file(build_file: str):
-    if os.path.isfile(build_file):
-        with open(build_file, "r") as f:
-            # modify load path to make the current directory importable
-            preamble = "import sys\nsys.path.insert(0, '.')\n\n"
-            exec(preamble + f.read(), globals())
-
-
 def read_config_file() -> ByggFile | None:
     if not os.path.isfile(YAML_INPUTFILE):
         return None
