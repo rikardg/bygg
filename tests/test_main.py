@@ -71,3 +71,13 @@ def test_tree_directory(snapshot, clean_bygg_tree, example):
     )
     assert process.returncode == 0
     assert process.stdout == snapshot
+
+
+def test_dump_schema(snapshot):
+    process = subprocess.run(
+        ["bygg", "--dump-schema"],
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout == snapshot
