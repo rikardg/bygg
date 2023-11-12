@@ -15,7 +15,7 @@
             }
           },
           "settings": {
-            "$ref": "#/$defs/SettingsSection"
+            "$ref": "#/$defs/Settings"
           },
           "environments": {
             "type": "object",
@@ -141,8 +141,8 @@
         ],
         "additionalProperties": false
       },
-      "SettingsSection": {
-        "title": "SettingsSection",
+      "Settings": {
+        "title": "Settings",
         "type": "object",
         "properties": {
           "default_action": {
@@ -312,8 +312,11 @@
 # ---
 # name: test_list[trivial]
   '''
-  Loaded build files but no entrypoints were found.
-  Type `bygg --help` for help.
+  Available actions:
+  
+  transform (default)
+      No description
+  
   
   '''
 # ---
@@ -420,8 +423,11 @@
 # name: test_list_directory[trivial]
   '''
   🛈 Entering directory 'examples/trivial'
-  Loaded build files but no entrypoints were found.
-  Type `bygg --help` for help.
+  Available actions:
+  
+  transform (default)
+      No description
+  
   
   '''
 # ---
@@ -460,6 +466,8 @@
 # ---
 # name: test_tree[only_python]
   '''
+  No actions specified and no default action is defined.
+  
   Available actions:
   
   hello
@@ -835,6 +843,8 @@
 # name: test_tree_directory[only_python]
   '''
   🛈 Entering directory 'examples/only_python'
+  No actions specified and no default action is defined.
+  
   Available actions:
   
   hello

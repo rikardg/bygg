@@ -9,17 +9,17 @@ import pytest
 class ExampleParameters:
     name: str
     list_rc: int = 0
+    tree_rc: int = 0
 
 
-# TODO exceptions below indicate missing functionality
 examples = [
     ExampleParameters("checks"),
     ExampleParameters("environments"),
     ExampleParameters("failing_jobs"),
-    ExampleParameters("only_python"),  # TODO: should have list_rc=1
+    ExampleParameters("only_python", tree_rc=1),
     ExampleParameters("parametric"),
     ExampleParameters("taskrunner"),
-    ExampleParameters("trivial", list_rc=1),  # TODO: should have list_rc=0
+    ExampleParameters("trivial"),
 ]
 
 examples_dir = Path("examples")
@@ -57,7 +57,7 @@ def test_tree(snapshot, clean_bygg_tree, example):
         capture_output=True,
         encoding="utf-8",
     )
-    assert process.returncode == 0
+    assert process.returncode == example.tree_rc
     assert process.stdout == snapshot
 
 
@@ -69,7 +69,7 @@ def test_tree_directory(snapshot, clean_bygg_tree, example):
         capture_output=True,
         encoding="utf-8",
     )
-    assert process.returncode == 0
+    assert process.returncode == example.tree_rc
     assert process.stdout == snapshot
 
 

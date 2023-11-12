@@ -75,44 +75,46 @@ def should_restart_with(environment: Environment) -> str | None:
 
 
 def apply_configuration(
-    configuration: ByggFile | None,
+    configuration: ByggFile,
     environment_name: str | None,
     is_restarted_with_env: str | None,
 ) -> str | None:
     """Returns the path of the bygg install to restart with if a restart is needed."""
-    if configuration:
-        if not is_restarted_with_env and environment_name:
-            if environment_name in configuration.environments:
-                environment = configuration.environments[environment_name]
-                setup_environment(environment)
 
-                restart_with = should_restart_with(environment)
-                if restart_with is not None:
-                    return restart_with
+    # Check if we need to restart to run in a different environment:
 
-        for action in configuration.actions:
-            # TODO Hack until we can iterate over the dependency graph in scheduler.prepare_run:
-            if is_restarted_with_env and action.environment != is_restarted_with_env:
-                continue
+    if not is_restarted_with_env and environment_name:
+        if environment_name in configuration.environments:
+            environment = configuration.environments[environment_name]
+            setup_environment(environment)
 
-            shell_command = (
-                create_shell_command(action.shell, action.message)
-                if action.shell
-                else None
-            )
-            Action(
-                action.name,
-                is_entrypoint=bool(action.is_entrypoint),
-                inputs=action.inputs,
-                outputs=action.outputs,
-                dependencies=action.dependencies,
-                command=shell_command,
-            )
+            restart_with = should_restart_with(environment)
+            if restart_with is not None:
+                return restart_with
+
+    # Now set up the actions for the current environment:
+
+    for action in configuration.actions:
+        if is_restarted_with_env and action.environment != is_restarted_with_env:
+            continue
+
+        shell_command = (
+            create_shell_command(action.shell, action.message) if action.shell else None
+        )
+        Action(
+            action.name,
+            description=action.description,
+            is_entrypoint=bool(action.is_entrypoint),
+            inputs=action.inputs,
+            outputs=action.outputs,
+            dependencies=action.dependencies,
+            command=shell_command,
+        )
 
     # Evaluate the Python build file:
 
     python_build_file = PYTHON_INPUTFILE
-    if configuration and environment_name:
+    if environment_name:
         environment = configuration.environments.get(environment_name, None)
         if environment:
             python_build_file = environment.byggfile
