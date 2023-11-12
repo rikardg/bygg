@@ -25,7 +25,7 @@ def examples(session):
     session.install(".")
 
     with session.chdir("examples/only_python"):
-        session.run("bygg")
+        session.run("bygg", success_codes=[1])
         session.run("bygg", "hello")
         session.run("bygg", "hello", "--tree")
         session.run("bygg", "--clean")

@@ -11,7 +11,7 @@ PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
 
 
-class SettingsSection(msgspec.Struct, forbid_unknown_fields=True):
+class Settings(msgspec.Struct, forbid_unknown_fields=True):
     default_action: Optional[str] = None
 
 
@@ -69,13 +69,13 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
 
 class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
     actions: List[ActionItem]
-    settings: SettingsSection = msgspec.field(default_factory=SettingsSection)
+    settings: Settings = msgspec.field(default_factory=Settings)
     environments: Dict[str, Environment] = msgspec.field(default_factory=dict)
 
 
-def read_config_file() -> ByggFile | None:
+def read_config_file() -> ByggFile:
     if not os.path.isfile(YAML_INPUTFILE):
-        return None
+        return ByggFile(actions=[], settings=Settings(), environments={})
 
     try:
         with open(YAML_INPUTFILE, "r") as f:

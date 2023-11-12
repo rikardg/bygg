@@ -13,7 +13,6 @@ from typing import Any, List
 
 import argcomplete
 
-from bygg.action import Action
 from bygg.apply_configuration import apply_configuration
 from bygg.argument_unparsing import unparse_args
 from bygg.configuration import (
@@ -51,6 +50,7 @@ class ByggContext:
 
     runner: ProcessRunner
     scheduler: Scheduler
+    configuration: ByggFile
 
 
 def get_job_count_limit():
@@ -64,7 +64,7 @@ def get_job_count_limit():
         return count
 
 
-def init_bygg_context():
+def init_bygg_context(configuration: ByggFile):
     scheduler = Scheduler()
     runner = ProcessRunner(scheduler)
 
@@ -72,7 +72,7 @@ def init_bygg_context():
     runner.job_status_listener = on_job_status
     runner.runner_status_listener = on_runner_status
 
-    return ByggContext(runner, scheduler)
+    return ByggContext(runner, scheduler, configuration)
 
 
 def build(
@@ -167,24 +167,29 @@ def clean(ctx: ByggContext, actions: List[str]):
     return True
 
 
-def get_entrypoints(ctx: ByggContext, configuration: ByggFile | None) -> List[Action]:
-    entrypoints = []
-    if configuration:
-        entrypoints += [x for x in configuration.actions if x.is_entrypoint]
+@dataclass
+class EntryPoint:
+    name: str
+    description: str | None
 
-    if not configuration or not configuration.environments:
-        entrypoints += [
-            x for x in ctx.scheduler.build_actions.values() if x.is_entrypoint
-        ]
 
-    return entrypoints
+def get_entrypoints(ctx: ByggContext) -> List[EntryPoint]:
+    return [
+        EntryPoint(x.name, x.description)
+        for x in ctx.scheduler.build_actions.values()
+        if x.is_entrypoint
+    ] or [
+        EntryPoint(x.name, x.description)
+        for x in ctx.configuration.actions
+        if x.is_entrypoint
+    ]
 
 
 list_actions_style = "B"
 
 
-def list_actions(ctx: ByggContext, configuration: ByggFile | None) -> bool:
-    entrypoints = get_entrypoints(ctx, configuration)
+def list_actions(ctx: ByggContext) -> bool:
+    entrypoints = get_entrypoints(ctx)
 
     if not entrypoints:
         program_name = os.path.basename(sys.argv[0])
@@ -196,9 +201,7 @@ def list_actions(ctx: ByggContext, configuration: ByggFile | None) -> bool:
     output = [f"{TS.BOLD}Available actions:{TS.RESET}"]
 
     sorted_actions = sorted(entrypoints, key=lambda x: x.name)
-    default_action_name = (
-        configuration.settings.default_action if configuration else None
-    )
+    default_action_name = ctx.configuration.settings.default_action
 
     if default_action_name:
         default_action_list = [
@@ -251,10 +254,6 @@ def list_actions(ctx: ByggContext, configuration: ByggFile | None) -> bool:
     return True
 
 
-def print_no_actions_text(ctx: ByggContext, configuration: ByggFile | None):
-    return list_actions(ctx, configuration)
-
-
 def print_version():
     import importlib.metadata
 
@@ -262,11 +261,6 @@ def print_version():
 
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
-
-
-def list_actions_and_exit(ctx: ByggContext, configuration: ByggFile | None):
-    status = list_actions(ctx, configuration)
-    sys.exit(0) if status else sys.exit(1)
 
 
 def dispatcher():
@@ -299,7 +293,7 @@ def dispatcher():
         sys.exit(1)
 
     configuration = read_config_file()
-    ctx = init_bygg_context()
+    ctx = init_bygg_context(configuration)
 
     try:
         action_partitions = (
@@ -314,20 +308,29 @@ def dispatcher():
     if not action_partitions:
         if os.path.isfile(PYTHON_INPUTFILE):
             # No configuration file, so load the Python build file directly.
-            apply_configuration(None, None, None)
-            # TODO will not be needed once we allow configuring default action also in
-            # Python.
-            if not args.actions or args.list:
-                list_actions_and_exit(ctx, configuration)
-            status = do_dispatch(ctx, args, args.actions)
+            apply_configuration(configuration, None, None)
+            default_action = configuration.settings.default_action
+            actions = (
+                args.actions
+                if args.actions
+                else [default_action]
+                if default_action
+                else []
+            )
+            status = do_dispatch(ctx, args, actions)
         else:
-            status = print_no_actions_text(ctx, configuration)
+            status = list_actions(ctx)
+
         if status:
             sys.exit(0)
         sys.exit(1)
 
+    # Special case for --list here, since it shouldn't start loading the environments:
     if args.list:
-        list_actions_and_exit(ctx, configuration)
+        status = list_actions(ctx)
+        sys.exit(0) if status else sys.exit(1)
+
+    # Execute each action partition within the correct environment:
 
     for partition in action_partitions:
         env = partition.environment_name
@@ -363,6 +366,13 @@ def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: List[str]) 
     always_make = args.always_make or args.check
     if args.clean:
         status = clean(ctx, actions)
+    elif args.list:
+        list_actions(ctx)
+        status = True
+    elif not actions:
+        output_error("No actions specified and no default action is defined.\n")
+        list_actions(ctx)
+        status = False
     elif args.tree:
         status = display_tree(ctx.scheduler, actions)
     else:
@@ -390,37 +400,58 @@ def partition_actions(
     actions: List[str] | None,
 ) -> List[ActionPartition] | None:
     """
-    Partition the actions into groups that should be run in the same environment.
+    Partition the actions into groups that should be run in the same environment. Only
+    partition the given actions that also exist in the configuration file. This is to
+    not have to load the Python build files for all the environments, since installing
+    their respective requiements can take a while.
+
+    Parameters
+    ----------
+    configuration : ByggFile
+        The configuration file.
+    actions : List[str] | None
+        The actions that should be run. If None, a partition will be created, resolved
+        to the default action.
+
+    Returns
+    -------
+    List[ActionPartition] | None
+        A list of ActionPartition objects, each representing a group of actions that
+        should be run in the same environment. Returns None if there are no actions in
+        the configuration.
     """
+    if not configuration.actions:
+        return None
+
     resolved_actions = actions if actions else []
 
-    if not actions and configuration.settings.default_action is not None:
+    if not resolved_actions and configuration.settings.default_action is not None:
         # Resolve to default action:
         resolved_actions += [configuration.settings.default_action]
         return [ActionPartition("default", resolved_actions)]
 
-    if configuration.actions:
-        # Put consecutive actions with the same environment in the same partition:
-        action_partitions = []
-        action_dict = {a.name: a for a in configuration.actions}
-        current_partition: ActionPartition | None = None
-        for action in [action_dict[a] for a in resolved_actions]:
-            if (
-                current_partition is None
-                or current_partition.environment_name != action.environment
-            ):
-                current_partition = ActionPartition(action.environment, [action.name])
-                action_partitions.append(current_partition)
-            else:
-                current_partition.actions.append(action.name)
+    # Put consecutive actions with the same environment in the same partition:
+    action_partitions = []
+    action_dict = {a.name: a for a in configuration.actions}
+    current_partition: ActionPartition | None = None
+    for action in [action_dict[a] for a in resolved_actions]:
+        if (
+            current_partition is None
+            or current_partition.environment_name != action.environment
+        ):
+            current_partition = ActionPartition(action.environment, [action.name])
+            action_partitions.append(current_partition)
+        else:
+            current_partition.actions.append(action.name)
 
-        return action_partitions
+    return action_partitions
 
 
 def entrypoint_completions(prefix, parsed_args, **kwargs):
-    ctx = init_bygg_context()
-    entrypoints = get_entrypoints(ctx, read_config_file())
-    return {x.name: x.message for x in entrypoints}
+    configuration = read_config_file()
+    ctx = init_bygg_context(configuration)
+    entrypoints = get_entrypoints(ctx)
+    return {x.name: x.description for x in entrypoints}
 
 
 def create_argument_parser():
