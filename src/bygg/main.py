@@ -514,6 +514,11 @@ List available actions:
         action="store_true",
         help="List available actions.",
     )
+    build_setup_group.add_argument(
+        "--tree",
+        action="store_true",
+        help="Display the dependency tree starting from the specified action(s).",
+    )
     # Some arguments inspired by Make:
     make_group = parser.add_argument_group("Make-like arguments")
     make_group.add_argument(
@@ -548,11 +553,6 @@ List available actions:
         "--check",
         action="store_true",
         help="Perform various checks on the action tree. Implies -B",
-    )
-    analyse_group.add_argument(
-        "--tree",
-        action="store_true",
-        help="Display the dependency tree starting from the specified action(s).",
     )
 
     # Meta arguments:
