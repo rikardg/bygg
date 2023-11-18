@@ -1,6 +1,5 @@
 # Development
 mypy==1.6.1
-nox==2023.4.22
 pip==23.3.1
 pip-tools==7.3.0
 pyright==1.1.333
