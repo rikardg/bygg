@@ -1,4 +1,12 @@
-from bygg.system_helpers import ExitCode, call, subprocess_tty, subprocess_tty_print
+import os
+
+from bygg.system_helpers import (
+    ExitCode,
+    call,
+    change_dir,
+    subprocess_tty,
+    subprocess_tty_print,
+)
 import pytest
 
 
@@ -49,3 +57,26 @@ def test_subprocess_tty():
     words = shell_command.split(" ")[-1].split("\n")
     for line, word in zip(subprocess_tty(shell_command.split(" ")), words):
         assert line.rstrip() == word
+
+
+def test_change_dir():
+    start_dir = os.getcwd()
+    with change_dir("/"):
+        assert os.getcwd() == "/"
+    assert os.getcwd() == start_dir
+
+    with change_dir("examples"):
+        assert os.getcwd() == os.path.join(start_dir, "examples")
+    assert os.getcwd() == start_dir
+
+    with change_dir("examples/checks"):
+        assert os.getcwd() == os.path.join(start_dir, "examples/checks")
+    assert os.getcwd() == start_dir
+
+    with change_dir("examples/trivial"):
+        assert os.getcwd() == os.path.join(start_dir, "examples/trivial")
+    assert os.getcwd() == start_dir
+
+    with change_dir(None):
+        assert os.getcwd() == start_dir
+    assert os.getcwd() == start_dir
