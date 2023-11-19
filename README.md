@@ -99,21 +99,33 @@ be used for declaring other (static) actions. See
 
 ## Shell tab completions
 
-Bygg has support for Bash and Zsh tab completions of entrypoint actions. The completions will be loaded:
+TL;DR: `bygg --completions`
 
-- from `Byggfile.py` if if `Byggfile.yml` doesn't exist, or there are no environments declared in `Byggfile.yml`.
-- from `Byggfile.yml` -- in this case, no Python files will be loaded to look
-  for entrypoint actions.
+Bygg has support for Bash and Zsh tab completions of arguments and entrypoint
+actions. The completions will be loaded:
 
-### Bygg is installed with pipx or pip
+- from `Byggfile.py` if `Byggfile.yml` doesn't exist, or if there are no
+  environments declared in `Byggfile.yml`.
+- from `Byggfile.yml` if it exists and has environments. In this case, only the
+  entrypoint actions listed in `Byggfile.yml` will be loaded; no Python files
+  will be loaded to look for entrypoint actions since this might require an
+  lengthy (in the context) install of environments.
 
-Add the following lines to `.bashrc` or `.zshrc`:
+To install completions, do:
 
 ```shell
-eval "$($(dirname $(readlink -f $(which bygg)))/register-python-argcomplete bygg)"
+bygg --completions
 ```
 
-### Bygg is installed in its own virtual environment managed by you
+It will output a line that you can then add to `.bashrc` or `.zshrc`.
+
+_Don't forget to open a new shell instance after you've made changes to the
+settings files._
+
+<details>
+<summary>
+Manual steps
+</summary>
 
 Add the following line to `.bashrc` or `.zshrc`:
 
@@ -121,10 +133,10 @@ Add the following line to `.bashrc` or `.zshrc`:
 eval "$(.your_bygg_venv/bin/register-python-argcomplete .your_bygg_venv/bin/bygg)"
 ```
 
-_Don't forget to open a new shell instance after you've made changes to the
-settings files._
+</details>
 
-### Note for Zsh + argcomplete v2 users
+<details>
+<summary>Note for Zsh + argcomplete v2 users</summary>
 
 The recommended setup above uses the argcomplete that is installed with Bygg,
 since this version (starting with v3) has proper support for Zsh so that the
@@ -136,6 +148,8 @@ layer first, and then the Bygg completions:
 autoload -U bashcompinit ; bashcompinit
 eval "$(register-python-argcomplete bygg)"
 ```
+
+</details>
 
 ## Getting a local copy
 
