@@ -38,7 +38,7 @@ providing correctness and minimal rebuilds.
 
 ## Installation
 
-_Bygg currently requires Python 3.11 or 3.12._
+Bygg requires Python 3.11 or 3.12.
 
 Install with
 
@@ -62,7 +62,7 @@ directly.
     "build1",
     inputs=["foo.in", "bar.in"],
     outputs=["foo.out", "bar.out"],
-    is_entrypoint: True
+    is_entrypoint=True
 )
 def a_build_command(ctx: Context):
     # do stuff
@@ -86,7 +86,8 @@ Action(
 ```
 
 Bygg will check for the presence of `Byggfile.py` in the current directory. The
-actions above can be built with `bygg build1` and `bygg build2`, respectively.
+actions above would be built with `bygg build1` and `bygg build2`,
+respectively. See the `examples/` directory for worked examples.
 
 ### Settings file
 
