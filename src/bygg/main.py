@@ -11,10 +11,16 @@ import textwrap
 import time
 from typing import Any, List
 
-import argcomplete
-
-from bygg.apply_configuration import apply_configuration
+from bygg.apply_configuration import (
+    apply_configuration,
+    register_actions_from_configuration,
+)
 from bygg.argument_unparsing import unparse_args
+from bygg.completions import (
+    ByggfileDirectoriesCompleter,
+    do_completion,
+    generate_shell_completions,
+)
 from bygg.configuration import (
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
@@ -41,6 +47,7 @@ from bygg.status_display import (
     on_runner_status,
     output_check_results,
 )
+from bygg.system_helpers import change_dir
 from bygg.tree import display_tree
 
 
@@ -170,16 +177,19 @@ def clean(ctx: ByggContext, actions: List[str]):
 @dataclass
 class EntryPoint:
     name: str
-    description: str | None
+    description: str
+
+
+NO_DESCRIPTION = "No description"
 
 
 def get_entrypoints(ctx: ByggContext) -> List[EntryPoint]:
     return [
-        EntryPoint(x.name, x.description)
+        EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
         if x.is_entrypoint
     ] or [
-        EntryPoint(x.name, x.description)
+        EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.configuration.actions
         if x.is_entrypoint
     ]
@@ -222,7 +232,7 @@ def list_actions(ctx: ByggContext) -> bool:
         width = min(terminal_cols, 80)
         subsequent_indent = " " * (section_indent + max_name_width + len(separator))
         for action in sorted_actions:
-            description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description if action.description else 'No description'}"
+            description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description}"
             output.extend(
                 textwrap.wrap(
                     description,
@@ -242,7 +252,7 @@ def list_actions(ctx: ByggContext) -> bool:
             output.append(f"{TS.BOLD}{action.name}{default_action_suffix}{TS.RESET}")
             output.append(
                 textwrap.fill(
-                    action.description if action.description else "No description",
+                    action.description,
                     initial_indent="    ",
                     subsequent_indent="    ",
                 )
@@ -268,7 +278,11 @@ def dispatcher():
     A build tool written in Python, where all actions can be written in Python.
     """
     parser = create_argument_parser()
+    do_completion(parser)
+
     args = parser.parse_args()
+
+    generate_shell_completions(args.completions)
 
     if args.dump_schema:
         dump_schema()
@@ -447,11 +461,33 @@ def partition_actions(
     return action_partitions
 
 
-def entrypoint_completions(prefix, parsed_args, **kwargs):
-    configuration = read_config_file()
-    ctx = init_bygg_context(configuration)
-    entrypoints = get_entrypoints(ctx)
-    return {x.name: x.description for x in entrypoints}
+def entrypoint_completions(prefix, parsed_args: argparse.Namespace, **kwargs):
+    import textwrap
+
+    # Handle -C/--directory:
+    new_dir = parsed_args.directory[0] if parsed_args.directory else None
+
+    with change_dir(new_dir):
+        configuration = read_config_file()
+        ctx = init_bygg_context(configuration)
+
+        if configuration.environments:
+            # We don't want to install environments while completing, so only load the
+            # actions from the static configuration file:
+            register_actions_from_configuration(ctx.configuration, None)
+        else:
+            apply_configuration(ctx.configuration, None, None)
+
+        entrypoints = get_entrypoints(ctx)
+        # Exlude already added entrypoints:
+        eligible_entrypoints = [
+            x for x in entrypoints if x.name not in parsed_args.actions
+        ]
+        # Fill the description really wide to get it combined to a single line with
+        # spaces dealt with correctly:
+        return {
+            x.name: textwrap.fill(x.description, 7000) for x in eligible_entrypoints
+        }
 
 
 def create_argument_parser():
@@ -475,17 +511,13 @@ List available actions:
     )
 
     # Use Any to get around type checking for argcomplete:
-    actions_action: Any = parser.add_argument(
+    arg: Any = parser.add_argument(
         "actions",
         nargs="*",
         default=None,
         help="Entrypoint actions to operate on.",
     )
-
-    actions_action.completer = entrypoint_completions
-
-    # Only add completions for the actions:
-    argcomplete.autocomplete(parser, exclude=["-h", "--help"])
+    arg.completer = entrypoint_completions
 
     parser.add_argument(
         "-v", "--version", action="store_true", help="Show version string and exit."
@@ -521,7 +553,7 @@ List available actions:
     )
     # Some arguments inspired by Make:
     make_group = parser.add_argument_group("Make-like arguments")
-    make_group.add_argument(
+    arg = make_group.add_argument(
         "-C",
         "--directory",
         nargs=1,
@@ -529,6 +561,8 @@ List available actions:
         default=None,
         help="Change to the specified directory.",
     )
+    arg.completer = ByggfileDirectoriesCompleter()
+
     make_group.add_argument(
         "-j",
         "--jobs",
@@ -561,6 +595,11 @@ List available actions:
         "--dump-schema",
         action="store_true",
         help="Generate a JSON Schema for the Byggfile.yml files. The schema will be printed to stdout.",
+    )
+    meta_group.add_argument(
+        "--completions",
+        action="store_true",
+        help="Output instructions for how to set up shell completions via the shell's startup script.",
     )
 
     return parser

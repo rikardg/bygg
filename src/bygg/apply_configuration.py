@@ -74,6 +74,27 @@ def should_restart_with(environment: Environment) -> str | None:
     return None
 
 
+def register_actions_from_configuration(
+    configuration: ByggFile, is_restarted_with_env: str | None
+):
+    for action in configuration.actions:
+        if is_restarted_with_env and action.environment != is_restarted_with_env:
+            continue
+
+        shell_command = (
+            create_shell_command(action.shell, action.message) if action.shell else None
+        )
+        Action(
+            action.name,
+            description=action.description,
+            is_entrypoint=bool(action.is_entrypoint),
+            inputs=action.inputs,
+            outputs=action.outputs,
+            dependencies=action.dependencies,
+            command=shell_command,
+        )
+
+
 def apply_configuration(
     configuration: ByggFile,
     environment_name: str | None,
@@ -93,23 +114,7 @@ def apply_configuration(
                 return restart_with
 
     # Now set up the actions for the current environment:
-
-    for action in configuration.actions:
-        if is_restarted_with_env and action.environment != is_restarted_with_env:
-            continue
-
-        shell_command = (
-            create_shell_command(action.shell, action.message) if action.shell else None
-        )
-        Action(
-            action.name,
-            description=action.description,
-            is_entrypoint=bool(action.is_entrypoint),
-            inputs=action.inputs,
-            outputs=action.outputs,
-            dependencies=action.dependencies,
-            command=shell_command,
-        )
+    register_actions_from_configuration(configuration, is_restarted_with_env)
 
     # Evaluate the Python build file:
 

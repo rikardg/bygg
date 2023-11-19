@@ -1,0 +1,158 @@
+# serializer version: 1
+# name: test_actions_completions[checks]
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'output_file_missing',
+  ])
+# ---
+# name: test_actions_completions[checks].1
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'output_file_missing',
+  ])
+# ---
+# name: test_actions_completions[checks].2
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'output_file_missing',
+  ])
+# ---
+# name: test_actions_completions[environments]
+  list([
+    'action1',
+    'action2',
+    'clean_environments',
+    'default_action',
+  ])
+# ---
+# name: test_actions_completions[environments].1
+  list([
+    'action1',
+    'action2',
+    'clean_environments',
+    'default_action',
+  ])
+# ---
+# name: test_actions_completions[environments].2
+  list([
+    'action1',
+    'action2',
+    'clean_environments',
+    'default_action',
+  ])
+# ---
+# name: test_actions_completions[failing_jobs]
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[failing_jobs].1
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[failing_jobs].2
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[only_python]
+  list([
+    'hello',
+  ])
+# ---
+# name: test_actions_completions[only_python].1
+  list([
+    'hello',
+  ])
+# ---
+# name: test_actions_completions[only_python].2
+  list([
+    'hello',
+  ])
+# ---
+# name: test_actions_completions[parametric]
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[parametric].1
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[parametric].2
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[taskrunner]
+  list([
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[taskrunner].1
+  list([
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[taskrunner].2
+  list([
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[trivial]
+  list([
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[trivial].1
+  list([
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[trivial].2
+  list([
+    'transform',
+  ])
+# ---
+# name: test_directory_completions[--directory ]
+  list([
+    'examples/checks',
+    'examples/environments',
+    'examples/failing_jobs',
+    'examples/only_python',
+    'examples/parametric',
+    'examples/taskrunner',
+    'examples/trivial',
+  ])
+# ---
+# name: test_directory_completions[-C ]
+  list([
+    'examples/checks',
+    'examples/environments',
+    'examples/failing_jobs',
+    'examples/only_python',
+    'examples/parametric',
+    'examples/taskrunner',
+    'examples/trivial',
+  ])
+# ---
