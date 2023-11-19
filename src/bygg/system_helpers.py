@@ -3,6 +3,7 @@ System-near helper functions. Only import things from the standard library here;
 way these helpers can be used also for utility scripts.
 """
 
+import contextlib
 import errno
 import os
 import pty
@@ -170,3 +171,14 @@ def call(cmd, encoding="utf-8", timeout=10, **kwargs) -> ExitCode:
     """
 
     return ExitCode(subprocess_tty_print(shlex.split(cmd), encoding, timeout, **kwargs))
+
+
+@contextlib.contextmanager
+def change_dir(dir: str | os.PathLike | None):
+    old_dir = os.getcwd()
+    try:
+        if dir is not None:
+            os.chdir(dir)
+        yield
+    finally:
+        os.chdir(old_dir)
