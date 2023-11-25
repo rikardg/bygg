@@ -55,7 +55,6 @@ class Action(ActionContext):
     def __init__(
         self,
         name: str,
-        description: str | None = None,
         message: str | None = None,
         inputs: Optional[Iterable[str]] = None,
         outputs: Optional[Iterable[str]] = None,
@@ -64,9 +63,9 @@ class Action(ActionContext):
         is_entrypoint: bool = False,
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
+        description: str | None = None,
     ):
         self.name = name
-        self.description = description
         self.message = message
         self.inputs = {*inputs} if inputs else set()
         self.outputs = {*outputs} if outputs else set()
@@ -75,6 +74,7 @@ class Action(ActionContext):
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
+        self.description = description if description else command.__doc__
 
         self.dependency_files = set()
 
@@ -107,7 +107,7 @@ def action(
     def create_action(func: Callable):
         Action(
             name,
-            message,
+            message=message,
             inputs=inputs,
             outputs=outputs,
             dependencies=dependencies,

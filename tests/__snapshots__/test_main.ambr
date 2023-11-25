@@ -282,7 +282,10 @@
   Available actions:
   
   hello
-      No description
+      An action that says 'Hello'.
+  
+  hi
+      An action that says 'Hi'.
   
   
   '''
@@ -390,7 +393,10 @@
   Available actions:
   
   hello
-      No description
+      An action that says 'Hello'.
+  
+  hi
+      An action that says 'Hi'.
   
   
   '''
@@ -471,7 +477,10 @@
   Available actions:
   
   hello
-      No description
+      An action that says 'Hello'.
+  
+  hi
+      An action that says 'Hi'.
   
   
   '''
@@ -848,7 +857,10 @@
   Available actions:
   
   hello
-      No description
+      An action that says 'Hello'.
+  
+  hi
+      An action that says 'Hi'.
   
   
   '''
