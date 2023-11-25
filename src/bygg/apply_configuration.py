@@ -3,6 +3,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import textwrap
 from typing import List
 
 from bygg.action import Action
@@ -130,8 +131,15 @@ def apply_configuration(
 
 
 def load_python_build_file(build_file: str):
+    # modify load path to make the current directory importable
+    preamble = """\
+        from pathlib import Path
+        import sys
+        sys.path.insert(0, str(Path('.').resolve()))
+
+        """
+
     if os.path.isfile(build_file):
         with open(build_file, "r") as f:
-            # modify load path to make the current directory importable
-            preamble = "from pathlib import Path\nimport sys\nsys.path.insert(0, str(Path('.').resolve()))\n\n"
-            exec(preamble + f.read(), globals())
+            # preamble = "from pathlib import Path\nimport sys\nsys.path.insert(0, str(Path('.').resolve()))\n\n"
+            exec(textwrap.dedent(preamble) + f.read(), globals())
