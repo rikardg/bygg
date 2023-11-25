@@ -55,6 +55,10 @@ jobs:
           # calm. Errors with regards to use of this dependency will be detected by nox.
           pip install rich
           pyright examples/
+      - name: Run pytest
+        run: |
+          . .venv/bin/activate
+          pytest
 
   audit:
     runs-on: ubuntu-latest
