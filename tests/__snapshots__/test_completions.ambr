@@ -74,16 +74,19 @@
 # name: test_actions_completions[only_python]
   list([
     'hello',
+    'hi',
   ])
 # ---
 # name: test_actions_completions[only_python].1
   list([
     'hello',
+    'hi',
   ])
 # ---
 # name: test_actions_completions[only_python].2
   list([
     'hello',
+    'hi',
   ])
 # ---
 # name: test_actions_completions[parametric]
