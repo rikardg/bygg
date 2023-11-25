@@ -133,5 +133,5 @@ def load_python_build_file(build_file: str):
     if os.path.isfile(build_file):
         with open(build_file, "r") as f:
             # modify load path to make the current directory importable
-            preamble = "import sys\nsys.path.insert(0, '.')\n\n"
+            preamble = "from pathlib import Path\nimport sys\nsys.path.insert(0, str(Path('.').resolve()))\n\n"
             exec(preamble + f.read(), globals())
