@@ -86,13 +86,13 @@ actions_completions = [p for p in Path("examples").iterdir() if p.is_dir()]
 def test_actions_completions(completion_tester, arg, snapshot, clean_bygg_tree):
     with change_dir(clean_bygg_tree):
         dir = str(arg)
-        # testcase = f"-C {dir} "
-        # testresult = completion_tester(testcase)
-        # assert sorted(testresult.split("\x0b")) == snapshot
+        testcase = f"-C {dir} "
+        testresult = completion_tester(testcase)
+        assert sorted(testresult.split("\x0b")) == snapshot
 
-        # testcase = f"--directory {dir} "
-        # testresult = completion_tester(testcase)
-        # assert sorted(testresult.split("\x0b")) == snapshot
+        testcase = f"--directory {dir} "
+        testresult = completion_tester(testcase)
+        assert sorted(testresult.split("\x0b")) == snapshot
 
         with change_dir(dir):
             testresult = completion_tester("")
