@@ -57,7 +57,7 @@ jobs:
           pyright examples/
       - name: Run pytest
         run: |
-          . .venv/bin/activate
+          .venv/bin/pip install .
           pytest
 
   audit:
