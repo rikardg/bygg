@@ -58,6 +58,7 @@ jobs:
       - name: Run pytest
         run: |
           .venv/bin/pip install .
+          . .venv/bin/activate
           pytest
 
   audit:
