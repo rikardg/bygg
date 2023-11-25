@@ -95,8 +95,8 @@ clean_bygg_tree_exclusions = (
 def clean_bygg_tree(tmp_path):
     clean_path = tmp_path / "bygg"
     shutil.copytree(
-        Path("."),
-        clean_path,
+        Path(".").resolve(),
+        clean_path.resolve(),
         ignore=shutil.ignore_patterns(*clean_bygg_tree_exclusions),
     )
     return clean_path
