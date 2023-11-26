@@ -6,6 +6,8 @@ from typing import List, Set, Tuple
 
 from bygg.action import Action, ActionContext, CommandStatus
 
+# Modify these constants to change aspects of the test build:
+
 # Directory for output files
 LEVELLED_DIR_PATH = "t"
 
@@ -15,18 +17,20 @@ TEST_LEVELS = 3
 # How many files per level
 TEST_FILES_PER_LEVEL = 50
 
-# Do something more than just sort lines in files. This will calculate primenumbers.
+# Do something more than just sort lines in files. This will calculate prime numbers.
 GENERATE_LOAD = False
 
 # Sleep in each job. Reduces throughput; useful to check logging and output. Don't sleep
 # in CI.
 ADD_SLEEP = False if "CI" in os.environ else True
 
-# Execute touch <outfile> in a shell.
+# Execute touch <outfile> in a shell instead of sorting the test files in Python. This
+# will cause work to be done by the process pool, but since the work is trivial, it
+# won't hardly be noticeable.
 USE_SHELL_COMMAND = False
 
 
-def calculate_first_primenumbers(count: int) -> List[int]:
+def calculate_first_prime_numbers(count: int) -> List[int]:
     """Calculate the first n prime numbers."""
     primes: List[int] = []
     i = 2
@@ -53,13 +57,13 @@ def sort_lines(ctx: ActionContext):
         lines.sort()
         with open(output, "w") as f:
             f.writelines(lines)
-        changed_files.add(str(output))
+        changed_files.add(output)
     sleep_time = random.random() if ADD_SLEEP else 0
     output_lines.append(f"Slept for {sleep_time} seconds")
     time.sleep(sleep_time)
 
     if GENERATE_LOAD:
-        calculate_first_primenumbers(5000)
+        calculate_first_prime_numbers(5000)
     return CommandStatus(0, "Sorted lines.", "\n".join(output_lines))
 
 
@@ -102,8 +106,8 @@ def generate_create_action(path: str):
 
 
 def declare_test_files_actions():
-    generated_files = []
-    generated_output_actions = []
+    generated_files: List[str] = []
+    generated_output_actions: List[Action] = []
 
     # Create a set of files with multiple dependency levels. In a real-world scenario,
     # these files would most likely already be present in the filesystem as source files
@@ -118,7 +122,7 @@ def declare_test_files_actions():
             generated_files += [path]
 
             Action(
-                name=str(path),
+                name=path,
                 message=f"Creating test file {path}",
                 inputs=None,
                 outputs=[path],
@@ -128,8 +132,8 @@ def declare_test_files_actions():
 
             # Add an action for an output file.
             output_file = path[:-3]
-            name = str(output_file)
-            dependencies = [str(path)]
+            name = output_file
+            dependencies = [path]
             if level < TEST_LEVELS - 1:
                 dependencies += [get_filename(level + 1, file)[:-3]]
             else:
@@ -150,7 +154,7 @@ def declare_test_files_actions():
     Action(
         name="setup_test_files",
         outputs=generated_files,
-        dependencies=[str(f) for f in generated_files],
+        dependencies=[f for f in generated_files],
         message="Setting up test files.",
     )
 
@@ -160,7 +164,7 @@ def declare_test_files_actions():
         dependencies=[
             a.name
             for a in generated_output_actions
-            if a.name.startswith(f"{str(LEVELLED_DIR_PATH)}/l0")
+            if a.name.startswith(f"{LEVELLED_DIR_PATH}/l0")
         ],
         outputs=["t"],
         message="Sorting test files.",
