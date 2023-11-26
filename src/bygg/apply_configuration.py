@@ -103,30 +103,28 @@ def apply_configuration(
 ) -> str | None:
     """Returns the path of the bygg install to restart with if a restart is needed."""
 
+    environment = (
+        configuration.environments[environment_name]
+        if environment_name and environment_name in configuration.environments
+        else None
+    )
+
     # Check if we need to restart to run in a different environment:
 
-    if not is_restarted_with_env and environment_name:
-        if environment_name in configuration.environments:
-            environment = configuration.environments[environment_name]
-            setup_environment(environment)
+    if not is_restarted_with_env and environment:
+        setup_environment(environment)
 
-            restart_with = should_restart_with(environment)
-            if restart_with is not None:
-                return restart_with
+        restart_with = should_restart_with(environment)
+        if restart_with is not None:
+            return restart_with
 
     # Now set up the actions for the current environment:
     register_actions_from_configuration(configuration, is_restarted_with_env)
 
     # Evaluate the Python build file:
 
-    python_build_file = PYTHON_INPUTFILE
-    if environment_name:
-        environment = configuration.environments.get(environment_name, None)
-        if environment:
-            python_build_file = environment.byggfile
-
+    python_build_file = environment.byggfile if environment else PYTHON_INPUTFILE
     load_python_build_file(python_build_file)
-
     return None
 
 
