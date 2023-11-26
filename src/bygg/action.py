@@ -27,24 +27,38 @@ class ActionContext:
     scheduling_type: SchedulingType
 
 
-Command = Callable[
-    [ActionContext],
-    CommandStatus,
-]
+Command = Callable[[ActionContext], CommandStatus]
 
 
 class Action(ActionContext):
     """
     An action in the build graph.
 
-    name: The name of the action.
-    message (optional): A message to display when the action is run.
-    inputs (optional): A list of paths that are inputs to the action.
-    outputs (optional): A list of paths that are outputs of the action.
-    dependencies (optional): A list of action names that this action depends on.
-    is_entrypoint (optional): Whether this action is an entrypoint to the build graph.
-    command (optional): Instance of one of the Command types to run.
-
+    Parameters
+    ----------
+    name : str
+        The name of the action.
+    message : str, optional
+        A message to display when the action is run. Default is None.
+    inputs : Iterable[str], optional
+        An iterable of paths that are inputs to the action. Default is None.
+    outputs : Iterable[str], optional
+        An iterable of paths that are outputs of the action. Default is None.
+    dependencies : Iterable[str], optional
+        An iterable of action names that this action depends on. Default is None.
+    dynamic_dependency : DynamicDependency, optional
+        A dynamic dependency of the action. Default is None.
+    is_entrypoint : bool, optional
+        Whether this action is an entrypoint to the build graph. Default is False.
+    command : Command, optional
+        Function to run. Default is None.
+    scheduling_type : SchedulingType, optional
+        The scheduling type for the action. Default is "processpool". Use "in-process"
+        for small Python functions that finish quickly so that they can be run in the
+        main process.
+    description : str, optional
+        A description of the action. Default is the docstring of the command if
+        provided, else None.
     """
 
     scheduler: Scheduler | None = None
