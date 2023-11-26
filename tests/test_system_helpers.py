@@ -67,6 +67,9 @@ def test_change_dir():
 
     with change_dir("examples"):
         assert os.getcwd() == os.path.join(start_dir, "examples")
+        with change_dir("checks"):
+            assert os.getcwd() == os.path.join(start_dir, "examples/checks")
+        assert os.getcwd() == os.path.join(start_dir, "examples")
     assert os.getcwd() == start_dir
 
     with change_dir("examples/checks"):
