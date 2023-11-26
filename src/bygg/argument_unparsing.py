@@ -42,7 +42,7 @@ def unparse_args(
     List[str]
         A list of command line arguments
     """
-    exec_list = []
+    exec_list: List[str] = []
     for k, v in vars(args).items():
         argument = _get_argument_for_dest(parser, k)
         if drop and k in drop:
@@ -51,6 +51,9 @@ def unparse_args(
             # These are arguments that were not given
             continue
         if v is True:
+            # If argument is None, something wrong is broken in the argparse Namespace
+            # and should be looked into.
+            assert argument
             exec_list.append(argument)
         elif v:
             if argument:
