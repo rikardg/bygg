@@ -214,13 +214,13 @@ class Scheduler:
                 *[job.action.inputs for job in job_list],
                 *[job.action.dependency_files for job in job_list],
             )
-            for job in job_list:
-                overlap = job.action.outputs & self.check_inputs_outputs_set
+            for job_to_check in job_list:
+                overlap = job_to_check.action.outputs & self.check_inputs_outputs_set
                 if overlap:
                     plural = len(overlap) > 1
                     on_check_failed(
                         "check_inputs_outputs",
-                        job.action,
+                        job_to_check.action,
                         f"Output{'s' if plural else ''} was declared as input{'s' if plural else ''} to earlier action: {', '.join(overlap)}",
                         "error",
                     )
