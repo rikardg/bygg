@@ -22,7 +22,7 @@ exit_code = 0
 for directory in directories:
     print(f"\n{TS.BOLD}=== Running mypy in {directory} ==={TS.RESET}")
     s = call(
-        f"{mypy} --no-warn-no-return --pretty {extra_arguments.get(directory, '')} {directory}"
+        f"{mypy} --no-warn-no-return --check-untyped-defs --pretty {extra_arguments.get(directory, '')} {directory}"
     )
     if not s:
         output_error(f"Failed to run mypy in {directory}")
