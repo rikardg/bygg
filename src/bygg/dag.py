@@ -6,7 +6,7 @@ from bygg.action import Action
 
 
 class Dag(metaclass=ABCMeta):
-    def __len__(self):
+    def __len__(self) -> int:
         return 0
 
     def clear(self):
