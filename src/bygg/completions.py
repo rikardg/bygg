@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import sys
 import textwrap
-from typing import Any, Set
+from typing import Any, Generator, Set
 
 from argcomplete.completers import DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
@@ -16,7 +16,7 @@ class ByggfileDirectoriesCompleter(DirectoriesCompleter):
     A completer for directories that contain Bygg files.
     """
 
-    def __call__(self, prefix, **kwargs):
+    def __call__(self, prefix, **kwargs) -> Generator[str, Any, None]:
         directories = super().__call__(prefix, **kwargs)
         byggfile_dirs = set()
         for dir in directories:
@@ -25,7 +25,8 @@ class ByggfileDirectoriesCompleter(DirectoriesCompleter):
                 for b in Path(dir).rglob("Byggfile.*")
                 if b.suffix in {".py", ".yml"}
             }
-        return sorted(list(byggfile_dirs))
+        for f in sorted(list(byggfile_dirs)):
+            yield f
 
 
 def construct_already_there(
@@ -63,7 +64,7 @@ class ByggCompletionFinder(CompletionFinder):
 
     def _get_completions(
         self, comp_words, cword_prefix, cword_prequote, last_wordbreak_pos
-    ):
+    ) -> list[str]:
         comp_words_set = set(comp_words)
 
         # Stop completions if we already have a "singular" option, i.e. an option that
@@ -81,7 +82,7 @@ class ByggCompletionFinder(CompletionFinder):
         # If the last word is a directory, the default completions will be from the
         # directories completer, so return these.
         if comp_words[-1] in directory_option:
-            return completions
+            return list(completions)
 
         action_completions = list(filter(lambda x: not x.startswith("-"), completions))
         already_there = construct_already_there(self._parser, comp_words_set)
@@ -90,17 +91,17 @@ class ByggCompletionFinder(CompletionFinder):
             # Actions if we have them.
             if action_completions and not cword_prefix.startswith("-"):
                 return action_completions
-            return completions & directory_option - already_there
+            return list(completions & directory_option - already_there)
 
         if comp_words_set & {"--list"}:
             # Only complete directories.
-            return completions & directory_option - already_there
+            return list(completions & directory_option - already_there)
 
         # Return action completions if they exist and user has not entered a '-'.
         if action_completions and not cword_prefix.startswith("-"):
             return action_completions
 
-        return completions - already_there
+        return list(completions - already_there)
 
 
 def do_completion(parser: argparse.ArgumentParser):
