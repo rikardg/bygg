@@ -2,6 +2,6 @@
 argcomplete==3.1.6
 dill==0.3.7
 graph-theory==2023.7.4
-msgspec==0.18.4
+msgspec==0.18.5
 multiprocess==0.70.15
 PyYAML==6.0.1 # msgspec requires this as an ambient
