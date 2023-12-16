@@ -1,10 +1,11 @@
+from abc import ABCMeta, abstractmethod
 from collections import deque
 from typing import Any, Dict, Iterable, List
 
 from bygg.action import Action
 
 
-class Dag:
+class Dag(metaclass=ABCMeta):
     def __len__(self):
         return 0
 
@@ -17,6 +18,7 @@ class Dag:
     def build_action_graph(self, build_actions: Dict[str, Action], action: Action):
         ...
 
+    @abstractmethod
     def get_ready_jobs(
         self,
         finished_jobs: Dict[str, Any],
@@ -24,13 +26,14 @@ class Dag:
     ) -> List[str]:
         ...
 
+    @abstractmethod
     def get_all_jobs(self) -> Iterable[str]:
         ...
 
 
 class GtDag(Dag):
     def __init__(self):
-        import graph
+        import graph  # type: ignore
 
         self.graph = graph.Graph()
 
