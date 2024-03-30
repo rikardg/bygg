@@ -267,7 +267,10 @@ def list_actions(ctx: ByggContext) -> bool:
 def print_version():
     import importlib.metadata
 
-    output_info(f"{__package__} {importlib.metadata.version(__package__)}")
+    if __package__:
+        output_info(f"{__package__} {importlib.metadata.version(__package__)}")
+    else:
+        output_error("Could not determine package name.")
 
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
