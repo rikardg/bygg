@@ -420,7 +420,7 @@ def partition_actions(
     Partition the actions into groups that should be run in the same environment. Only
     partition the given actions that also exist in the configuration file. This is to
     not have to load the Python build files for all the environments, since installing
-    their respective requiements can take a while.
+    their respective requirements can take a while.
 
     Parameters
     ----------
