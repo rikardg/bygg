@@ -13,6 +13,7 @@ jobs:
         python_version: ["3.11", "3.12"]
         nox_session: [tests, basics, examples]
         os: [ubuntu-latest, macos-latest, macos-14]
+        install_uv: [0, 1]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -25,9 +26,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install nox
+          if [ ${{ matrix.install_uv }} -eq 1 ]; then
+            pip install uv
+          fi
       - name: Test with nox
         run: |
-          nox --python ${{ matrix.python_version }} --session ${{ matrix.nox_session }}
+          nox --python ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
 
   pyright_and_ruff:
     strategy:
