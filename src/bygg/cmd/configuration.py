@@ -2,10 +2,9 @@ import os
 import sys
 from typing import Dict, List, Optional
 
+from bygg.output.output import Symbols, output_plain
+from bygg.output.output import TerminalStyle as TS
 import msgspec
-
-from bygg.output import Symbols, output_plain
-from bygg.output import TerminalStyle as TS
 
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
@@ -16,7 +15,6 @@ class Settings(msgspec.Struct, forbid_unknown_fields=True):
 
 
 class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
-
     """
     This is a representation of the Action class used for deserialising from YAML.
 

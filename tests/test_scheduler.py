@@ -1,4 +1,4 @@
-from bygg.action import Action, CommandStatus
+from bygg.core.action import Action, CommandStatus
 
 
 def test_scheduler_single_action(scheduler_single_action):

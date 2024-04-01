@@ -4,7 +4,7 @@ import subprocess
 import time
 from typing import List, Set, Tuple
 
-from bygg.action import Action, ActionContext, CommandStatus
+from bygg.core.action import Action, ActionContext, CommandStatus
 
 # Modify these constants to change aspects of the test build:
 

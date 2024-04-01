@@ -3,8 +3,8 @@ from pathlib import Path
 import shutil
 from tempfile import mkstemp
 
-from bygg.action import Action
-from bygg.scheduler import Scheduler
+from bygg.core.action import Action
+from bygg.core.scheduler import Scheduler
 import pytest
 
 

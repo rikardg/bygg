@@ -1,5 +1,5 @@
-from bygg.action import Action, ActionContext, CommandStatus
-from bygg.scheduler import Scheduler
+from bygg.core.action import Action, ActionContext, CommandStatus
+from bygg.core.scheduler import Scheduler
 import pytest
 
 

@@ -7,8 +7,7 @@ from typing import Any, Generator, Set
 
 from argcomplete.completers import DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
-
-from bygg.output import output_plain
+from bygg.output.output import output_plain
 
 
 class ByggfileDirectoriesCompleter(DirectoriesCompleter):

@@ -1,4 +1,4 @@
-from bygg.tree import display_tree
+from bygg.cmd.tree import display_tree
 
 
 def test_tree_single_action(scheduler_single_action, capsys, snapshot):

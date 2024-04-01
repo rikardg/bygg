@@ -2,9 +2,9 @@ from dataclasses import dataclass
 import shutil
 from typing import List, Literal
 
-from bygg.action import Action
-from bygg.common_types import CommandStatus, JobStatus, Severity
-from bygg.output import (
+from bygg.core.action import Action
+from bygg.core.common_types import CommandStatus, JobStatus, Severity
+from bygg.output.output import (
     Symbols,
     output_error,
     output_info,

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from tempfile import TemporaryDirectory, mkstemp
 
-from bygg.cache import Cache, InputsOutputsDigests
+from bygg.core.cache import Cache, InputsOutputsDigests
 
 
 def test_cache_load_non_existing():
