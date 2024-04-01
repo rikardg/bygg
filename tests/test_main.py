@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+import re
 import subprocess
 
 import pytest
@@ -81,3 +82,19 @@ def test_dump_schema(snapshot):
     )
     assert process.returncode == 0
     assert process.stdout == snapshot
+
+
+def test_version():
+    process = subprocess.run(
+        ["bygg", "--version"],
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout[1:7] == " bygg "
+    # Version string looks something like this when developing:
+    # 🛈 bygg 0.3.3.dev5+g900af94
+    # Clean it and check if it seems valid. However, it will vary depending on what tags
+    # are set etc, so only do a rudimentary check for numbers in a major-minor pattern.
+    cleaned_version = process.stdout[7:].strip()
+    assert re.match(r"\d+\.\d+", cleaned_version)
