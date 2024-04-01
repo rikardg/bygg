@@ -1,8 +1,8 @@
 from itertools import chain
 from typing import List
 
-from bygg.output import TerminalStyle as TS
-from bygg.scheduler import Scheduler
+from bygg.core.scheduler import Scheduler
+from bygg.output.output import TerminalStyle as TS
 
 
 class TreeStyle:

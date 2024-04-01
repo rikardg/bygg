@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from bygg.job_output import HighlightConfig, highlight_log
+from bygg.output.job_output import HighlightConfig, highlight_log
 import pytest
 
 short_gcc_log = """

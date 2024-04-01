@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import pickle
 
-from bygg.scaffolding import STATUS_DIR, make_sure_status_dir_exists
+from bygg.core.scaffolding import STATUS_DIR, make_sure_status_dir_exists
 
 DEFAULT_DB_FILE = STATUS_DIR / "cache.db"
 

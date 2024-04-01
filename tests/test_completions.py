@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from bygg.completions import ByggCompletionFinder
-from bygg.main import create_argument_parser
+from bygg.cmd.completions import ByggCompletionFinder
+from bygg.cmd.dispatcher import create_argument_parser
 from bygg.system_helpers import change_dir
 import pytest
 

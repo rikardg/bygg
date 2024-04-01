@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Set, Tuple
 
-from bygg.common_types import CommandStatus
+from bygg.core.common_types import CommandStatus
 
 if TYPE_CHECKING:
-    from bygg.scheduler import Scheduler
+    from bygg.core.scheduler import Scheduler
 
 SchedulingType = Literal["in-process", "processpool"]
 

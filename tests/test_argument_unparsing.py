@@ -1,5 +1,5 @@
-from bygg.argument_unparsing import unparse_args
-from bygg.main import create_argument_parser
+from bygg.cmd.argument_unparsing import unparse_args
+from bygg.cmd.dispatcher import create_argument_parser
 import pytest
 
 args = [

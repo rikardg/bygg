@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from bygg.action import Action, ActionContext, action
-from bygg.common_types import CommandStatus
+from bygg.core.action import Action, ActionContext, action
+from bygg.core.common_types import CommandStatus
 import more_things.MoreActions  # noqa: F401 (imported for side effects)
 
 

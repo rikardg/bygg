@@ -2,9 +2,9 @@ from dataclasses import dataclass
 import re
 from typing import List
 
-from bygg.output import TerminalStyle as TS
-from bygg.output import isatty, output_plain
-from bygg.scheduler import Job
+from bygg.core.scheduler import Job
+from bygg.output.output import TerminalStyle as TS
+from bygg.output.output import isatty, output_plain
 
 
 @dataclass
