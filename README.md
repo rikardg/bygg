@@ -64,14 +64,14 @@ directly.
     outputs=["foo.out", "bar.out"],
     is_entrypoint=True
 )
-def a_build_command(ctx: Context):
+def a_build_command(ctx: ActionContext):
     # do stuff
     ...
 
 
 # Separate function + Action constructor:
 
-def also_a_build_command(ctx: Context):
+def also_a_build_command(ctx: ActionContext):
     # do stuff
     ...
 
@@ -108,7 +108,7 @@ actions. The completions will be loaded:
   environments declared in `Byggfile.yml`.
 - from `Byggfile.yml` if it exists and has environments. In this case, only the
   entrypoint actions listed in `Byggfile.yml` will be loaded; no Python files
-  will be loaded to look for entrypoint actions since this might require an
+  will be loaded to look for entrypoint actions since this might require a
   lengthy (in the context) install of environments.
 
 To install completions, do:
