@@ -157,11 +157,16 @@ If you want to try out the examples or even develop Bygg itself, Bygg can be
 tried out and worked on without installing it globally:
 
 First, clone this repo and cd into it, then execute the commands below.
-`bootstrap.py` creates a virtual environment and installs Bygg into it together
-with its dependencies.
+
+If [uv](https://github.com/astral-sh/uv) is installed (e.g. with `pipx install uv`),
+it will be used by `bootstrap.py` and the Bygg examples where relevant.
+This will speed up project setup and test running. If `uv` is not installed,
+regular `pip` will be used.
 
 ```shell
+# Create a virtual environment and install Bygg into it together with its dependencies:
 ./bootstrap.py
+# Activate the virtual environment:
 . .venv/bin/activate
 ```
 
@@ -194,7 +199,13 @@ pytest
 
 With the virtual environment _deactivated_, the full test suite can be run with
 [Nox](https://nox.thea.codes/en/stable/). Nox should be installed outside of
-the virtual environment since it manages its own virtual environments:
+Bygg's virtual environment since it manages its own virtual environments:
+
+```shell
+pipx install nox
+```
+
+or
 
 ```shell
 pip install --user --upgrade nox
