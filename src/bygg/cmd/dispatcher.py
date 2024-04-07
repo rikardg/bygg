@@ -26,6 +26,7 @@ from bygg.cmd.configuration import (
     dump_schema,
     read_config_file,
 )
+from bygg.cmd.templates import complete_templates, describe_templates
 from bygg.cmd.tree import display_tree
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
@@ -288,6 +289,10 @@ def dispatcher():
 
     if args.version:
         print_version()
+        sys.exit(0)
+
+    if args.describe_templates:
+        describe_templates()
         sys.exit(0)
 
     directory = args.directory[0] if args.directory else None
@@ -598,6 +603,18 @@ List available actions:
         "--completions",
         action="store_true",
         help="Output instructions for how to set up shell completions via the shell's startup script.",
+    )
+    meta_group.add_argument(
+        "--describe-templates",
+        action="store_true",
+        help="Describe templates.",
+    )
+    meta_group.add_argument(
+        "--init-template",
+        nargs=1,
+        type=str,
+        choices=complete_templates(),
+        help="Create init files from a template.",
     )
 
     return parser
