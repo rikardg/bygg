@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
+from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import output_error
 
-from bygg.output.output import TerminalStyle as TS
 from src.bygg.system_helpers import call
 
 directories = [
