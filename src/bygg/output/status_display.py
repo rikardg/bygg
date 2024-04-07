@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import shutil
-from typing import List, Literal
+from typing import Literal
 
 from bygg.core.action import Action
 from bygg.core.common_types import CommandStatus, JobStatus, Severity
@@ -81,7 +81,7 @@ class CheckStatus:
     severity: Severity
 
 
-failed_checks: List[CheckStatus] = []
+failed_checks: list[CheckStatus] = []
 
 
 def on_check_failed(

@@ -1,6 +1,6 @@
 import os
 import signal
-from typing import Callable, List
+from typing import Callable
 
 from bygg.core.action import Action, CommandStatus
 from bygg.core.common_types import JobStatus
@@ -18,7 +18,7 @@ class ProcessRunner:
     scheduler: Scheduler
     job_status_listener: JobStatusListener
     runner_status_listener: RunnerStatusListener
-    failed_jobs: List[Job]
+    failed_jobs: list[Job]
 
     def __init__(self, scheduler: Scheduler):
         self.scheduler = scheduler
@@ -36,8 +36,8 @@ class ProcessRunner:
             signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         with Pool(max_workers, init_worker) as pool:
-            scheduled_queue: List[ApplyResult] = []
-            backlog: List[Job] = []
+            scheduled_queue: list[ApplyResult] = []
+            backlog: list[Job] = []
 
             manager = multiprocess.managers.SyncManager()
             manager.start()
@@ -146,8 +146,8 @@ class ProcessRunner:
                         poll_msg_queue()
                         early_out = True
 
-    def check_for_missing_output_files(self, job: Job) -> List[str]:
-        missing_files: List[str] = []
+    def check_for_missing_output_files(self, job: Job) -> list[str]:
+        missing_files: list[str] = []
         for filename in job.action.outputs:
             if not os.path.exists(filename):
                 missing_files.append(filename)

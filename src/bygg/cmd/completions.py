@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 import sys
 import textwrap
-from typing import Any, Generator, Set
+from typing import Any, Generator
 
 from argcomplete.completers import DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
@@ -29,13 +29,13 @@ class ByggfileDirectoriesCompleter(DirectoriesCompleter):
 
 
 def construct_already_there(
-    parser: argparse.ArgumentParser | Any, options: Set[str]
-) -> Set[str]:
+    parser: argparse.ArgumentParser | Any, options: set[str]
+) -> set[str]:
     """
     Construct a set of options that are already present among the command line
     arguments. Adds both the short and long versions if they exist.
     """
-    already_there_set: Set[str] = set()
+    already_there_set: set[str] = set()
     for action in parser._get_optional_actions():
         option_strings = set(action.option_strings)
         if option_strings & options:

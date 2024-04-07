@@ -4,7 +4,6 @@ import shutil
 import subprocess
 import sys
 import textwrap
-from typing import List
 
 from bygg.cmd.configuration import PYTHON_INPUTFILE, ByggFile, Environment
 from bygg.core.action import Action
@@ -14,7 +13,7 @@ from bygg.util import create_shell_command
 
 
 def calculate_environment_hash(environment: Environment) -> str:
-    requirements: List[str] = []
+    requirements: list[str] = []
     requirements.append(environment.shell)
     if environment.inputs:
         for input in environment.inputs:

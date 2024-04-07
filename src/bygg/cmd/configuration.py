@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Dict, List, Optional
+from typing import Optional
 
 from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
@@ -45,9 +45,9 @@ class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
     name: str
     description: Optional[str] = None
     message: Optional[str] = None
-    inputs: Optional[List[str]] = None
-    outputs: Optional[List[str]] = None
-    dependencies: Optional[List[str]] = None
+    inputs: Optional[list[str]] = None
+    outputs: Optional[list[str]] = None
+    dependencies: Optional[list[str]] = None
     is_entrypoint: Optional[bool] = None
     environment: Optional[str] = "default"
     shell: Optional[str] = None
@@ -61,7 +61,7 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
     ----------
     byggfile : str
         The Python Byggfile that uses this environment.
-    inputs : List[str]
+    inputs : list[str]
         A list of files that are used as input to the environment. Typically pip
         requirements files, but can be any files.
     venv_directory : str
@@ -76,7 +76,7 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
     """
 
     byggfile: str
-    inputs: List[str]
+    inputs: list[str]
     venv_directory: str
     shell: str
     description: Optional[str] = None
@@ -84,9 +84,9 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
 
 
 class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
-    actions: List[ActionItem]
+    actions: list[ActionItem]
     settings: Settings = msgspec.field(default_factory=Settings)
-    environments: Dict[str, Environment] = msgspec.field(default_factory=dict)
+    environments: dict[str, Environment] = msgspec.field(default_factory=dict)
 
 
 def read_config_file() -> ByggFile:

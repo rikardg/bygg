@@ -1,6 +1,5 @@
 import argparse
 import functools
-from typing import List
 
 
 @functools.cache
@@ -23,8 +22,8 @@ def unparse_args(
     parser: argparse.ArgumentParser,
     args: argparse.Namespace,
     *,
-    drop: List[str] | None = None,
-) -> List[str]:
+    drop: list[str] | None = None,
+) -> list[str]:
     """
     Convert an argparse.Namespace back to a list of command line arguments.
 
@@ -34,15 +33,15 @@ def unparse_args(
         The parser that was used to parse the command line arguments.
     args : argparse.Namespace
         The parsed command line arguments to unparse.
-    drop : List[str] | None, optional
+    drop : list[str] | None, optional
         Which dest keys to drop, by default None.
 
     Returns
     -------
-    List[str]
+    list[str]
         A list of command line arguments
     """
-    exec_list: List[str] = []
+    exec_list: list[str] = []
     for k, v in vars(args).items():
         argument = _get_argument_for_dest(parser, k)
         if drop and k in drop:

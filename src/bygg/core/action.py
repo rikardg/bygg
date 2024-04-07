@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Set, Tuple
+from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional
 
 from bygg.core.common_types import CommandStatus
 
@@ -19,9 +19,9 @@ DynamicDependency = Callable[[], str | None]
 class ActionContext:
     name: str
     message: str | None
-    inputs: Set[str]
-    outputs: Set[str]
-    dependencies: Set[str]
+    inputs: set[str]
+    outputs: set[str]
+    dependencies: set[str]
     dynamic_dependency: Optional[DynamicDependency]
     is_entrypoint: bool
     scheduling_type: SchedulingType
@@ -64,7 +64,7 @@ class Action(ActionContext):
     scheduler: Scheduler | None = None
 
     command: Command | None
-    dependency_files: Set[str]
+    dependency_files: set[str]
 
     def __init__(
         self,
@@ -137,7 +137,7 @@ def action_set(
     base_name: str,
     *,
     message: Optional[str] = None,
-    file_pairs: Iterable[Tuple[str, str]],
+    file_pairs: Iterable[tuple[str, str]],
     dependencies: Optional[Iterable[str]] = None,
     is_entrypoint: bool = False,
 ):

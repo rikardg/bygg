@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from collections import deque
-from typing import Any, Dict, Iterable, List
+from typing import Any, Iterable
 
 from bygg.core.action import Action
 
@@ -13,14 +13,14 @@ class Dag(metaclass=ABCMeta):
 
     def remove_node(self, node: str): ...
 
-    def build_action_graph(self, build_actions: Dict[str, Action], action: Action): ...
+    def build_action_graph(self, build_actions: dict[str, Action], action: Action): ...
 
     @abstractmethod
     def get_ready_jobs(
         self,
-        finished_jobs: Dict[str, Any],
-        running_jobs: Dict[str, Any],
-    ) -> List[str]: ...
+        finished_jobs: dict[str, Any],
+        running_jobs: dict[str, Any],
+    ) -> list[str]: ...
 
     @abstractmethod
     def get_all_jobs(self) -> Iterable[str]: ...
@@ -48,7 +48,7 @@ class GtDag(Dag):
     def remove_node(self, node: str):
         self.graph.del_node(node)
 
-    def build_action_graph(self, build_actions: Dict[str, Action], action: Action):
+    def build_action_graph(self, build_actions: dict[str, Action], action: Action):
         """Build the action graph."""
         queue = deque([action])
         while len(queue) > 0:
@@ -63,9 +63,9 @@ class GtDag(Dag):
 
     def get_ready_jobs(
         self,
-        finished_jobs: Dict[str, Any],
-        running_jobs: Dict[str, Any],
-    ) -> List[str]:
+        finished_jobs: dict[str, Any],
+        running_jobs: dict[str, Any],
+    ) -> list[str]:
         nodes = self.graph.nodes()
         if nodes is None:
             return []

@@ -3,7 +3,7 @@ import functools
 import hashlib
 import io
 import os
-from typing import Callable, List, Set, Tuple
+from typing import Callable
 
 DIGEST_TYPE = "sha1"
 
@@ -34,7 +34,7 @@ def calculate_file_digest(file: str) -> str | None:
             return hashlib.file_digest(f, DIGEST_TYPE).hexdigest()
 
 
-def calculate_dependency_digest(filenames: Set[str]) -> Tuple[str, bool]:
+def calculate_dependency_digest(filenames: set[str]) -> tuple[str, bool]:
     """
     Calculate the digest of a set of files.
     filenames: The files to calculate the digest of.
@@ -56,7 +56,7 @@ def calculate_dependency_digest(filenames: Set[str]) -> Tuple[str, bool]:
     )
 
 
-def calculate_digest(items: List[str]) -> str:
+def calculate_digest(items: list[str]) -> str:
     digests = sorted(
         filter(
             None,

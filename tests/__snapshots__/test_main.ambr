@@ -162,7 +162,7 @@
       },
       "Environment": {
         "title": "Environment",
-        "description": "A class used to represent a virtual environment that actions can be run in.\n\nAttributes\n----------\nbyggfile : str\n    The Python Byggfile that uses this environment.\ninputs : List[str]\n    A list of files that are used as input to the environment. Typically pip\n    requirements files, but can be any files.\nvenv_directory : str\n    The directory where the virtual environment is located. Will be recreated by\n    Bygg if any of the inputs are modified.\nshell : str\n    The shell command for creating the environment.\ndescription : str, optional\n    A description of the environment. Used in e.g. help messages, by default None\nmessage : str, optional\n    A message related to the environment, by default None",
+        "description": "A class used to represent a virtual environment that actions can be run in.\n\nAttributes\n----------\nbyggfile : str\n    The Python Byggfile that uses this environment.\ninputs : list[str]\n    A list of files that are used as input to the environment. Typically pip\n    requirements files, but can be any files.\nvenv_directory : str\n    The directory where the virtual environment is located. Will be recreated by\n    Bygg if any of the inputs are modified.\nshell : str\n    The shell command for creating the environment.\ndescription : str, optional\n    A description of the environment. Used in e.g. help messages, by default None\nmessage : str, optional\n    A message related to the environment, by default None",
         "type": "object",
         "properties": {
           "byggfile": {
