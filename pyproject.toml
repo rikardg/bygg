@@ -39,6 +39,9 @@ bygg = "bygg.main:main"
 "Homepage" = "https://github.com/rikardg/bygg"
 "Bug Tracker" = "https://github.com/rikardg/bygg/issues"
 
+[tool.pyright]
+include = ["src/bygg", "tests"]
+
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib", "tests/"]
 
