@@ -34,7 +34,6 @@ classifiers = [
 
 [project.scripts]
 bygg = "bygg.main:main"
-gg = "bygg.main:main"
 
 [project.urls]
 "Homepage" = "https://github.com/rikardg/bygg"
