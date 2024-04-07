@@ -139,23 +139,23 @@
 # ---
 # name: test_directory_completions[--directory ]
   list([
-    'examples/checks',
-    'examples/environments',
-    'examples/failing_jobs',
-    'examples/only_python',
-    'examples/parametric',
-    'examples/taskrunner',
-    'examples/trivial',
+    'checks',
+    'environments',
+    'failing_jobs',
+    'only_python',
+    'parametric',
+    'taskrunner',
+    'trivial',
   ])
 # ---
 # name: test_directory_completions[-C ]
   list([
-    'examples/checks',
-    'examples/environments',
-    'examples/failing_jobs',
-    'examples/only_python',
-    'examples/parametric',
-    'examples/taskrunner',
-    'examples/trivial',
+    'checks',
+    'environments',
+    'failing_jobs',
+    'only_python',
+    'parametric',
+    'taskrunner',
+    'trivial',
   ])
 # ---

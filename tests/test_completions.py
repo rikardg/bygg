@@ -73,7 +73,8 @@ directories_completions = [
 
 
 @pytest.mark.parametrize("arg", directories_completions, ids=lambda x: x)
-def test_directory_completions(completion_tester, arg, snapshot):
+def test_directory_completions(completion_tester, arg, snapshot, monkeypatch):
+    monkeypatch.chdir("examples")
     testcase = arg
     testresult = completion_tester(testcase)
     assert sorted(testresult.split("\x0b")) == snapshot
