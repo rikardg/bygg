@@ -1,0 +1,9 @@
+# Comment in if you want a standard action:
+# settings:
+  # default_action: "transform"
+
+actions:
+  - name: example_task
+    description: This is a task declared in Byggfile.yml.
+    shell: |
+      ls -hal
