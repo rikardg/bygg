@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 import re
-from typing import List
 
 from bygg.core.scheduler import Job
 from bygg.output.output import TerminalStyle as TS
@@ -26,10 +25,10 @@ error_hl_config = HighlightConfig(
     end=TS.Fg.RESET + TS.Bg.RESET,
 )
 
-default_highlight_config: List[HighlightConfig] = [warning_hl_config, error_hl_config]
+default_highlight_config: list[HighlightConfig] = [warning_hl_config, error_hl_config]
 
 
-def highlight_log(message: str, config: List[HighlightConfig] | None = None):
+def highlight_log(message: str, config: list[HighlightConfig] | None = None):
     """
     Highlights the message according to the regexes and styles. Regexes are applied
     per line.
@@ -45,7 +44,7 @@ def highlight_log(message: str, config: List[HighlightConfig] | None = None):
     return "\n".join(lines)
 
 
-def output_job_logs(jobs: List[Job]):
+def output_job_logs(jobs: list[Job]):
     print(
         f"\n{TS.BOLD}Showing logs for {len(jobs)} failed job{'s' if len(jobs) > 1 else ''}:{TS.RESET}\n"
     )

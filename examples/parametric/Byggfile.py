@@ -2,7 +2,6 @@ import os
 import random
 import subprocess
 import time
-from typing import List, Set, Tuple
 
 from bygg.core.action import Action, ActionContext, CommandStatus
 
@@ -30,9 +29,9 @@ ADD_SLEEP = False if "CI" in os.environ else True
 USE_SHELL_COMMAND = False
 
 
-def calculate_first_prime_numbers(count: int) -> List[int]:
+def calculate_first_prime_numbers(count: int) -> list[int]:
     """Calculate the first n prime numbers."""
-    primes: List[int] = []
+    primes: list[int] = []
     i = 2
     while len(primes) < count:
         if all(i % prime != 0 for prime in primes):
@@ -46,8 +45,8 @@ def sort_lines(ctx: ActionContext):
     if not ctx.inputs:
         return CommandStatus(1, "No inputs.", None)
 
-    changed_files: Set[str] = set()
-    output_lines: List[str] = []
+    changed_files: set[str] = set()
+    output_lines: list[str] = []
 
     for input in ctx.inputs:
         output = input[:-3]
@@ -67,7 +66,7 @@ def sort_lines(ctx: ActionContext):
     return CommandStatus(0, "Sorted lines.", "\n".join(output_lines))
 
 
-def shell_executor(command: str) -> Tuple[int, str]:
+def shell_executor(command: str) -> tuple[int, str]:
     process = subprocess.run(
         command,
         shell=True,
@@ -81,8 +80,8 @@ def shell_executor(command: str) -> Tuple[int, str]:
 def call_shell_command(ctx: ActionContext):
     sleep_time = random.random() if ADD_SLEEP else 0
     time.sleep(sleep_time)
-    output_lines: List[str] = []
-    rc_list: List[int] = []
+    output_lines: list[str] = []
+    rc_list: list[int] = []
     for output_file in ctx.outputs:
         rc, output = shell_executor(f"touch {output_file}")
         rc_list.append(rc)
@@ -106,8 +105,8 @@ def generate_create_action(path: str):
 
 
 def declare_test_files_actions():
-    generated_files: List[str] = []
-    generated_output_actions: List[Action] = []
+    generated_files: list[str] = []
+    generated_output_actions: list[Action] = []
 
     # Create a set of files with multiple dependency levels. In a real-world scenario,
     # these files would most likely already be present in the filesystem as source files

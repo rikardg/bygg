@@ -1,13 +1,13 @@
 import os
 import re
 import subprocess
-from typing import List, Optional, Set, Tuple
+from typing import Optional
 
 from bygg.core.common_types import CommandStatus
 
 
 def create_shell_command(shell_command: str, message: Optional[str] = None):
-    def call_shell_command(inputs: Optional[Set[str]], outputs: Optional[Set[str]]):
+    def call_shell_command(inputs: Optional[set[str]], outputs: Optional[set[str]]):
         # Map stderr onto stdout and return both as the output
         process = subprocess.run(
             shell_command,
@@ -22,8 +22,8 @@ def create_shell_command(shell_command: str, message: Optional[str] = None):
 
 
 def filenames_from_pattern(
-    input_files: List[str], in_pattern: str, out_pattern: str
-) -> List[Tuple[str, str]]:
+    input_files: list[str], in_pattern: str, out_pattern: str
+) -> list[tuple[str, str]]:
     """
     Generate a list of tuples with the input and output file names from a a list of
     input file names and a pattern like in Makefile pattern rules. File names that don't

@@ -1,5 +1,4 @@
 from itertools import chain
-from typing import List
 
 from bygg.core.scheduler import Scheduler
 from bygg.output.output import TerminalStyle as TS
@@ -41,7 +40,7 @@ class TreeStyleAscii(TreeStyle):
         self.HANGER = f"{self.END_CORNER + self.BAR * (indent - 1 - len(self.END_CORNER)):<{indent}}"
 
 
-def display_tree(scheduler: Scheduler, entry_points: List[str]):
+def display_tree(scheduler: Scheduler, entry_points: list[str]):
     """
     Display the dependency tree for the given entry points.
 
@@ -62,7 +61,7 @@ def display_tree(scheduler: Scheduler, entry_points: List[str]):
     for entry_point in entry_points:
         build_actions = scheduler.build_actions
 
-        def format_children(name: str, last_sibling: bool, depth: int) -> List[str]:
+        def format_children(name: str, last_sibling: bool, depth: int) -> list[str]:
             action = build_actions[name]
             display_name = f"{TS.BOLD}{name}{TS.RESET}" if depth == 0 else name
 

@@ -7,7 +7,7 @@ import subprocess
 import sys
 import textwrap
 import time
-from typing import Any, List
+from typing import Any
 
 from bygg.cmd.apply_configuration import (
     apply_configuration,
@@ -82,7 +82,7 @@ def init_bygg_context(configuration: ByggFile):
 
 def build(
     ctx: ByggContext,
-    actions: List[str],
+    actions: list[str],
     job_count: int | None,
     always_make: bool,
     check: bool,
@@ -140,7 +140,7 @@ def build(
     return True
 
 
-def clean(ctx: ByggContext, actions: List[str]):
+def clean(ctx: ByggContext, actions: list[str]):
     try:
         for action in actions:
             output_info(f"Cleaning action '{action}':")
@@ -181,7 +181,7 @@ class EntryPoint:
 NO_DESCRIPTION = "No description"
 
 
-def get_entrypoints(ctx: ByggContext) -> List[EntryPoint]:
+def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
@@ -373,7 +373,7 @@ def dispatcher():
                 sys.exit(1)
 
 
-def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: List[str]) -> bool:
+def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: list[str]) -> bool:
     # Analysis implies building:
     always_make = args.always_make or args.check
     if args.clean:
@@ -404,13 +404,13 @@ class ActionPartition:
     """
 
     environment_name: str | None
-    actions: List[str]
+    actions: list[str]
 
 
 def partition_actions(
     configuration: ByggFile,
-    actions: List[str] | None,
-) -> List[ActionPartition] | None:
+    actions: list[str] | None,
+) -> list[ActionPartition] | None:
     """
     Partition the actions into groups that should be run in the same environment. Only
     partition the given actions that also exist in the configuration file. This is to
@@ -421,13 +421,13 @@ def partition_actions(
     ----------
     configuration : ByggFile
         The configuration file.
-    actions : List[str] | None
+    actions : list[str] | None
         The actions that should be run. If None, a partition will be created, resolved
         to the default action.
 
     Returns
     -------
-    List[ActionPartition] | None
+    list[ActionPartition] | None
         A list of ActionPartition objects, each representing a group of actions that
         should be run in the same environment. Returns None if there are no actions in
         the configuration.

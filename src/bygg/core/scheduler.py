@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, List, Literal, Set
+from typing import Literal
 
 from bygg.core.action import Action, CommandStatus
 from bygg.core.cache import Cache
@@ -39,17 +39,17 @@ class ActionDigestItem(msgspec.Struct):
 
 class Scheduler:
     cache: Cache
-    build_actions: Dict[str, Action]
+    build_actions: dict[str, Action]
 
     job_graph: Dag
-    dirty_jobs: Set[str]
-    ready_jobs: Set[str]
-    running_jobs: Dict[str, Job]
-    finished_jobs: Dict[str, Job]
+    dirty_jobs: set[str]
+    ready_jobs: set[str]
+    running_jobs: dict[str, Job]
+    finished_jobs: dict[str, Job]
 
     started: bool
     always_make: bool
-    check_inputs_outputs_set: Set[str] | None
+    check_inputs_outputs_set: set[str] | None
 
     def __init__(self):
         Action.scheduler = self
@@ -172,7 +172,7 @@ class Scheduler:
         # print(f"Job {job_name} is clean")
         return False
 
-    def get_ready_jobs(self, batch_size: int = 0) -> List[Job]:
+    def get_ready_jobs(self, batch_size: int = 0) -> list[Job]:
         """
         Create a batch of jobs and put them in the running pool. Returns all ready jobs
         if batch_size is 0.
@@ -196,7 +196,7 @@ class Scheduler:
         if len(self.ready_jobs) == 0:
             return []
 
-        job_list: List[Job] = []
+        job_list: list[Job] = []
         for _ in range(
             len(self.ready_jobs)
             if batch_size == 0
