@@ -10,7 +10,7 @@ python_versions = ["3.11.8", "3.12.2"]
 def tests(session):
     session.install("-r", "requirements.txt", "-r", "requirements-dev.txt")
     session.install(".")
-    session.run("pytest")
+    session.run("pytest", "-vv")
 
 
 @nox.session(python=python_versions)
