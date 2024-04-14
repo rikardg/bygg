@@ -3,6 +3,50 @@
 - [Structure](#Structure)
 - [Actions](#Actions)
 
+## Command line interface
+
+### `ACTION [ACTION2, ACTION3, ...]`
+
+To build a target (execute an action) and its dependencies, just type `bygg
+ACTION`, e.g.
+
+```shell
+bygg myprogram
+```
+
+Any number of actions can be listed on the command line. Eachone will be built
+one at the time in the order they were given. The dependencies in their
+respective dependency trees will be built in parallel.
+
+The actions on the command line can use different environments if needed --
+there is no restriction that they need to use the same one.
+
+Executing `bygg` with no arguments will build the default action if one is set,
+and otherwise give an error.
+
+### `--clean`
+
+Removes all files declared as outputs from the stated entrypoint (or default)
+action and its dependencies.
+
+### `-l`, `--list`
+
+Lists the available entrypoint actions. Note that declaring an action as being
+an entrypoint only affects the content of this list; any action can still be
+built from the command line.
+
+### `--tree`
+
+Displays the dependency tree of the given (or default) action.
+
+### `-h`, `--help`
+
+Displays brief help for the available command line options.
+
+### `-v`, `--version`
+
+Prints the version.
+
 ## Execution model
 
 Bygg will go through the `Action`s and check their dependencies on other
