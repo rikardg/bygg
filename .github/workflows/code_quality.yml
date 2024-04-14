@@ -10,7 +10,7 @@ jobs:
   nox:
     strategy:
       matrix:
-        python_version: ["3.11", "3.12"]
+        python_version: ["3.11.8", "3.12.2"]
         nox_session: [tests, basics, examples]
         os: [ubuntu-latest, macos-latest, macos-14]
         install_uv: [0, 1]
@@ -36,7 +36,7 @@ jobs:
   pyright_and_ruff:
     strategy:
       matrix:
-        python_version: ["3.11", "3.12"]
+        python_version: ["3.11.8", "3.12.2"]
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
