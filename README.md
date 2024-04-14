@@ -48,7 +48,9 @@ or
 
 or in a virtual environment.
 
-## Usage
+## Usage -- what it looks like
+
+[More in-depth documentation here](docs/Usage.md).
 
 Specify the actions in `Byggfile.py` in your source directory. Either wrap the
 action function using the `@action` decorator, or use the `Action` constructor
