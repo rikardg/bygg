@@ -1,5 +1,5 @@
 # Core
-argcomplete==3.2.3
+argcomplete==3.3.0
 dill==0.3.8
 graph-theory==2023.7.6
 msgspec==0.18.6
