@@ -10,7 +10,7 @@ jobs:
   nox:
     strategy:
       matrix:
-        python_version: ["3.11.8", "3.12.2"]
+        python_version: ["3.11.9", "3.12.3"]
         nox_session: [tests, basics, examples]
         os: [ubuntu-latest, macos-latest, macos-14]
         install_uv: [0, 1]
@@ -31,12 +31,12 @@ jobs:
           fi
       - name: Test with nox
         run: |
-          nox --python ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
+          nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
 
   pyright_and_ruff:
     strategy:
       matrix:
-        python_version: ["3.11.8", "3.12.2"]
+        python_version: ["3.11.9", "3.12.3"]
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
