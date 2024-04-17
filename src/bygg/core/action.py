@@ -138,6 +138,7 @@ def action_set(
     *,
     message: Optional[str] = None,
     file_pairs: Iterable[tuple[str, str]],
+    extra_inputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
     is_entrypoint: bool = False,
 ):
@@ -150,17 +151,21 @@ def action_set(
     def create_actions(func: Callable):
         action_list = []
         for input_file, output_file in file_pairs:
-            action_name = f"{base_name}_{output_file}"
+            action_name = f"{base_name}::{output_file}"
             action_list.append(action_name)
             Action(
                 action_name,
                 message,
-                inputs=[input_file],
+                inputs=[input_file] + list(extra_inputs) if extra_inputs else None,
                 outputs=[output_file],
                 dependencies=dependencies,
-                is_entrypoint=is_entrypoint,
                 command=func,
             )
-        Action(base_name, f"Action set {base_name}", dependencies=action_list)
+        Action(
+            base_name,
+            f"Action set {base_name}",
+            dependencies=action_list,
+            is_entrypoint=is_entrypoint,
+        )
 
     return create_actions
