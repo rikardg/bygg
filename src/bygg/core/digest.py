@@ -41,14 +41,9 @@ def calculate_dependency_digest(filenames: set[str]) -> tuple[str, bool]:
     Returns: The digest of the files as a hex string.
     """
 
-    files_were_missing = False
-
-    digests = sorted(
-        filter(None, [calculate_file_digest(filename) for filename in filenames])
-    )
-
-    # if len(digests) == 0:
-    #     return ""
+    file_digests = [calculate_file_digest(filename) for filename in filenames]
+    digests = sorted(filter(None, file_digests))
+    files_were_missing = len(file_digests) != len(digests)
 
     return (
         hashlib.new(DIGEST_TYPE, "".join(digests).encode()).hexdigest(),
