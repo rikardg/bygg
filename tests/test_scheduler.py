@@ -1,4 +1,7 @@
 from bygg.core.action import Action, CommandStatus
+import pytest
+
+pytestmark = pytest.mark.scheduler
 
 
 def test_scheduler_single_action(scheduler_single_action):
