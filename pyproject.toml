@@ -44,6 +44,7 @@ include = ["src/bygg", "tests"]
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib", "tests/"]
+markers = ["digest: Tests for digest functionality."]
 
 [tool.ruff]
 exclude = ["_version.py"]
