@@ -1,4 +1,4 @@
-from bygg.core.action import Action, CommandStatus
+from bygg.core.action import Action, ActionContext, CommandStatus
 import pytest
 
 pytestmark = pytest.mark.scheduler
@@ -307,3 +307,52 @@ def test_scheduler_dynamic_dependency_two_runs(scheduler_fixture):
 
     assert len(scheduler.build_actions) == 2
     assert len(scheduler.running_jobs) == 0
+
+
+def test_scheduler_single_file(scheduler_fixture, tmp_path):
+    scheduler, cache_file = scheduler_fixture
+
+    def action1(ctx: ActionContext):
+        for output in ctx.outputs:
+            with open(output, "w") as f:
+                f.write("file content")
+        return CommandStatus(0, "Executed successfully", None)
+
+    Action(
+        name="file",
+        is_entrypoint=True,
+        inputs=[],
+        outputs=[str(tmp_path / "file1")],
+        command=action1,
+    )
+
+    scheduler.start_run("file")
+
+    job = scheduler.get_ready_jobs(1)[0]
+    job.status = job.action.command(job.action)
+    scheduler.job_finished(job)
+
+    assert len(scheduler.job_graph) == 0
+    assert scheduler.run_status() == "finished"
+
+    scheduler.shutdown()
+
+    # Second run
+
+    scheduler.__init__()
+    scheduler.init_cache(cache_file)
+
+    Action(
+        name="file",
+        is_entrypoint=True,
+        inputs=[],
+        outputs=[str(tmp_path / "file1")],
+        command=action1,
+    )
+
+    scheduler.start_run("file")
+    job_list = scheduler.get_ready_jobs(1)
+
+    assert len(job_list) == 0
+    assert len(scheduler.job_graph) == 0
+    assert scheduler.run_status() == "finished"
