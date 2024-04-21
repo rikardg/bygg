@@ -77,7 +77,12 @@ pyright==1.1.357 \
 pytest==8.1.1 \
     --hash=sha256:2a8386cfc11fa9d2c50ee7b2a57e7d898ef90470a7a34c4b949ff59662bb78b7 \
     --hash=sha256:ac978141a75948948817d360297b7aae0fcb9d6ff6bc9ec6d514b85d5a65c044
-    # via syrupy
+    # via
+    #   pytest-mock
+    #   syrupy
+pytest-mock==3.14.0 \
+    --hash=sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f \
+    --hash=sha256:2719255a1efeceadbc056d6bf3df3d1c5015530fb40cf347c0f9afac88410bd0
 ruff==0.3.4 \
     --hash=sha256:3f3860057590e810c7ffea75669bdc6927bfd91e29b4baa9258fd48b540a4365 \
     --hash=sha256:519cf6a0ebed244dce1dc8aecd3dc99add7a2ee15bb68cf19588bb5bf58e0488 \
