@@ -7,15 +7,25 @@ from typing import Callable
 
 DIGEST_TYPE = "sha1"
 
-# If True, cache the file digest in memory based on the content and stat.mtime_ns of the
-# file.
+# If True, cache the file digest in memory based on the filename, stat.ctime_ns,
+# stat.mtime_ns and stat.size of the file.
 ALLOW_DIGEST_CACHING = True
 
 
-@functools.cache
-def file_digest_memo(file: str, mtime: int) -> str | None:
+def file_digest(file: str) -> str:
     with open(file, "rb") as f:
         return hashlib.file_digest(f, DIGEST_TYPE).hexdigest()
+
+
+@functools.cache
+def file_digest_memo(
+    file: str, st_ctime_ns: int, st_mtime_ns: int, st_size: int
+) -> str:
+    """
+    Cache a file's digest based on the content, stat.ctime_ns, stat.mtime_ns and
+    stat.size of the file.
+    """
+    return file_digest(file)
 
 
 def calculate_file_digest(file: str) -> str | None:
@@ -27,11 +37,10 @@ def calculate_file_digest(file: str) -> str | None:
 
     """
     if os.path.isfile(file):
-        s = os.stat(file)
-        with open(file, "rb") as f:
-            if ALLOW_DIGEST_CACHING:
-                return file_digest_memo(file, s.st_mtime_ns)
-            return hashlib.file_digest(f, DIGEST_TYPE).hexdigest()
+        if ALLOW_DIGEST_CACHING:
+            st = os.stat(file)
+            return file_digest_memo(file, st.st_ctime_ns, st.st_mtime_ns, st.st_size)
+        return file_digest(file)
 
 
 def calculate_dependency_digest(filenames: set[str]) -> tuple[str, bool]:
