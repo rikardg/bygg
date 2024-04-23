@@ -1,12 +1,8 @@
 import argparse
 from dataclasses import dataclass
 import os
-import shutil
-import stat
 import subprocess
 import sys
-import textwrap
-import time
 from typing import Any
 
 from bygg.cmd.apply_configuration import (
@@ -14,6 +10,7 @@ from bygg.cmd.apply_configuration import (
     register_actions_from_configuration,
 )
 from bygg.cmd.argument_unparsing import unparse_args
+from bygg.cmd.build_clean import build, clean
 from bygg.cmd.completions import (
     ByggfileDirectoriesCompleter,
     do_completion,
@@ -26,47 +23,25 @@ from bygg.cmd.configuration import (
     dump_schema,
     read_config_file,
 )
+from bygg.cmd.datastructures import ByggContext, get_entrypoints
+from bygg.cmd.list_actions import list_actions
 from bygg.cmd.tree import display_tree
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
-from bygg.output.job_output import output_job_logs
 from bygg.output.output import (
     TerminalStyle as TS,
 )
 from bygg.output.output import (
     output_error,
     output_info,
-    output_ok,
     output_plain,
     output_warning,
 )
 from bygg.output.status_display import (
-    failed_checks,
     on_job_status,
     on_runner_status,
-    output_check_results,
 )
 from bygg.system_helpers import change_dir
-
-
-@dataclass
-class ByggContext:
-    """Container for various state"""
-
-    runner: ProcessRunner
-    scheduler: Scheduler
-    configuration: ByggFile
-
-
-def get_job_count_limit():
-    try:
-        # Use os.sched_getaffinity where available (on U**X):
-        # https://stackoverflow.com/a/55423170
-        return len(os.sched_getaffinity(0))
-    except AttributeError:
-        count = os.cpu_count()
-        assert count is not None
-        return count
 
 
 def init_bygg_context(configuration: ByggFile):
@@ -78,188 +53,6 @@ def init_bygg_context(configuration: ByggFile):
     runner.runner_status_listener = on_runner_status
 
     return ByggContext(runner, scheduler, configuration)
-
-
-def build(
-    ctx: ByggContext,
-    actions: list[str],
-    job_count: int | None,
-    always_make: bool,
-    check: bool,
-) -> bool:
-    """
-    actions: The actions to build.
-
-    job_count: The number of jobs to run simultaneously. None means to use the number of
-    available cores.
-
-    always_make: If True, all actions will be built, even if they are up to date.
-
-    check: If True, apply various checks:
-
-    * Check that the inputs and outputs of all actions will be checked for consistency.
-      A job that runs later must not have files as output that are inputs to a job that
-      runs earlier.
-    """
-    try:
-        max_workers = get_job_count_limit() if job_count is None else job_count
-
-        for action in actions:
-            t1 = time.time()
-            output_info(f"Building action '{action}':")
-
-            ctx.scheduler.start_run(
-                action,
-                always_make=always_make,
-                check=check,
-            )
-            status = ctx.runner.start(max_workers)
-            ctx.scheduler.shutdown()
-
-            if status:
-                output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
-            else:
-                output_error(
-                    f"Action '{action}' failed after {time.time() - t1:.2f} s."
-                )
-                output_job_logs(ctx.runner.failed_jobs)
-                return False
-
-    except KeyboardInterrupt:
-        output_warning("\nBuild was interrupted by user.")
-        return False
-    except KeyError as e:
-        output_error(f"Error: Action '{e}' not found.")
-        return False
-    finally:
-        ctx.scheduler.shutdown()
-
-    if check and failed_checks:
-        return output_check_results()
-
-    return True
-
-
-def clean(ctx: ByggContext, actions: list[str]):
-    try:
-        for action in actions:
-            output_info(f"Cleaning action '{action}':")
-            ctx.scheduler.prepare_run(action)
-            for job_name in ctx.scheduler.job_graph.get_all_jobs():
-                job = ctx.scheduler.build_actions.get(job_name, None)
-                if job is None:
-                    continue
-                for output in job.outputs:
-                    try:
-                        s = os.stat(output)
-                        if stat.S_ISREG(s.st_mode):
-                            os.unlink(output)
-                        elif stat.S_ISDIR(s.st_mode):
-                            output_info(f"Removing directory: {output}")
-                            shutil.rmtree(output)
-                    except FileNotFoundError:
-                        pass
-            ctx.scheduler.shutdown()
-    except KeyboardInterrupt:
-        output_warning("Build was interrupted by user.")
-        return False
-    except KeyError as e:
-        output_error(f"Error: Action '{e}' not found.")
-        return False
-    finally:
-        ctx.scheduler.shutdown()
-
-    return True
-
-
-@dataclass
-class EntryPoint:
-    name: str
-    description: str
-
-
-NO_DESCRIPTION = "No description"
-
-
-def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
-    return [
-        EntryPoint(x.name, x.description or NO_DESCRIPTION)
-        for x in ctx.scheduler.build_actions.values()
-        if x.is_entrypoint
-    ] or [
-        EntryPoint(x.name, x.description or NO_DESCRIPTION)
-        for x in ctx.configuration.actions
-        if x.is_entrypoint
-    ]
-
-
-list_actions_style = "B"
-
-
-def list_actions(ctx: ByggContext) -> bool:
-    entrypoints = get_entrypoints(ctx)
-
-    if not entrypoints:
-        program_name = os.path.basename(sys.argv[0])
-        output_error("Loaded build files but no entrypoints were found.")
-        output_error(f"Type `{program_name} --help` for help.")
-        return False
-
-    terminal_cols, terminal_rows = shutil.get_terminal_size()
-    output = [f"{TS.BOLD}Available actions:{TS.RESET}"]
-
-    sorted_actions = sorted(entrypoints, key=lambda x: x.name)
-    default_action_name = ctx.configuration.settings.default_action
-
-    if default_action_name:
-        default_action_list = [
-            x for x in sorted_actions if x.name == default_action_name
-        ]
-
-        if default_action_list:
-            default_action = default_action_list[0]
-            default_action_name = default_action.name
-            sorted_actions.remove(default_action)
-            sorted_actions.insert(0, default_action)
-
-    if list_actions_style == "A":
-        output.append("")
-        section_indent = 0
-        separator = " : "
-        max_name_width = max([len(x.name) for x in entrypoints])
-        width = min(terminal_cols, 80)
-        subsequent_indent = " " * (section_indent + max_name_width + len(separator))
-        for action in sorted_actions:
-            description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description}"
-            output.extend(
-                textwrap.wrap(
-                    description,
-                    width=width,
-                    initial_indent=" " * section_indent,
-                    subsequent_indent=subsequent_indent,
-                )
-            )
-            output.append("")
-
-    if list_actions_style == "B":
-        output.append("")
-        for action in sorted_actions:
-            default_action_suffix = (
-                " (default)" if action.name == default_action_name else ""
-            )
-            output.append(f"{TS.BOLD}{action.name}{default_action_suffix}{TS.RESET}")
-            output.append(
-                textwrap.fill(
-                    action.description,
-                    initial_indent="    ",
-                    subsequent_indent="    ",
-                )
-            )
-            output.append("")
-
-    print("\n".join(output))
-
-    return True
 
 
 def print_version():
