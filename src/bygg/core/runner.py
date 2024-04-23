@@ -164,3 +164,14 @@ def run_job(job: Job, qq):
     except Exception as e:
         job.status = CommandStatus(1, "Job failed with exception.", f"{e}")
     return job
+
+
+def get_job_count_limit():
+    try:
+        # Use os.sched_getaffinity where available (on U**X):
+        # https://stackoverflow.com/a/55423170
+        return len(os.sched_getaffinity(0))
+    except AttributeError:
+        count = os.cpu_count()
+        assert count is not None
+        return count
