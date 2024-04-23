@@ -77,8 +77,9 @@ class Scheduler:
             self.build_actions, self.build_actions[entrypoint]
         )
 
-        # Fill the actions' _dependency_files from their dependencies
+        # Fill the actions' dependency_files from self and their dependencies
         for action in self.build_actions.values():
+            action.dependency_files.update(action.inputs)
             for dependency in action.dependencies:
                 action.dependency_files.update(self.build_actions[dependency].outputs)
             # print(f"Action {action.name} inputs: {action._dependency_files}")

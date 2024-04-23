@@ -356,3 +356,83 @@ def test_scheduler_single_file(scheduler_fixture, tmp_path):
     assert len(job_list) == 0
     assert len(scheduler.job_graph) == 0
     assert scheduler.run_status() == "finished"
+
+
+def test_scheduler_single_file_changed(scheduler_fixture, tmp_path):
+    scheduler, cache_file = scheduler_fixture
+    infile = tmp_path / "file0"
+    outfile = tmp_path / "file1"
+
+    def action1(ctx: ActionContext):
+        for output in ctx.outputs:
+            with open(output, "w") as f:
+                f.write("file content")
+        return CommandStatus(0, "Executed successfully", None)
+
+    Action(
+        name="file",
+        is_entrypoint=True,
+        inputs=[str(infile)],
+        outputs=[str(outfile)],
+        command=action1,
+    )
+
+    infile.write_text("infile content")
+
+    scheduler.start_run("file")
+
+    job = scheduler.get_ready_jobs(1)[0]
+    job.status = job.action.command(job.action)
+    scheduler.job_finished(job)
+
+    assert len(scheduler.job_graph) == 0
+    assert scheduler.run_status() == "finished"
+
+    scheduler.shutdown()
+
+    # Second run
+
+    scheduler.__init__()
+    scheduler.init_cache(cache_file)
+
+    Action(
+        name="file",
+        is_entrypoint=True,
+        inputs=[str(infile)],
+        outputs=[str(outfile)],
+        command=action1,
+    )
+
+    scheduler.start_run("file")
+    job_list = scheduler.get_ready_jobs(1)
+
+    assert len(job_list) == 0
+    assert len(scheduler.job_graph) == 0
+    assert scheduler.run_status() == "finished"
+
+    # Third run, modify input file
+
+    infile.write_text("modified infile content")
+
+    scheduler.__init__()
+    scheduler.init_cache(cache_file)
+
+    Action(
+        name="file",
+        is_entrypoint=True,
+        inputs=[str(infile)],
+        outputs=[str(outfile)],
+        command=action1,
+    )
+
+    scheduler.start_run("file")
+    job_list = scheduler.get_ready_jobs(1)
+
+    assert len(job_list) == 1
+    assert len(scheduler.job_graph) == 1
+
+    job.status = job.action.command(job.action)
+    scheduler.job_finished(job)
+
+    assert len(scheduler.job_graph) == 0
+    assert scheduler.run_status() == "finished"
