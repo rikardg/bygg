@@ -36,11 +36,14 @@ def calculate_file_digest(file: str) -> str | None:
     Returns: The digest of the file as a hex string, or None if the file does not exist.
 
     """
-    if os.path.isfile(file):
+    real_path = os.path.realpath(file)
+    if os.path.isfile(real_path):
         if ALLOW_DIGEST_CACHING:
-            st = os.stat(file)
-            return file_digest_memo(file, st.st_ctime_ns, st.st_mtime_ns, st.st_size)
-        return file_digest(file)
+            st = os.stat(real_path)
+            return file_digest_memo(
+                real_path, st.st_ctime_ns, st.st_mtime_ns, st.st_size
+            )
+        return file_digest(real_path)
 
 
 def calculate_dependency_digest(filenames: set[str]) -> tuple[str, bool]:

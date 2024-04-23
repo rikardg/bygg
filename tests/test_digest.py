@@ -202,3 +202,48 @@ def test_calculate_dependency_digest(tmp_path: Path, mocker):
 
     assert digests4 != digests3
     assert not was_missing4
+
+
+def test_file_digest_memo_symlinks(tmp_path, mocker):
+    import bygg.core.digest
+
+    digest_spy = mocker.spy(bygg.core.digest, "file_digest")
+
+    file = tmp_path / "real.txt"
+    file.write_text(f"real file content for {str(file)}")
+
+    link = tmp_path / "link.txt"
+    os.symlink(file, link)
+
+    st = os.stat(str(link))
+    digest1 = file_digest_memo(str(file), st.st_ctime_ns, st.st_mtime_ns, st.st_size)
+    digest2 = file_digest_memo(str(link), st.st_ctime_ns, st.st_mtime_ns, st.st_size)
+
+    assert digest1 == digest2
+    assert digest_spy.call_count == 2
+
+
+def test_calculate_dependency_digest_symlinks(tmp_path: Path, mocker):
+    import bygg.core.digest
+
+    digest_spy = mocker.spy(bygg.core.digest, "file_digest")
+
+    file = tmp_path / "file"
+    file.write_text(f"content for {str(file)}")
+
+    link = tmp_path / "link"
+    link.symlink_to(file)
+
+    digests1, was_missing1 = calculate_dependency_digest(set([str(link)]))
+
+    assert digests1
+    assert not was_missing1
+    assert digest_spy.call_count == 1
+
+    file.write_text(f"different content for {str(file)}")
+
+    digests2, was_missing2 = calculate_dependency_digest(set([str(link)]))
+
+    assert digests1 != digests2
+    assert not was_missing2
+    assert digest_spy.call_count == 2
