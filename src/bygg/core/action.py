@@ -116,7 +116,34 @@ def action(
     dynamic_dependency: Optional[DynamicDependency] = None,
     is_entrypoint: bool = False,
 ):
-    """Decorator for creating an Action from a function."""
+    """Decorator to define a Bygg action.
+
+    Wraps the decorated function in an Action instance.
+
+    Parameters
+    ----------
+    name : str
+        The name of the action
+    message : str, optional
+        A message to display when the action is run, by default None
+    inputs : Iterable[str], optional
+        An iterable of input files, by default None
+    outputs : Iterable[str], optional
+        An iterable of output files, by default None
+    dependencies : Iterable[str], optional
+        An iterable of dependency actions, by default None
+    dynamic_dependency : DynamicDependency, optional
+        A dynamic dependency, by default None
+    is_entrypoint : bool, optional
+        Whether the action is an entrypoint, by default False
+    description : str, optional
+        A description of the action, by default None
+
+    Returns
+    -------
+    Callable[[Callable], Action]
+        A decorator that converts the decorated function into an Action
+    """
 
     def create_action(func: Callable):
         Action(
@@ -146,6 +173,26 @@ def action_set(
     Decorator for creating individual Actions from a list of input-output file pairs and
     a function. Creates one Action that depends on all of the individual Actions. It has
     name = base_name, which in turn can be used as a dependency for other Actions.
+
+    Parameters
+    ----------
+    base_name : str
+        Base name to use for generated actions
+    message : str, optional
+        Message for actions, by default None
+    file_pairs : Iterable[tuple[str, str]]
+        Input and output file pairs
+    extra_inputs : Iterable[str], optional
+        Extra input files, by default None
+    dependencies : Iterable[str], optional
+        Dependencies for actions, by default None
+    is_entrypoint : bool, optional
+        Whether the top-most action should be an entrypoint, by default False
+
+    Returns
+    -------
+    Callable[[Callable], None]
+        A decorator that registers actions constructed around the decorated function
     """
 
     def create_actions(func: Callable):
