@@ -6,6 +6,7 @@ from bygg.core.cache import Cache
 from bygg.core.dag import Dag, create_dag
 from bygg.core.digest import calculate_dependency_digest, calculate_digest
 from bygg.output.status_display import on_check_failed
+from loguru import logger
 import msgspec
 
 
@@ -129,7 +130,7 @@ class Scheduler:
             and not action.dynamic_dependency
         ):
             # An action with neither inputs nor outputs will always be built
-            # print(f"Job {job_name} is dirty (no inputs or outputs)")
+            logger.debug(f"Job '{job_name}' is dirty (no inputs or outputs)")
             return True
 
         if (
@@ -138,13 +139,13 @@ class Scheduler:
             or not cached_digests.inputs_digest
         ):
             # No previous result, so we need to build
-            # print(f"Job {job_name} is dirty (no previous result)")
+            logger.debug(f"Job '{job_name}' is dirty (no previous result)")
             return True
 
         outputs_digest, files_were_missing = calculate_dependency_digest(action.outputs)
         if files_were_missing or cached_digests.outputs_digest != outputs_digest:
             # The output has changed, so we need to rebuild
-            # print(f"Job {job_name} is dirty (output changed)")
+            logger.debug(f"Job '{job_name}' is dirty (output changed)")
             return True
 
         inputs_digest, files_were_missing = calculate_dependency_digest(
@@ -161,16 +162,16 @@ class Scheduler:
                 dd_result is None
                 or calculate_digest([dd_result]) != cached_digests.dynamic_digest
             ):
-                # print(f"Job {job_name} is dirty (dynamic dependency changed)")
+                logger.debug(f"Job '{job_name}' is dirty (dynamic dependency changed)")
                 return True
 
         # TODO handle files_were_missing here? abort?
         if cached_digests.inputs_digest != inputs_digest:
             # The inputs have changed, so we need to rebuild
-            # print(f"Job {job_name} is dirty (inputs changed)")
+            logger.debug(f"Job '{job_name}' is dirty (inputs changed)")
             return True
 
-        # print(f"Job {job_name} is clean")
+        logger.debug(f"Job '{job_name}' is clean")
         return False
 
     def get_ready_jobs(self, batch_size: int = 0) -> list[Job]:

@@ -9,6 +9,9 @@ dill==0.3.8 \
     # via multiprocess
 graph-theory==2023.7.6 \
     --hash=sha256:9030aee88aa1db6c778f73338c143a4c872eb9ed5fad5eb9a768ebeb75541340
+loguru==0.7.2 \
+    --hash=sha256:003d71e3d3ed35f0f8984898359d65b79e5b21943f78af86aa5491210429b8eb \
+    --hash=sha256:e671a53522515f34fd406340ee968cb9ecafbc4b36c679da03c18fd8d0bd51ac
 msgspec==0.18.6 \
     --hash=sha256:06acbd6edf175bee0e36295d6b0302c6de3aaf61246b46f9549ca0041a9d7177 \
     --hash=sha256:0e24539b25c85c8f0597274f11061c102ad6b0c56af053373ba4629772b407be \
