@@ -42,6 +42,7 @@ from bygg.output.status_display import (
     on_runner_status,
 )
 from bygg.system_helpers import change_dir
+from loguru import logger
 
 
 def init_bygg_context(configuration: ByggFile):
@@ -282,6 +283,8 @@ def entrypoint_completions(prefix, parsed_args: argparse.Namespace, **kwargs):
 
 
 def create_argument_parser():
+    logger.info("Creating argument parser")
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""
