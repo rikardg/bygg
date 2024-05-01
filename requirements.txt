@@ -7,8 +7,8 @@ dill==0.3.8 \
     --hash=sha256:3ebe3c479ad625c4553aca177444d89b486b1d84982eeacded644afc0cf797ca \
     --hash=sha256:c36ca9ffb54365bdd2f8eb3eff7d2a21237f8452b57ace88b1ac615b7e815bd7
     # via multiprocess
-graph-theory==2023.7.6 \
-    --hash=sha256:9030aee88aa1db6c778f73338c143a4c872eb9ed5fad5eb9a768ebeb75541340
+graph-theory==2023.7.7 \
+    --hash=sha256:4d33f4f73f7dddf1e36166056e93f82accca4854efcc8c25eb85f8c609385a8d
 loguru==0.7.2 \
     --hash=sha256:003d71e3d3ed35f0f8984898359d65b79e5b21943f78af86aa5491210429b8eb \
     --hash=sha256:e671a53522515f34fd406340ee968cb9ecafbc4b36c679da03c18fd8d0bd51ac
