@@ -84,7 +84,7 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
 
 
 class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
-    actions: list[ActionItem]
+    actions: list[ActionItem] = msgspec.field(default_factory=list)
     settings: Settings = msgspec.field(default_factory=Settings)
     environments: dict[str, Environment] = msgspec.field(default_factory=dict)
 
