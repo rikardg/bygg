@@ -12,7 +12,8 @@
             "type": "array",
             "items": {
               "$ref": "#/$defs/ActionItem"
-            }
+            },
+            "default": []
           },
           "settings": {
             "$ref": "#/$defs/Settings"
@@ -25,9 +26,7 @@
             "default": {}
           }
         },
-        "required": [
-          "actions"
-        ],
+        "required": [],
         "additionalProperties": false
       },
       "ActionItem": {
