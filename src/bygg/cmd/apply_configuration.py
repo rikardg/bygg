@@ -10,6 +10,7 @@ from bygg.core.action import Action
 from bygg.core.digest import calculate_string_digest
 from bygg.output.output import output_error, output_info, output_plain
 from bygg.util import create_shell_command
+from loguru import logger
 
 
 def calculate_environment_hash(environment: Environment) -> str:
@@ -42,7 +43,7 @@ def setup_environment(environment: Environment):
         output_info(f"Replacing venv at {venv_path}")
         shutil.rmtree(venv_path)
 
-    output_info("Setting up environment")
+    output_info(f"Setting up environment in {venv_path}")
     process = subprocess.run(
         environment.shell,
         shell=True,
@@ -77,8 +78,14 @@ def should_restart_with(environment: Environment) -> str | None:
 def register_actions_from_configuration(
     configuration: ByggFile, is_restarted_with_env: str | None
 ):
+    logger.info(f"Registering actions from configuration for '{is_restarted_with_env}'")
     for action in configuration.actions:
+        logger.debug(f"Action '{action.name}'")
+
         if is_restarted_with_env and action.environment != is_restarted_with_env:
+            logger.debug(
+                f"Skipping action '{action.name}' for environment '{is_restarted_with_env}', it belongs to '{action.environment}'"
+            )
             continue
 
         shell_command = (
