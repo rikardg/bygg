@@ -454,7 +454,7 @@
   
   default_action
   └── default_action_python
-  🛈 Setting up environment
+  🛈 Setting up environment in .venv
   
   '''
 # ---
@@ -832,7 +832,7 @@
   default_action
   └── default_action_python
   🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment
+  🛈 Setting up environment in .venv
   
   '''
 # ---
