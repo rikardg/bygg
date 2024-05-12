@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import os
 import subprocess
 import sys
+import tempfile
 from typing import Any
 
 from bygg.cmd.apply_configuration import (
@@ -23,18 +24,15 @@ from bygg.cmd.configuration import (
     dump_schema,
     read_config_file,
 )
-from bygg.cmd.datastructures import ByggContext, get_entrypoints
-from bygg.cmd.list_actions import list_actions
-from bygg.cmd.tree import display_tree
+from bygg.cmd.datastructures import ByggContext, SubProcessIpcData, get_entrypoints
+from bygg.cmd.list_actions import list_actions, list_collect_subprocess, print_actions
+from bygg.cmd.tree import display_tree, print_tree
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
-from bygg.output.output import (
-    TerminalStyle as TS,
-)
+from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import (
     output_error,
     output_info,
-    output_plain,
     output_warning,
 )
 from bygg.output.status_display import (
@@ -43,6 +41,7 @@ from bygg.output.status_display import (
 )
 from bygg.system_helpers import change_dir
 from loguru import logger
+import msgspec
 
 
 def init_bygg_context(configuration: ByggFile):
@@ -63,6 +62,9 @@ def print_version():
 
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
+
+DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE = 127
+"""Exit code returned by a subprocess when an action is not found."""
 
 
 def dispatcher():
@@ -101,86 +103,186 @@ def dispatcher():
     configuration = read_config_file()
     ctx = init_bygg_context(configuration)
 
-    try:
-        action_partitions = (
-            partition_actions(configuration, args.actions) if configuration else None
-        )
-    except KeyError as e:
-        output_plain(
-            f"Could not find action {TS.BOLD}{e}{TS.RESET}. List available actions with {TS.BOLD}--list{TS.RESET}."
-        )
-        sys.exit(1)
-
-    if not action_partitions:
-        if os.path.isfile(PYTHON_INPUTFILE):
-            # No configuration file, so load the Python build file directly.
+    if not configuration.environments:
+        if os.path.isfile(PYTHON_INPUTFILE) or os.path.isfile(YAML_INPUTFILE):
+            # No environments, so just load the Python build file directly.
             apply_configuration(configuration, None, None)
-            default_action = configuration.settings.default_action
-            actions = (
-                args.actions
-                if args.actions
-                else [default_action]
-                if default_action
-                else []
-            )
-            status = do_dispatch(ctx, args, actions)
+            status = do_dispatch(ctx, args)
         else:
-            status = list_actions(ctx)
+            status = list_actions(ctx, args)
 
         if status:
             sys.exit(0)
         sys.exit(1)
 
-    # Special case for --list here, since it shouldn't start loading the environments:
-    if args.list:
-        status = list_actions(ctx)
-        sys.exit(0) if status else sys.exit(1)
+    # Execute each action within the correct environment:
 
-    # Execute each action partition within the correct environment:
+    subprocess_output: dict[str, SubProcessIpcData] = {}
 
-    for partition in action_partitions:
-        env = partition.environment_name
+    # Parent process
+    if not is_restarted_with_env:
+        actions: list[str | None] = (
+            args.actions
+            if len(args.actions) > 0
+            else [configuration.settings.default_action]
+        )
+        for action in actions:
+            dispatch_for_toplevel_process(ctx, args, parser, subprocess_output, action)
+
+        # Print results from subprocess execution
+
+        if not actions:
+            output_error("No actions specified and no default action is defined.\n")
+            print_actions(subprocess_output)
+            sys.exit(1)
+
+        if args.list:
+            print_actions(subprocess_output)
+            sys.exit(0)
+
+        if args.tree:
+            truthy_actions = [a for a in actions if a]
+            for k, v in subprocess_output.items():
+                if v.tree:
+                    print_tree(v.tree, truthy_actions)
+
+        sys.exit(0)
+
+    # We're in subprocess
+    assert len(args.actions) <= 1
+    subprocess_actions: list[str | None] = [args.actions[0]] or [None]
+    for action in subprocess_actions:
+        dispatch_for_subprocess(ctx, args, action)
+
+
+def output_environment_list_tree(ctx: ByggContext, args: argparse.Namespace):
+    for environment in ctx.configuration.environments:
+        output_info(f"{environment}")
+        if args.list:
+            output_info(f"  {TS.BOLD}Actions:{TS.RESET}")
+
+
+def dispatch_for_toplevel_process(
+    ctx: ByggContext,
+    args: argparse.Namespace,
+    parser: argparse.ArgumentParser,
+    subprocess_output: dict[str, SubProcessIpcData],
+    action: str | None,
+):
+    """Dispatches an action in all environments."""
+    logger.info(f"Dispatch for toplevel process, action: {action}")
+    for environment in ctx.configuration.environments:
+        assert environment
         # Check if we should restart with another Python interpreter (e.g. from a
         # virtualenv):
-        restart_with = apply_configuration(configuration, env, is_restarted_with_env)
+        restart_with = apply_configuration(ctx.configuration, environment, None)
 
-        if restart_with is not None and not is_restarted_with_env:
-            exec_list = [restart_with, *partition.actions] + unparse_args(
-                parser, args, drop=["actions"]
+        assert restart_with is not None  # this should not happen
+
+        fd, ipc_filename = tempfile.mkstemp()
+        os.close(fd)
+
+        exec_list = []
+        exec_list += [restart_with]
+        if action:
+            exec_list += [action]
+        exec_list += unparse_args(parser, args, drop=["actions"])
+        exec_list += ["--is_restarted_with_env", environment]
+        exec_list += ["--ipc_filename", ipc_filename]
+
+        logger.debug(f"Restarting with: {exec_list}")
+        try:
+            process = subprocess.run(exec_list, encoding="utf-8")
+            if process.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE:
+                continue
+            if process.returncode != 0:
+                sys.exit(process.returncode)
+        except FileNotFoundError:
+            output_error(f"Error: Could not restart with '{restart_with}'.")
+            output_warning(
+                "Please make sure that bygg is in your pip requirements list for this environment."
             )
-            if partition.environment_name:
-                exec_list += ["--is_restarted_with_env", partition.environment_name]
-
+            sys.exit(1)
+        finally:
             try:
-                process = subprocess.run(exec_list, encoding="utf-8")
-                if process.returncode != 0:
-                    sys.exit(process.returncode)
-            except FileNotFoundError:
-                output_error(f"Error: Could not restart with '{restart_with}'.")
-                output_warning(
-                    "Please make sure that bygg is in your pip requirements list for this environment."
-                )
-                sys.exit(1)
-        else:
-            status = do_dispatch(ctx, args, partition.actions)
-            if not status:
-                sys.exit(1)
+                with open(ipc_filename, "rb") as f:
+                    subprocess_output[environment] = msgspec.msgpack.decode(
+                        f.read(), type=SubProcessIpcData
+                    )
+            except (FileNotFoundError, msgspec.DecodeError) as e:
+                print(e)
+                pass
+            os.remove(ipc_filename)
 
 
-def do_dispatch(ctx: ByggContext, args: argparse.Namespace, actions: list[str]) -> bool:
+def dispatch_for_subprocess(
+    ctx: ByggContext, args: argparse.Namespace, action: str | None
+):
+    logger.info("Dispatch for subprocess")
+    logger.debug(f"Action: {action}")
+    # We're in subprocess
+    ctx.ipc_data = SubProcessIpcData()
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+    apply_configuration(ctx.configuration, is_restarted_with_env, is_restarted_with_env)
+
+    # Always fill the subprocess data, but exit if only listing or treeing
+    if ctx.ipc_data:
+        list_collect_subprocess(ctx, args)
+        entry_points = [
+            a.name for k, a in ctx.scheduler.build_actions.items() if a.is_entrypoint
+        ]
+        display_tree(ctx, entry_points)
+        # if args.list or args.tree:
+        #     return True
+
+    ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
+    if ipc_filename:
+        logger.debug(f"Writing IPC data to {args.ipc_filename}")
+        with open(ipc_filename, "wb") as f:
+            f.write(msgspec.msgpack.encode(ctx.ipc_data))
+
+    if action and action not in ctx.scheduler.build_actions:
+        sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
+
+    status = do_dispatch(ctx, args)
+    if not status:
+        sys.exit(1)
+
+
+def do_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     # Analysis implies building:
     always_make = args.always_make or args.check
+
+    if args.list:
+        list_actions(ctx, args)
+        return True
+
+    default_action = ctx.configuration.settings.default_action
+    actions = (
+        args.actions
+        if args.actions
+        else [default_action]
+        if default_action and default_action in ctx.scheduler.build_actions
+        else []
+    )
+
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+    if is_restarted_with_env and not actions:
+        sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
+
+    if not actions:
+        output_error("No actions specified and no default action is defined.\n")
+        list_actions(ctx, args)
+        status = False
+
     if args.clean:
         status = clean(ctx, actions)
-    elif args.list:
-        list_actions(ctx)
-        status = True
-    elif not actions:
-        output_error("No actions specified and no default action is defined.\n")
-        list_actions(ctx)
-        status = False
     elif args.tree:
-        status = display_tree(ctx.scheduler, actions)
+        status = display_tree(ctx, actions)
     else:
         jobs = int(args.jobs) if args.jobs else None
         status = build(ctx, actions, jobs, always_make, args.check)
@@ -270,7 +372,7 @@ def entrypoint_completions(prefix, parsed_args: argparse.Namespace, **kwargs):
         else:
             apply_configuration(ctx.configuration, None, None)
 
-        entrypoints = get_entrypoints(ctx)
+        entrypoints = get_entrypoints(ctx, parsed_args)
         # Exlude already added entrypoints:
         eligible_entrypoints = [
             x for x in entrypoints if x.name not in parsed_args.actions
@@ -319,6 +421,13 @@ List available actions:
 
     parser.add_argument(
         "--is_restarted_with_env",
+        nargs=1,
+        type=str,
+        default=None,
+        help=argparse.SUPPRESS,
+    )
+    parser.add_argument(
+        "--ipc_filename",
         nargs=1,
         type=str,
         default=None,

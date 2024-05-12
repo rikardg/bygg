@@ -1,8 +1,25 @@
+import argparse
 from dataclasses import dataclass
+from typing import Optional
 
 from bygg.cmd.configuration import ByggFile
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
+import msgspec
+
+
+class SubProcessIpcDataList(msgspec.Struct):
+    actions: dict[str, str]
+    default_action: Optional[str] = None
+
+
+class SubProcessIpcDataTree(msgspec.Struct):
+    actions: dict[str, str]
+
+
+class SubProcessIpcData(msgspec.Struct):
+    list: Optional[SubProcessIpcDataList] = None
+    tree: Optional[SubProcessIpcDataTree] = None
 
 
 @dataclass
@@ -12,6 +29,7 @@ class ByggContext:
     runner: ProcessRunner
     scheduler: Scheduler
     configuration: ByggFile
+    ipc_data: Optional[SubProcessIpcData] = None
 
 
 @dataclass
@@ -23,7 +41,11 @@ class EntryPoint:
 NO_DESCRIPTION = "No description"
 
 
-def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
+def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoint]:
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
@@ -31,5 +53,5 @@ def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
     ] or [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.configuration.actions
-        if x.is_entrypoint
+        if x.is_entrypoint and x.environment == is_restarted_with_env
     ]

@@ -237,19 +237,28 @@
 # ---
 # name: test_list[environments]
   '''
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
   Available actions:
+  
+  ~~ default ~~
+  
+  clean_environments
+      Clean all environments
   
   default_action (default)
       The default action. Runs in the default environment.
   
+  ~~ env1 ~~
+  
   action1
       Action that runs in env1.
   
+  ~~ env2 ~~
+  
   action2
       Action that runs in env2.
-  
-  clean_environments
-      Clean all environments
   
   
   '''
@@ -346,19 +355,28 @@
 # name: test_list_directory[environments]
   '''
   🛈 Entering directory 'examples/environments'
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
   Available actions:
+  
+  ~~ default ~~
+  
+  clean_environments
+      Clean all environments
   
   default_action (default)
       The default action. Runs in the default environment.
   
+  ~~ env1 ~~
+  
   action1
       Action that runs in env1.
   
+  ~~ env2 ~~
+  
   action2
       Action that runs in env2.
-  
-  clean_environments
-      Clean all environments
   
   
   '''
@@ -451,10 +469,12 @@
 # ---
 # name: test_tree[environments]
   '''
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
   
   default_action
   └── default_action_python
-  🛈 Setting up environment in .venv
   
   '''
 # ---
@@ -828,11 +848,13 @@
 # ---
 # name: test_tree_directory[environments]
   '''
+  🛈 Entering directory 'examples/environments'
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
   
   default_action
   └── default_action_python
-  🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment in .venv
   
   '''
 # ---

@@ -1,19 +1,61 @@
+import argparse
 import os
 import shutil
 import sys
 import textwrap
 
-from bygg.cmd.datastructures import ByggContext, get_entrypoints
+from bygg.cmd.datastructures import (
+    ByggContext,
+    EntryPoint,
+    SubProcessIpcData,
+    SubProcessIpcDataList,
+    get_entrypoints,
+)
 from bygg.output.output import (
     TerminalStyle as TS,
 )
 from bygg.output.output import output_error
+from loguru import logger
 
 list_actions_style = "B"
 
+HEADER = f"{TS.BOLD}Available actions:{TS.RESET}"
 
-def list_actions(ctx: ByggContext) -> bool:
-    entrypoints = get_entrypoints(ctx)
+
+def list_collect_subprocess(
+    ctx: ByggContext,
+    args: argparse.Namespace,
+) -> bool:
+    entrypoints = get_entrypoints(ctx, args)
+
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+    if is_restarted_with_env and not entrypoints:
+        return False
+
+    sorted_actions = sorted(entrypoints, key=lambda x: x.name)
+    default_action_name = ctx.configuration.settings.default_action
+
+    if ctx.ipc_data:
+        logger.debug(f"{sorted_actions=}")
+        ctx.ipc_data.list = SubProcessIpcDataList(
+            actions={x.name: x.description for x in sorted_actions},
+            default_action=default_action_name,
+        )
+        return True
+
+    return False
+
+
+def list_actions(ctx: ByggContext, args: argparse.Namespace) -> bool:
+    entrypoints = get_entrypoints(ctx, args)
+
+    is_restarted_with_env = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+    if is_restarted_with_env and not entrypoints:
+        return False
 
     if not entrypoints:
         program_name = os.path.basename(sys.argv[0])
@@ -21,11 +63,18 @@ def list_actions(ctx: ByggContext) -> bool:
         output_error(f"Type `{program_name} --help` for help.")
         return False
 
-    terminal_cols, terminal_rows = shutil.get_terminal_size()
-    output = [f"{TS.BOLD}Available actions:{TS.RESET}"]
+    output = [HEADER]
 
     sorted_actions = sorted(entrypoints, key=lambda x: x.name)
     default_action_name = ctx.configuration.settings.default_action
+
+    if ctx.ipc_data:
+        logger.debug(f"{sorted_actions=}")
+        ctx.ipc_data.list = SubProcessIpcDataList(
+            actions={x.name: x.description for x in sorted_actions},
+            default_action=default_action_name,
+        )
+        return True
 
     if default_action_name:
         default_action_list = [
@@ -39,40 +88,87 @@ def list_actions(ctx: ByggContext) -> bool:
             sorted_actions.insert(0, default_action)
 
     if list_actions_style == "A":
-        output.append("")
-        section_indent = 0
-        separator = " : "
-        max_name_width = max([len(x.name) for x in entrypoints])
-        width = min(terminal_cols, 80)
-        subsequent_indent = " " * (section_indent + max_name_width + len(separator))
-        for action in sorted_actions:
-            description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description}"
-            output.extend(
-                textwrap.wrap(
-                    description,
-                    width=width,
-                    initial_indent=" " * section_indent,
-                    subsequent_indent=subsequent_indent,
-                )
-            )
-            output.append("")
+        list_actions_A(output, sorted_actions)
 
     if list_actions_style == "B":
-        output.append("")
-        for action in sorted_actions:
-            default_action_suffix = (
-                " (default)" if action.name == default_action_name else ""
-            )
-            output.append(f"{TS.BOLD}{action.name}{default_action_suffix}{TS.RESET}")
-            output.append(
-                textwrap.fill(
-                    action.description,
-                    initial_indent="    ",
-                    subsequent_indent="    ",
-                )
-            )
-            output.append("")
+        list_actions_B(output, sorted_actions, default_action_name)
 
     print("\n".join(output))
 
     return True
+
+
+def list_actions_A(output: list[str], actions: list[EntryPoint]):
+    terminal_cols, terminal_rows = shutil.get_terminal_size()
+
+    output.append("")
+    section_indent = 0
+    separator = " : "
+    max_name_width = max([len(x.name) for x in actions])
+    width = min(terminal_cols, 80)
+    subsequent_indent = " " * (section_indent + max_name_width + len(separator))
+    for action in actions:
+        description = f"{TS.BOLD}{action.name: <{max_name_width}}{TS.RESET}{separator}{action.description}"
+        output.extend(
+            textwrap.wrap(
+                description,
+                width=width,
+                initial_indent=" " * section_indent,
+                subsequent_indent=subsequent_indent,
+            )
+        )
+        output.append("")
+
+
+def list_actions_B(
+    output: list[str], actions: list[EntryPoint], default_action_name: str | None
+):
+    output.append("")
+    for action in actions:
+        default_action_suffix = (
+            " (default)" if action.name == default_action_name else ""
+        )
+        output.append(f"{TS.BOLD}{action.name}{default_action_suffix}{TS.RESET}")
+        output.append(
+            textwrap.fill(
+                action.description,
+                initial_indent="    ",
+                subsequent_indent="    ",
+            )
+        )
+        output.append("")
+
+
+def print_actions(subprocess_output: dict[str, SubProcessIpcData]):
+    display_environment_names = (
+        len(
+            [
+                len(v.list.actions)
+                for k, v in subprocess_output.items()
+                if v.list and len(v.list.actions) > 0
+            ]
+        )
+        > 1
+    )
+
+    output = [HEADER]
+
+    if display_environment_names:
+        output.append("")
+
+    for env, data in sorted(
+        subprocess_output.items(),
+        key=lambda x: (0, x[0]) if x[0] == "default" else (1, x[0]),
+    ):
+        if not data.list:
+            continue
+
+        if display_environment_names:
+            output.append(f"~~ {env} ~~")
+
+        list_actions_B(
+            output,
+            [EntryPoint(name, descr) for name, descr in data.list.actions.items()],
+            data.list.default_action,
+        )
+    print("\n".join(output))
