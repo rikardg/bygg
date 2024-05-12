@@ -26,12 +26,9 @@ def list_collect_subprocess(
     ctx: ByggContext,
     args: argparse.Namespace,
 ) -> bool:
-    entrypoints = get_entrypoints(ctx, args)
+    entrypoints = get_entrypoints(ctx)
 
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-    if is_restarted_with_env and not entrypoints:
+    if ctx.is_restarted_with_env and not entrypoints:
         return False
 
     sorted_actions = sorted(entrypoints, key=lambda x: x.name)
@@ -48,13 +45,10 @@ def list_collect_subprocess(
     return False
 
 
-def list_actions(ctx: ByggContext, args: argparse.Namespace) -> bool:
-    entrypoints = get_entrypoints(ctx, args)
+def list_actions(ctx: ByggContext) -> bool:
+    entrypoints = get_entrypoints(ctx)
 
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-    if is_restarted_with_env and not entrypoints:
+    if ctx.is_restarted_with_env and not entrypoints:
         return False
 
     if not entrypoints:

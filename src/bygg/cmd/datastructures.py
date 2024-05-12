@@ -1,4 +1,3 @@
-import argparse
 from dataclasses import dataclass
 from typing import Optional
 
@@ -29,6 +28,7 @@ class ByggContext:
     runner: ProcessRunner
     scheduler: Scheduler
     configuration: ByggFile
+    is_restarted_with_env: str | None
     ipc_data: Optional[SubProcessIpcData] = None
 
 
@@ -41,11 +41,7 @@ class EntryPoint:
 NO_DESCRIPTION = "No description"
 
 
-def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoint]:
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-
+def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
@@ -53,5 +49,5 @@ def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoi
     ] or [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.configuration.actions
-        if x.is_entrypoint and x.environment == is_restarted_with_env
+        if x.is_entrypoint and x.environment == ctx.is_restarted_with_env
     ]

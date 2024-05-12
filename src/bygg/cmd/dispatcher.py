@@ -44,7 +44,9 @@ from loguru import logger
 import msgspec
 
 
-def init_bygg_context(configuration: ByggFile):
+def init_bygg_context(
+    configuration: ByggFile, is_restarted_with_env: str | None
+) -> ByggContext:
     scheduler = Scheduler()
     runner = ProcessRunner(scheduler)
 
@@ -52,7 +54,7 @@ def init_bygg_context(configuration: ByggFile):
     runner.job_status_listener = on_job_status
     runner.runner_status_listener = on_runner_status
 
-    return ByggContext(runner, scheduler, configuration)
+    return ByggContext(runner, scheduler, configuration, is_restarted_with_env)
 
 
 def print_version():
@@ -86,10 +88,7 @@ def dispatcher():
         print_version()
         sys.exit(0)
 
-    directory = args.directory[0] if args.directory else None
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
+    directory, is_restarted_with_env = get_directory_and_restarted_env(args)
 
     if directory and not is_restarted_with_env:
         directory_arg = args.directory[0]
@@ -101,7 +100,7 @@ def dispatcher():
         sys.exit(1)
 
     configuration = read_config_file()
-    ctx = init_bygg_context(configuration)
+    ctx = init_bygg_context(configuration, is_restarted_with_env)
 
     if not configuration.environments:
         if os.path.isfile(PYTHON_INPUTFILE) or os.path.isfile(YAML_INPUTFILE):
@@ -109,7 +108,7 @@ def dispatcher():
             apply_configuration(configuration, None, None)
             status = do_dispatch(ctx, args)
         else:
-            status = list_actions(ctx, args)
+            status = list_actions(ctx)
 
         if status:
             sys.exit(0)
@@ -153,6 +152,16 @@ def dispatcher():
     subprocess_actions: list[str | None] = [args.actions[0]] or [None]
     for action in subprocess_actions:
         dispatch_for_subprocess(ctx, args, action)
+
+
+def get_directory_and_restarted_env(
+    args: argparse.Namespace,
+) -> tuple[str | None, str | None]:
+    directory: str | None = args.directory[0] if args.directory else None
+    is_restarted_with_env: str | None = (
+        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    )
+    return directory, is_restarted_with_env
 
 
 def output_environment_list_tree(ctx: ByggContext, args: argparse.Namespace):
@@ -222,10 +231,9 @@ def dispatch_for_subprocess(
     logger.debug(f"Action: {action}")
     # We're in subprocess
     ctx.ipc_data = SubProcessIpcData()
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    apply_configuration(
+        ctx.configuration, ctx.is_restarted_with_env, ctx.is_restarted_with_env
     )
-    apply_configuration(ctx.configuration, is_restarted_with_env, is_restarted_with_env)
 
     # Always fill the subprocess data, but exit if only listing or treeing
     if ctx.ipc_data:
@@ -256,7 +264,7 @@ def do_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     always_make = args.always_make or args.check
 
     if args.list:
-        list_actions(ctx, args)
+        list_actions(ctx)
         return True
 
     default_action = ctx.configuration.settings.default_action
@@ -268,15 +276,12 @@ def do_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
         else []
     )
 
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-    if is_restarted_with_env and not actions:
+    if ctx.is_restarted_with_env and not actions:
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
 
     if not actions:
         output_error("No actions specified and no default action is defined.\n")
-        list_actions(ctx, args)
+        list_actions(ctx)
         status = False
 
     if args.clean:
@@ -359,11 +364,11 @@ def entrypoint_completions(prefix, parsed_args: argparse.Namespace, **kwargs):
     import textwrap
 
     # Handle -C/--directory:
-    new_dir = parsed_args.directory[0] if parsed_args.directory else None
+    new_dir, is_restarted_with_env = get_directory_and_restarted_env(parsed_args)
 
     with change_dir(new_dir):
         configuration = read_config_file()
-        ctx = init_bygg_context(configuration)
+        ctx = init_bygg_context(configuration, is_restarted_with_env)
 
         if configuration.environments:
             # We don't want to install environments while completing, so only load the
@@ -372,7 +377,7 @@ def entrypoint_completions(prefix, parsed_args: argparse.Namespace, **kwargs):
         else:
             apply_configuration(ctx.configuration, None, None)
 
-        entrypoints = get_entrypoints(ctx, parsed_args)
+        entrypoints = get_entrypoints(ctx)
         # Exlude already added entrypoints:
         eligible_entrypoints = [
             x for x in entrypoints if x.name not in parsed_args.actions
