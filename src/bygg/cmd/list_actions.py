@@ -4,6 +4,7 @@ import shutil
 import sys
 import textwrap
 
+from bygg.cmd.configuration import DEFAULT_ENVIRONMENT_NAME
 from bygg.cmd.datastructures import (
     ByggContext,
     EntryPoint,
@@ -165,7 +166,7 @@ def print_actions(subprocess_output: dict[str, SubProcessIpcData]):
 
     for env, data in sorted(
         subprocess_output.items(),
-        key=lambda x: (0, x[0]) if x[0] == "default" else (1, x[0]),
+        key=lambda x: (0, x[0]) if x[0] == DEFAULT_ENVIRONMENT_NAME else (1, x[0]),
     ):
         if not data.list:
             continue
