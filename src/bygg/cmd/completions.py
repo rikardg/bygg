@@ -1,4 +1,5 @@
 import argparse
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -106,6 +107,10 @@ class ByggCompletionFinder(CompletionFinder):
 def do_completion(parser: argparse.ArgumentParser):
     completer = ByggCompletionFinder()
     completer(parser)
+
+
+def is_completing():
+    return os.environ.get("_ARGCOMPLETE") == "1"
 
 
 def generate_shell_completions(print_and_exit: bool):

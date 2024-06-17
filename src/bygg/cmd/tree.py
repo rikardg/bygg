@@ -1,6 +1,6 @@
 from itertools import chain
 
-from bygg.core.scheduler import Scheduler
+from bygg.cmd.datastructures import ByggContext, SubProcessIpcDataTree
 from bygg.output.output import TerminalStyle as TS
 
 
@@ -40,7 +40,7 @@ class TreeStyleAscii(TreeStyle):
         self.HANGER = f"{self.END_CORNER + self.BAR * (indent - 1 - len(self.END_CORNER)):<{indent}}"
 
 
-def display_tree(scheduler: Scheduler, entry_points: list[str]):
+def display_tree(ctx: ByggContext, entry_points: list[str]):
     """
     Display the dependency tree for the given entry points.
 
@@ -58,8 +58,10 @@ def display_tree(scheduler: Scheduler, entry_points: list[str]):
     indent = 4
     style = TreeStyleUnicode(indent)
 
+    formatted_data: dict[str, str] = {}
+
     for entry_point in entry_points:
-        build_actions = scheduler.build_actions
+        build_actions = ctx.scheduler.build_actions
 
         def format_children(name: str, last_sibling: bool, depth: int) -> list[str]:
             action = build_actions[name]
@@ -83,6 +85,25 @@ def display_tree(scheduler: Scheduler, entry_points: list[str]):
             )
             return subtree
 
+        formatted_data[entry_point] = "\n".join(format_children(entry_point, True, 0))
+
+        tree_data = SubProcessIpcDataTree(actions=formatted_data)
+        if ctx.ipc_data:
+            ctx.ipc_data.tree = tree_data
+        else:
+            print_tree(tree_data, entry_points)
+    return len(entry_points) > 0
+
+
+def print_tree(ipc_data_tree: SubProcessIpcDataTree, actions: list[str]):
+    """Print the dependency tree from the IPC data."""
+    actions_to_list = actions if actions else sorted(ipc_data_tree.actions.keys())
+    trees = list(
+        filter(
+            lambda x: len(x) > 0,
+            [ipc_data_tree.actions.get(a, "") for a in actions_to_list],
+        )
+    )
+    if trees:
         print()
-        print("\n".join(format_children(entry_point, True, 0)))
-    return True
+        print("\n".join(trees))
