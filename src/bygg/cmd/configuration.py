@@ -9,13 +9,15 @@ import msgspec
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
 
+DEFAULT_ENVIRONMENT_NAME = "default"
+
 
 class Settings(msgspec.Struct, forbid_unknown_fields=True):
     default_action: Optional[str] = None
 
 
 class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
-    """
+    __doc__ = f"""
     This is a representation of the Action class used for deserialising from YAML.
 
     Parameters
@@ -37,7 +39,7 @@ class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
         executed directly from the command line. If not set, this is treated as true by
         default in Byggfile.yml and false when used from Python. Default is None.
     environment : str, optional
-        The environment for the action. Default is "default".
+        The environment for the action. Default is "{DEFAULT_ENVIRONMENT_NAME}".
     shell : str, optional
         The shell command to execute when the action is run. Default is None.
     """
@@ -49,7 +51,7 @@ class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
     outputs: Optional[list[str]] = None
     dependencies: Optional[list[str]] = None
     is_entrypoint: Optional[bool] = None
-    environment: Optional[str] = "default"
+    environment: Optional[str] = DEFAULT_ENVIRONMENT_NAME
     shell: Optional[str] = None
 
 

@@ -15,6 +15,7 @@ from bygg.cmd.completions import (
     is_completing,
 )
 from bygg.cmd.configuration import (
+    DEFAULT_ENVIRONMENT_NAME,
     PYTHON_INPUTFILE,
     YAML_INPUTFILE,
     ByggFile,
@@ -117,7 +118,7 @@ def dispatcher(
             if is_completing():
                 ctx.ipc_data = SubProcessIpcData()
                 list_collect_subprocess(ctx, args)
-                return {"default": ctx.ipc_data}
+                return {DEFAULT_ENVIRONMENT_NAME: ctx.ipc_data}
 
             status = inner_dispatch(ctx, args)
         else:
