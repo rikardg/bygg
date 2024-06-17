@@ -48,10 +48,6 @@ NO_DESCRIPTION = "No description"
 
 
 def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoint]:
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
@@ -59,5 +55,5 @@ def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoi
     ] or [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.configuration.actions
-        if x.is_entrypoint and x.environment == is_restarted_with_env
+        if x.is_entrypoint and x.environment == args.is_restarted_with_env
     ]

@@ -67,10 +67,7 @@ def bygg():
     """Entry point for the Bygg command line interface."""
     parser = create_argument_parser()
     args = parser.parse_args()
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-    if is_restarted_with_env is None:
+    if args.is_restarted_with_env is None:
         do_completion(parser)
     return dispatcher(parser, args)
 
@@ -93,11 +90,8 @@ def dispatcher(
         sys.exit(0)
 
     directory = args.directory[0] if args.directory else None
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
 
-    if directory and not is_restarted_with_env:
+    if directory and not args.is_restarted_with_env:
         directory_arg = args.directory[0]
         output_info(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
@@ -131,7 +125,7 @@ def dispatcher(
     # Execute each action within the correct environment:
 
     # Parent process
-    if not is_restarted_with_env:
+    if not args.is_restarted_with_env:
         subprocess_output: dict[str, SubProcessIpcData] = {}
         actions: list[str | None] = (
             args.actions
@@ -239,10 +233,9 @@ def dispatch_for_subprocess(
     logger.debug("Action: {}", action)
     # We're in subprocess
     ctx.ipc_data = SubProcessIpcData()
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
+    apply_configuration(
+        ctx.configuration, args.is_restarted_with_env, args.is_restarted_with_env
     )
-    apply_configuration(ctx.configuration, is_restarted_with_env, is_restarted_with_env)
 
     # Always fill the subprocess data
     if ctx.ipc_data:
@@ -292,10 +285,7 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
         else []
     )
 
-    is_restarted_with_env = (
-        args.is_restarted_with_env[0] if args.is_restarted_with_env else None
-    )
-    if is_restarted_with_env and not actions:
+    if args.is_restarted_with_env and not actions:
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
 
     if not actions:
@@ -385,9 +375,8 @@ List available actions:
 
     parser.add_argument(
         "--is_restarted_with_env",
-        nargs=1,
+        nargs="?",
         type=str,
-        default=None,
         help=argparse.SUPPRESS,
     )
     # Used internally for communicating the IPC filename to the subprocess.
