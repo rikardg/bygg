@@ -23,6 +23,7 @@
 # name: test_actions_completions[environments]
   list([
     'action1',
+    'action1_python_entrypoint_python',
     'action2',
     'clean_environments',
     'default_action',
@@ -31,6 +32,7 @@
 # name: test_actions_completions[environments].1
   list([
     'action1',
+    'action1_python_entrypoint_python',
     'action2',
     'clean_environments',
     'default_action',
@@ -39,6 +41,7 @@
 # name: test_actions_completions[environments].2
   list([
     'action1',
+    'action1_python_entrypoint_python',
     'action2',
     'clean_environments',
     'default_action',
