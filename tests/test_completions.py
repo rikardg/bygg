@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from bygg.cmd.completions import ByggCompletionFinder
-from bygg.cmd.dispatcher import create_argument_parser
+from bygg.cmd.dispatcher import EntrypointCompleter, create_argument_parser
 from bygg.system_helpers import change_dir
 import pytest
 
@@ -31,7 +31,7 @@ def completion_tester(monkeypatch, tmp_path):
         # to get its knickers in a twist.
         monkeypatch.setattr("os.fdopen", open_raise)
 
-        parser = create_argument_parser()
+        parser = create_argument_parser(EntrypointCompleter())
         completer = ByggCompletionFinder()
 
         with open(outfile, "w", encoding="utf-8"):
