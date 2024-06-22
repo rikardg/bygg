@@ -1281,3 +1281,48 @@
   
   '''
 # ---
+# name: test_tree_non_existing_action[checks]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[environments]
+  '''
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
+  Action 'no_such_action' not found in any environment.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[failing_jobs]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[only_python]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[parametric]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[taskrunner]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---
+# name: test_tree_non_existing_action[trivial]
+  '''
+  Error: Action 'no_such_action' not found.
+  
+  '''
+# ---

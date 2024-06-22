@@ -2,6 +2,7 @@ from itertools import chain
 
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcDataTree
 from bygg.output.output import TerminalStyle as TS
+from bygg.output.output import output_error
 
 
 class TreeStyle:
@@ -62,6 +63,9 @@ def display_tree(ctx: ByggContext, entry_points: list[str]):
 
     for entry_point in entry_points:
         build_actions = ctx.scheduler.build_actions
+        if not ctx.ipc_data and entry_point not in build_actions:
+            output_error(f"Error: Action '{entry_point}' not found.")
+            return False
 
         def format_children(name: str, last_sibling: bool, depth: int) -> list[str]:
             action = build_actions[name]
