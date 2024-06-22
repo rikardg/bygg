@@ -139,36 +139,36 @@ def dispatcher(
         for action in actions:
             dispatch_for_toplevel_process(ctx, args, parser, subprocess_output, action)
 
-        # Act on results from subprocess execution
+            # Act on results from subprocess execution. Only actions that are to be
+            # built or cleaned need to continue the loop beyond the first pass.
 
-        if is_completing():
-            return subprocess_output
+            if is_completing():
+                return subprocess_output
 
-        if args.list:
-            print_actions(subprocess_output)
-            sys.exit(0)
+            if args.list:
+                print_actions(subprocess_output)
+                sys.exit(0)
 
-        truthy_actions = set(filter(None, actions))
-        found_actions: set[str] = set().union(
-            *(i.found_actions for i in subprocess_output.values())
-        )
-        missing_actions = truthy_actions - found_actions
+            truthy_actions = set(filter(None, actions))
+            found_actions: set[str] = set().union(
+                *(i.found_actions for i in subprocess_output.values())
+            )
 
-        for a in missing_actions:
-            output_error(f"Action '{a}' not found in any environment.")
-            sys.exit(1)
+            if action not in found_actions:
+                output_error(f"Action '{action}' not found in any environment.")
+                sys.exit(1)
 
-        if args.tree:
-            # TODO error out if there no actions could be printed
-            for k, v in subprocess_output.items():
-                if v.tree:
-                    print_tree(v.tree, list(truthy_actions))
-            sys.exit(0)
+            if args.tree:
+                # TODO error out if there no actions could be printed
+                for k, v in subprocess_output.items():
+                    if v.tree:
+                        print_tree(v.tree, list(truthy_actions))
+                sys.exit(0)
 
-        if not truthy_actions:
-            output_error("No actions specified and no default action is defined.\n")
-            print_actions(subprocess_output)
-            sys.exit(1)
+            if not truthy_actions:
+                output_error("No actions specified and no default action is defined.\n")
+                print_actions(subprocess_output)
+                sys.exit(1)
 
         sys.exit(0)
 
