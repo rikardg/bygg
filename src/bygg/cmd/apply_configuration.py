@@ -39,11 +39,13 @@ def setup_environment(environment: Environment):
     # TODO should we remove the whole venv or just trust pip to do the right thing? For
     # now, remove the venv.
 
+    environment_name = f' "{environment.name}" ' if environment.name else " "
+
     if venv_path.exists():
-        output_info(f"Replacing venv at {venv_path}")
+        output_info(f"Replacing venv{environment_name}at {venv_path}")
         shutil.rmtree(venv_path)
 
-    output_info(f"Setting up environment in {venv_path}")
+    output_info(f"Setting up environment{environment_name}in {venv_path}")
     process = subprocess.run(
         environment.shell,
         shell=True,
