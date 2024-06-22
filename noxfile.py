@@ -28,7 +28,8 @@ def examples(session):
         session.run("bygg", success_codes=[1])
         session.run("bygg", "hello")
         session.run("bygg", "hello", "--tree")
-        session.run("bygg", "--clean")
+        session.run("bygg", "--clean", success_codes=[1])
+        session.run("bygg", "hello", "--clean")
 
     with session.chdir("examples/parametric"):
         session.run("bygg")
