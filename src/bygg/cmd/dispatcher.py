@@ -59,6 +59,9 @@ def print_version():
 
 MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
 
+DISPATCHER_IS_COMPLETING_EXIT_CODE = 126
+"""Exit code returned by a subprocess when completing."""
+
 DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE = 127
 """Exit code returned by a subprocess when an action is not found."""
 
@@ -145,13 +148,21 @@ def dispatcher(
             print_actions(subprocess_output)
             sys.exit(0)
 
-        truthy_actions = list(filter(None, actions))
+        truthy_actions = set(filter(None, actions))
+        found_actions: set[str] = set().union(
+            *(i.found_actions for i in subprocess_output.values())
+        )
+        missing_actions = truthy_actions - found_actions
+
+        for a in missing_actions:
+            output_error(f"Action '{a}' not found in any environment.")
+            sys.exit(1)
 
         if args.tree:
             # TODO error out if there no actions could be printed
             for k, v in subprocess_output.items():
                 if v.tree:
-                    print_tree(v.tree, truthy_actions)
+                    print_tree(v.tree, list(truthy_actions))
             sys.exit(0)
 
         if not truthy_actions:
@@ -204,7 +215,10 @@ def dispatch_for_toplevel_process(
         logger.debug("Restarting with: {}", exec_list)
         try:
             process = subprocess.run(exec_list, encoding="utf-8")
-            if process.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE:
+            if (
+                process.returncode == DISPATCHER_IS_COMPLETING_EXIT_CODE
+                or process.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE
+            ):
                 continue
             if process.returncode != 0:
                 sys.exit(process.returncode)
@@ -244,6 +258,8 @@ def dispatch_for_subprocess(
             a.name for k, a in ctx.scheduler.build_actions.items() if a.is_entrypoint
         ]
         display_tree(ctx, entry_points)
+        if action and action in ctx.scheduler.build_actions:
+            ctx.ipc_data.found_actions.add(action)
 
     ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
     if ipc_filename:
@@ -252,7 +268,7 @@ def dispatch_for_subprocess(
             f.write(msgspec.msgpack.encode(ctx.ipc_data))
 
     if is_completing():
-        sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)  # TODO change exit code
+        sys.exit(DISPATCHER_IS_COMPLETING_EXIT_CODE)
 
     if action and action not in ctx.scheduler.build_actions:
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
@@ -286,6 +302,7 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     )
 
     if args.is_restarted_with_env and not actions:
+        assert False, "This should not happen"
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
 
     if not actions:

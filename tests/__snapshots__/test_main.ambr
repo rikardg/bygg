@@ -460,6 +460,64 @@
   
   '''
 # ---
+# name: test_non_existing_action[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
+# name: test_non_existing_action[environments]
+  '''
+  🛈 Entering directory 'examples/environments'
+  🛈 Setting up environment in .venv1
+  🛈 Setting up environment in .venv2
+  🛈 Setting up environment in .venv
+  Action 'no_such_action' not found in any environment.
+  
+  '''
+# ---
+# name: test_non_existing_action[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
+# name: test_non_existing_action[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
+# name: test_non_existing_action[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
+# name: test_non_existing_action[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
+# name: test_non_existing_action[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  🛈 Building action 'no_such_action':
+  Error: Action ''no_such_action'' not found.
+  
+  '''
+# ---
 # name: test_tree[checks]
   '''
   

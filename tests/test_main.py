@@ -98,3 +98,15 @@ def test_version():
     # are set etc, so only do a rudimentary check for numbers in a major-minor pattern.
     cleaned_version = process.stdout[7:].strip()
     assert re.match(r"\d+\.\d+", cleaned_version)
+
+
+@pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
+def test_non_existing_action(snapshot, clean_bygg_tree, example):
+    process = subprocess.run(
+        ["bygg", "no_such_action", "-C", examples_dir / example.name],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 1
+    assert process.stdout == snapshot
