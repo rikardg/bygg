@@ -146,7 +146,7 @@ def dispatcher(
                 return subprocess_output
 
             if args.list:
-                print_actions(subprocess_output)
+                print_actions(ctx, subprocess_output)
                 sys.exit(0)
 
             truthy_actions = set(filter(None, actions))
@@ -167,7 +167,7 @@ def dispatcher(
 
             if not truthy_actions:
                 output_error("No actions specified and no default action is defined.\n")
-                print_actions(subprocess_output)
+                print_actions(ctx, subprocess_output)
                 sys.exit(1)
 
         sys.exit(0)

@@ -27,6 +27,7 @@ actions:
 
 environments:
   env1:
+    name: "Environment 1"
     byggfile: "Byggfile1.py"
     inputs:
       - "requirements1.txt"
@@ -43,6 +44,7 @@ environments:
       fi
 
   env2:
+    # Leaving this environment without a human-friendly name for testing purposes
     byggfile: "Byggfile2.py"
     inputs:
       - "requirements2.txt"
@@ -59,6 +61,7 @@ environments:
       fi
 
   default:
+    name: "Default environment"
     byggfile: "Byggfile.py"
     inputs:
       - requirements.txt

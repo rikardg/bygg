@@ -140,7 +140,7 @@ def list_actions_B(
     return output
 
 
-def print_actions(subprocess_output: dict[str, SubProcessIpcData]):
+def print_actions(ctx: ByggContext, subprocess_output: dict[str, SubProcessIpcData]):
     """Prints a list of actions from different environments."""
     display_environment_names = (
         len(
@@ -166,7 +166,12 @@ def print_actions(subprocess_output: dict[str, SubProcessIpcData]):
             continue
 
         if display_environment_names:
-            output.append(f"~~ {env} ~~")
+            # Get the human-friendly name or fall back to the environment key:
+            environment = ctx.configuration.environments.get(env)
+            environment_name = (
+                environment.name if environment and environment.name else env
+            )
+            output.append(f"~~ {environment_name} ~~")
 
         output += list_actions_B(
             [EntryPoint(name, descr) for name, descr in data.list.actions.items()],

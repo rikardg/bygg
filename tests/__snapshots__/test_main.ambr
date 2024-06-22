@@ -161,7 +161,7 @@
       },
       "Environment": {
         "title": "Environment",
-        "description": "A class used to represent a virtual environment that actions can be run in.\n\nAttributes\n----------\nbyggfile : str\n    The Python Byggfile that uses this environment.\ninputs : list[str]\n    A list of files that are used as input to the environment. Typically pip\n    requirements files, but can be any files.\nvenv_directory : str\n    The directory where the virtual environment is located. Will be recreated by\n    Bygg if any of the inputs are modified.\nshell : str\n    The shell command for creating the environment.\ndescription : str, optional\n    A description of the environment. Used in e.g. help messages, by default None\nmessage : str, optional\n    A message related to the environment, by default None",
+        "description": "A class used to represent a virtual environment that actions can be run in.\n\nAttributes\n----------\nbyggfile : str\n    The Python Byggfile that uses this environment.\ninputs : list[str]\n    A list of files that are used as input to the environment. Typically pip\n    requirements files, but can be any files.\nvenv_directory : str\n    The directory where the virtual environment is located. Will be recreated by\n    Bygg if any of the inputs are modified.\nshell : str\n    The shell command for creating the environment.\nname : str, optional\n    A human-friendly name for the environment. Used in e.g. help messages, by default None",
         "type": "object",
         "properties": {
           "byggfile": {
@@ -179,18 +179,7 @@
           "shell": {
             "type": "string"
           },
-          "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
-          "message": {
+          "name": {
             "anyOf": [
               {
                 "type": "string"
@@ -237,12 +226,12 @@
 # ---
 # name: test_list[environments]
   '''
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   Available actions:
   
-  ~~ default ~~
+  ~~ Default environment ~~
   
   clean_environments
       Clean all environments
@@ -250,7 +239,7 @@
   default_action (default)
       The default action. Runs in the default environment.
   
-  ~~ env1 ~~
+  ~~ Environment 1 ~~
   
   action1
       Action that runs in env1.
@@ -358,12 +347,12 @@
 # name: test_list_directory[environments]
   '''
   🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   Available actions:
   
-  ~~ default ~~
+  ~~ Default environment ~~
   
   clean_environments
       Clean all environments
@@ -371,7 +360,7 @@
   default_action (default)
       The default action. Runs in the default environment.
   
-  ~~ env1 ~~
+  ~~ Environment 1 ~~
   
   action1
       Action that runs in env1.
@@ -471,9 +460,9 @@
 # name: test_non_existing_action[environments]
   '''
   🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   Action 'no_such_action' not found in any environment.
   
   '''
@@ -533,9 +522,9 @@
 # ---
 # name: test_tree[environments]
   '''
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   
   default_action
   └── default_action_python
@@ -913,9 +902,9 @@
 # name: test_tree_directory[environments]
   '''
   🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   
   default_action
   └── default_action_python
@@ -1289,9 +1278,9 @@
 # ---
 # name: test_tree_non_existing_action[environments]
   '''
-  🛈 Setting up environment in .venv1
+  🛈 Setting up environment "Environment 1" in .venv1
   🛈 Setting up environment in .venv2
-  🛈 Setting up environment in .venv
+  🛈 Setting up environment "Default environment" in .venv
   Action 'no_such_action' not found in any environment.
   
   '''

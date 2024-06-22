@@ -71,18 +71,15 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
         Bygg if any of the inputs are modified.
     shell : str
         The shell command for creating the environment.
-    description : str, optional
-        A description of the environment. Used in e.g. help messages, by default None
-    message : str, optional
-        A message related to the environment, by default None
+    name : str, optional
+        A human-friendly name for the environment. Used in e.g. help messages, by default None
     """
 
     byggfile: str
     inputs: list[str]
     venv_directory: str
     shell: str
-    description: Optional[str] = None
-    message: Optional[str] = None
+    name: Optional[str] = None
 
 
 class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
