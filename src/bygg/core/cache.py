@@ -38,6 +38,7 @@ class Cache:
     def save(self):
         if not self.data:
             return
+        make_sure_status_dir_exists()
         with open(self.db_file, "wb") as f:
             pickle.dump(self.data, f)
         # print(f"Cache: {self.data.digests}")
