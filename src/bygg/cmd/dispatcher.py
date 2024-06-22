@@ -292,8 +292,7 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
         output_error("No actions specified and no default action is defined.\n")
         list_actions(ctx, args)
         status = False
-
-    if args.clean:
+    elif args.clean:
         status = clean(ctx, actions)
     elif args.tree:
         status = display_tree(ctx, actions)
