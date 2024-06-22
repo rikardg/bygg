@@ -24,6 +24,8 @@ class SubProcessIpcDataTree(msgspec.Struct):
 class SubProcessIpcData(msgspec.Struct):
     """Holds the results for metadata from a subprocess."""
 
+    # Actions that were found
+    found_actions: set[str] = msgspec.field(default_factory=set)
     list: Optional[SubProcessIpcDataList] = None
     tree: Optional[SubProcessIpcDataTree] = None
 
