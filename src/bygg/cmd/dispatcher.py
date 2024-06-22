@@ -3,13 +3,13 @@ import os
 import subprocess
 import sys
 import tempfile
-from typing import Any
 
+from argcomplete.completers import BaseCompleter
 from bygg.cmd.apply_configuration import apply_configuration
+from bygg.cmd.argument_parsing import create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.build_clean import build, clean
 from bygg.cmd.completions import (
-    ByggfileDirectoriesCompleter,
     do_completion,
     generate_shell_completions,
     is_completing,
@@ -68,7 +68,7 @@ DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE = 127
 
 def bygg():
     """Entry point for the Bygg command line interface."""
-    parser = create_argument_parser()
+    parser = create_argument_parser(EntrypointCompleter())
     args = parser.parse_args()
     if args.is_restarted_with_env is None:
         do_completion(parser)
@@ -320,159 +320,42 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     return status
 
 
-def entrypoint_completions(
-    prefix, parser: argparse.ArgumentParser, parsed_args: argparse.Namespace, **kwargs
-):
-    import textwrap
+class EntrypointCompleter(BaseCompleter):
+    def __call__(
+        self,
+        *,
+        prefix,
+        action: argparse.Action,
+        parser: argparse.ArgumentParser,
+        parsed_args: argparse.Namespace,
+        **kwargs,
+    ):
+        import textwrap
 
-    subprocess_data = dispatcher(parser, parsed_args)
-    if not subprocess_data:
-        return {}
+        subprocess_data = dispatcher(parser, parsed_args)
+        if not subprocess_data:
+            return {}
 
-    # There can technically only be one default_action, but easy way to consolidate:
-    default_actions = {
-        ipc_data.list.default_action
-        for env, ipc_data in subprocess_data.items()
-        if ipc_data.list is not None
-    }
+        # There can technically only be one default_action, but easy way to consolidate:
+        default_actions = {
+            ipc_data.list.default_action
+            for env, ipc_data in subprocess_data.items()
+            if ipc_data.list is not None
+        }
 
-    env_actions = [
-        ipc_data.list.actions
-        for env, ipc_data in subprocess_data.items()
-        if ipc_data.list is not None
-    ]
+        env_actions = [
+            ipc_data.list.actions
+            for env, ipc_data in subprocess_data.items()
+            if ipc_data.list is not None
+        ]
 
-    actions = {
-        name: textwrap.fill(
-            f"{'(default) ' if name in default_actions else ''}{description}", 7000
-        )
-        for action_set in env_actions
-        for name, description in action_set.items()
-        if name not in parsed_args.actions
-    }
+        actions = {
+            name: textwrap.fill(
+                f"{'(default) ' if name in default_actions else ''}{description}", 7000
+            )
+            for action_set in env_actions
+            for name, description in action_set.items()
+            if name not in parsed_args.actions
+        }
 
-    return actions
-
-
-def create_argument_parser():
-    logger.info("Creating argument parser")
-
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        description="""
-A build tool written in Python, where all actions can be written in Python.
-
-Build the default action:
- %(prog)s
-
-Build ACTION:
- %(prog)s ACTION
-
-Clean ACTION:
- %(prog)s ACTION --clean
-
-List available actions:
- %(prog)s --list
-""",
-    )
-
-    # Use Any to get around type checking for argcomplete:
-    arg: Any = parser.add_argument(
-        "actions",
-        nargs="*",
-        default=None,
-        help="Entrypoint actions to operate on.",
-    )
-    arg.completer = entrypoint_completions
-
-    parser.add_argument(
-        "-v", "--version", action="store_true", help="Show version string and exit."
-    )
-
-    parser.add_argument(
-        "--is_restarted_with_env",
-        nargs="?",
-        type=str,
-        help=argparse.SUPPRESS,
-    )
-    # Used internally for communicating the IPC filename to the subprocess.
-    parser.add_argument(
-        "--ipc_filename",
-        nargs=1,
-        type=str,
-        default=None,
-        help=argparse.SUPPRESS,
-    )
-    # Commands that operate on the build setup:
-    build_setup_wrapper_group = parser.add_argument_group(
-        "Commands that operate on the build setup"
-    )  # add_mutually_exclusive_group doesn't accept a title, so wrap it in a regular group.
-    build_setup_group = build_setup_wrapper_group.add_mutually_exclusive_group()
-    build_setup_group.add_argument(
-        "--clean",
-        action="store_true",
-        help="Clean the outputs of the specified actions.",
-    )
-    build_setup_group.add_argument(
-        "-l",
-        "--list",
-        action="store_true",
-        help="List available actions.",
-    )
-    build_setup_group.add_argument(
-        "--tree",
-        action="store_true",
-        help="Display the dependency tree starting from the specified action(s).",
-    )
-    # Some arguments inspired by Make:
-    make_group = parser.add_argument_group("Make-like arguments")
-    arg = make_group.add_argument(
-        "-C",
-        "--directory",
-        nargs=1,
-        type=str,
-        default=None,
-        help="Change to the specified directory.",
-    )
-    arg.completer = ByggfileDirectoriesCompleter()
-
-    make_group.add_argument(
-        "-j",
-        "--jobs",
-        nargs="?",
-        type=int,
-        default=None,
-        help="Specify the number of jobs to run simultaneously. None means to use the number of available cores.",
-    )
-    make_group.add_argument(
-        "-B",
-        "--always-make",
-        action="store_true",
-        help="Always build all actions.",
-    )
-
-    # Analyse and verify:
-    analyse_group = parser.add_argument_group(
-        "Analyse and verify",
-        "Arguments in this group will add more analysis to the build process. Actions will be built and the analysis result will be reported.",
-    )
-    analyse_group.add_argument(
-        "--check",
-        action="store_true",
-        help="Perform various checks on the action tree. Implies -B",
-    )
-
-    # Meta arguments:
-    meta_group = parser.add_argument_group("Meta arguments")
-    meta_group.add_argument(
-        "--dump-schema",
-        action="store_true",
-        help="Generate a JSON Schema for the Byggfile.yml files. The schema will be printed to stdout.",
-    )
-    meta_group.add_argument(
-        "--completions",
-        action="store_true",
-        help="Output instructions for how to set up shell completions via the shell's startup script.",
-    )
-
-    return parser
+        return actions
