@@ -203,7 +203,7 @@ def action_set(
             Action(
                 action_name,
                 message,
-                inputs=[input_file] + list(extra_inputs) if extra_inputs else None,
+                inputs=[input_file] + (list(extra_inputs) if extra_inputs else []),
                 outputs=[output_file],
                 dependencies=dependencies,
                 command=func,
