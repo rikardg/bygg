@@ -1,0 +1,33 @@
+# serializer version: 1
+# name: test_list[action_set]
+  list([
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+  ])
+# ---
+# name: test_list[action_set].1
+  list([
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+  ])
+# ---
+# name: test_list[action_set].2
+  list([
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+  ])
+# ---
