@@ -106,10 +106,9 @@ actions. The completions will be loaded:
 
 - from `Byggfile.py` if `Byggfile.yml` doesn't exist, or if there are no
   environments declared in `Byggfile.yml`.
-- from `Byggfile.yml` if it exists and has environments. In this case, only the
-  entrypoint actions listed in `Byggfile.yml` will be loaded; no Python files
-  will be loaded to look for entrypoint actions since this might require a
-  lengthy (in the context) install of environments.
+- from `Byggfile.yml` if it exists. If it has environments, each environment
+  will be installed if needed and its respective Byggfile evaluated to collect
+  all entrypoint actions.
 
 To install completions, do:
 
