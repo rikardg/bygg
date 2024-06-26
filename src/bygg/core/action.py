@@ -114,6 +114,7 @@ def action(
     outputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
+    scheduling_type: SchedulingType = "processpool",
     is_entrypoint: bool = False,
 ):
     """Decorator to define a Bygg action.
@@ -136,6 +137,10 @@ def action(
         A dynamic dependency, by default None
     is_entrypoint : bool, optional
         Whether the action is an entrypoint, by default False
+    scheduling_type : SchedulingType, optional
+        The scheduling type for the action. Default is "processpool". Use "in-process"
+        for small Python functions that finish quickly so that they can be run in the
+        main process.
     description : str, optional
         A description of the action, by default None
 
@@ -154,6 +159,7 @@ def action(
             dependencies=dependencies,
             dynamic_dependency=dynamic_dependency,
             is_entrypoint=is_entrypoint,
+            scheduling_type=scheduling_type,
             command=func,
         )
 
@@ -168,6 +174,7 @@ def action_set(
     extra_inputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
     is_entrypoint: bool = False,
+    scheduling_type: SchedulingType = "processpool",
     description: str | None = None,
 ):
     """
@@ -189,6 +196,10 @@ def action_set(
         Dependencies for actions, by default None
     is_entrypoint : bool, optional
         Whether the top-most action should be an entrypoint, by default False
+    scheduling_type : SchedulingType, optional
+        The scheduling type for the action. Default is "processpool". Use "in-process"
+        for small Python functions that finish quickly so that they can be run in the
+        main process.
     description : str, optional
         A description of the action, by default None
 
@@ -209,6 +220,7 @@ def action_set(
                 inputs=[input_file] + (list(extra_inputs) if extra_inputs else []),
                 outputs=[output_file],
                 dependencies=dependencies,
+                scheduling_type=scheduling_type,
                 command=func,
             )
         Action(
@@ -216,7 +228,8 @@ def action_set(
             f"Action set {base_name}",
             dependencies=action_list,
             is_entrypoint=is_entrypoint,
-            description=description
+            scheduling_type=scheduling_type,
+            description=description,
         )
 
     return create_actions
