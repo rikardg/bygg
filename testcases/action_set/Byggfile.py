@@ -16,6 +16,7 @@ static_file_pairs = [
     message="Transforming file",
     file_pairs=static_file_pairs,
     is_entrypoint=True,
+    description="Transforms a file to another file (testcase for action_set)",
 )
 def transform_testfile(ctx: ActionContext):
     if not ctx.inputs or not ctx.outputs:

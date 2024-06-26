@@ -1,5 +1,15 @@
 # serializer version: 1
 # name: test_list[action_set]
+  '''
+  Available actions:
+  
+  testfiles_static
+      Transforms a file to another file (testcase for action_set)
+  
+  
+  '''
+# ---
+# name: test_list[action_set].1
   list([
     'Byggfile.py',
     'files',
@@ -8,7 +18,7 @@
     'files/c.txt',
   ])
 # ---
-# name: test_list[action_set].1
+# name: test_list[action_set].2
   list([
     'Byggfile.py',
     'files',
@@ -21,7 +31,7 @@
     'files/out/c.txt',
   ])
 # ---
-# name: test_list[action_set].2
+# name: test_list[action_set].3
   list([
     'Byggfile.py',
     'files',

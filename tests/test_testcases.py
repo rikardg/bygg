@@ -39,8 +39,6 @@ def filetree(path: str):
 def test_list(snapshot, clean_bygg_tree, testcase):
     example_path = clean_bygg_tree / testcases_dir / testcase.name
 
-    # assert filetree_before == snapshot
-
     process = subprocess.run(
         ["bygg", "--list"],
         cwd=clean_bygg_tree / testcases_dir / testcase.name,
@@ -48,6 +46,7 @@ def test_list(snapshot, clean_bygg_tree, testcase):
         encoding="utf-8",
     )
     assert process.returncode == 0
+    assert process.stdout == snapshot
     assert filetree(example_path) == snapshot
 
     for action in testcase.actions:
