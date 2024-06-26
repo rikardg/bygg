@@ -168,6 +168,7 @@ def action_set(
     extra_inputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
     is_entrypoint: bool = False,
+    description: str | None = None,
 ):
     """
     Decorator for creating individual Actions from a list of input-output file pairs and
@@ -188,6 +189,8 @@ def action_set(
         Dependencies for actions, by default None
     is_entrypoint : bool, optional
         Whether the top-most action should be an entrypoint, by default False
+    description : str, optional
+        A description of the action, by default None
 
     Returns
     -------
@@ -213,6 +216,7 @@ def action_set(
             f"Action set {base_name}",
             dependencies=action_list,
             is_entrypoint=is_entrypoint,
+            description=description
         )
 
     return create_actions
