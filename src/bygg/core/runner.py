@@ -118,14 +118,7 @@ class ProcessRunner:
                     scheduled_queue.append(queued_job)  # add it back to the queue
                 else:
                     job_result: Job = queued_job.get()
-                    missing_files = self.check_for_missing_output_files(job_result)
-                    if missing_files:
-                        on_check_failed(
-                            "output_file_missing",
-                            job_result.action,
-                            f"Job {TS.BOLD}{job_result.name}{TS.RESET} didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: {TS.BOLD}{', '.join(missing_files)}{TS.RESET}",
-                            "error",
-                        )
+                    self.check_for_missing_output_files(job_result)
 
                     self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:
@@ -146,12 +139,18 @@ class ProcessRunner:
                         poll_msg_queue()
                         early_out = True
 
-    def check_for_missing_output_files(self, job: Job) -> list[str]:
+    def check_for_missing_output_files(self, job: Job):
         missing_files: list[str] = []
         for filename in job.action.outputs:
             if not os.path.exists(filename):
                 missing_files.append(filename)
-        return missing_files
+        if missing_files:
+            on_check_failed(
+                "output_file_missing",
+                job.action,
+                f"Job {TS.BOLD}{job.name}{TS.RESET} didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: {TS.BOLD}{', '.join(missing_files)}{TS.RESET}",
+                "error",
+            )
 
 
 def run_job(job: Job, qq):
