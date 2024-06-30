@@ -26,71 +26,56 @@ class Dag(metaclass=ABCMeta):
     def get_all_jobs(self) -> Iterable[str]: ...
 
 
-class GtDag(Dag):
+class ByggDag(Dag):
+    nodes: dict[str, set[str]]
+
     def __init__(self):
-        import graph  # type: ignore
+        self.nodes = {}
 
-        self.graph = graph.Graph()
-
-    def __len__(self):
-        nodes = self.graph.nodes()
-        if nodes is None:
-            return 0
-        return len(nodes)
+    def __len__(self) -> int:
+        return len(self.nodes)
 
     def clear(self):
-        nodes = self.graph.nodes()
-        if nodes is None:
-            return
-        for n in nodes:
-            self.graph.del_node(n)
+        self.nodes.clear()
 
     def remove_node(self, node: str):
-        self.graph.del_node(node)
+        self.nodes.pop(node, None)
 
     def build_action_graph(self, build_actions: dict[str, Action], action: Action):
         """Build the action graph."""
         queue = deque([action])
         while len(queue) > 0:
             a = queue.popleft()
-            self.graph.add_node(a.name)
+            self.nodes[a.name] = set()
             for dependency in a.dependencies:
                 dependency_action = build_actions.get(dependency)
                 if not dependency_action:
                     raise ValueError(f"Action '{dependency}' not found")
                 queue.append(dependency_action)
-                self.graph.add_edge(a.name, dependency)
+                self.nodes[a.name].add(dependency)
 
     def get_ready_jobs(
         self,
         finished_jobs: dict[str, Any],
         running_jobs: dict[str, Any],
     ) -> list[str]:
-        nodes = self.graph.nodes()
-        if nodes is None:
-            return []
-        if len(nodes) == 1 and (
-            nodes[0] not in finished_jobs and nodes[0] not in running_jobs
-        ):
-            return nodes
+        finished = set(finished_jobs.keys())
+        running = set(running_jobs.keys())
+        nodes = set(self.nodes.keys())
+        ready_jobs = []
 
-        new_nodes = self.graph.nodes(out_degree=0)
-        if new_nodes is None:
-            return []
-
-        new_jobs = [
-            n for n in new_nodes if n not in finished_jobs and n not in running_jobs
-        ]
-
-        # print(f"new jobs: {len(new_jobs)}")
-        return new_jobs
+        for node, dependencies in self.nodes.items():
+            # Successful and skipped jobs will have been removed from the graph, while
+            # failed jobs remain.
+            if node in finished or node in running:
+                continue
+            if len(nodes & dependencies) == 0:
+                ready_jobs.append(node)
+        return ready_jobs
 
     def get_all_jobs(self) -> Iterable[str]:
-        nodes = self.graph.nodes()
-        if nodes is None:
-            return []
-        return nodes
+        return self.nodes.keys()
 
 
 def create_dag() -> Dag:
-    return GtDag()
+    return ByggDag()
