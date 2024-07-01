@@ -9,6 +9,7 @@ actions:
     dependencies:
       - check_inputs_outputs
       - output_file_missing
+      - same_output_files
 
   # Circular dependencies
   - name: "circular_A"
@@ -50,4 +51,21 @@ actions:
   - name: "no_outputs_A"
     is_entrypoint: false
     outputs: ["no_outputs_A"]
+    shell: "true"
+
+  # Actions that create the same outputs
+  - name: "same_output_files"
+    description: |
+      Example where several actions create the same outputs. This should trigger same_output_files
+      when run with --check.
+    dependencies: ["same_output_file_A", "same_output_file_B"]
+
+  - name: "same_output_file_A"
+    is_entrypoint: false
+    outputs: ["same_output_file_A.txt", "common_output_file.txt"]
+    shell: "true"
+
+  - name: "same_output_file_B"
+    is_entrypoint: false
+    outputs: ["same_output_file_B.txt", "common_output_file.txt"]
     shell: "true"

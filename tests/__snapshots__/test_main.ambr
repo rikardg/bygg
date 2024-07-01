@@ -221,6 +221,10 @@
       Example that doesn't create the outputs that it declares. This
       should trigger output_file_missing when run with --check.
   
+  same_output_files
+      Example where several actions create the same outputs. This should
+      trigger same_output_files when run with --check.
+  
   
   '''
 # ---
@@ -340,6 +344,10 @@
   output_file_missing
       Example that doesn't create the outputs that it declares. This
       should trigger output_file_missing when run with --check.
+  
+  same_output_files
+      Example where several actions create the same outputs. This should
+      trigger same_output_files when run with --check.
   
   
   '''
@@ -515,8 +523,11 @@
   │   └── circular_C
   │       └── circular_B
   │           └── circular_A
-  └── output_file_missing
-      └── no_outputs_A
+  ├── output_file_missing
+  │   └── no_outputs_A
+  └── same_output_files
+      ├── same_output_file_A
+      └── same_output_file_B
   
   '''
 # ---
@@ -894,8 +905,11 @@
   │   └── circular_C
   │       └── circular_B
   │           └── circular_A
-  └── output_file_missing
-      └── no_outputs_A
+  ├── output_file_missing
+  │   └── no_outputs_A
+  └── same_output_files
+      ├── same_output_file_A
+      └── same_output_file_B
   
   '''
 # ---

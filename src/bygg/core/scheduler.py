@@ -68,7 +68,7 @@ class Scheduler:
     def init_cache(self, cache_file: Path):
         self.cache = Cache(cache_file)
 
-    def prepare_run(self, entrypoint: str):
+    def prepare_run(self, entrypoint: str, check=False):
         self.job_graph.clear()
         self.ready_jobs = set()
         self.running_jobs = {}
@@ -77,6 +77,22 @@ class Scheduler:
         self.job_graph.build_action_graph(
             self.build_actions, self.build_actions[entrypoint]
         )
+
+        if check:
+            # Do this check before dependency files are filled in from dependencies
+            files_with_several_actions = {
+                f: a
+                for f, a in self.create_outputs_to_action_dict().items()
+                if len(a) > 1
+            }
+            for f, a in files_with_several_actions.items():
+                scapegoat = list(a)[0]
+                on_check_failed(
+                    "same_output_files",
+                    self.build_actions[scapegoat],
+                    f"The file {f} is in the output list from multiple actions: {', '.join(a)}",
+                    "error",
+                )
 
         # Fill the actions' dependency_files from self and their dependencies
         for action in self.build_actions.values():
@@ -90,9 +106,20 @@ class Scheduler:
     ):
         self.always_make = always_make
         self.check_inputs_outputs_set = set() if check else None
-        self.prepare_run(entrypoint)
+        self.prepare_run(entrypoint, check)
         self.cache.load()
         self.started = True
+
+    def create_outputs_to_action_dict(self):
+        """Create a dictionary of outputs to actions"""
+        res: dict[str, set[str]] = {}
+        for job in self.job_graph.get_all_jobs():
+            action = self.build_actions[job]
+            for output in action.outputs:
+                if output not in res:
+                    res[output] = set()
+                res[output].add(action.name)
+        return res
 
     def shutdown(self):
         self.cache.save()
