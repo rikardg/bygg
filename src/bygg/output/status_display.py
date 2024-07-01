@@ -61,7 +61,7 @@ def on_job_status(
             raise ValueError(f"Unhandled job status {job_status}")
 
 
-CheckRule = Literal["check_inputs_outputs", "output_file_missing"]
+CheckRule = Literal["check_inputs_outputs", "output_file_missing", "same_output_files"]
 """
 The different rules that can be checked.
 
@@ -70,6 +70,8 @@ The different rules that can be checked.
 
     output_file_missing: Check that actions create the files that they declare as
     outputs.
+
+    same_output_files: Check that different actions don't produce the same output files.
 """
 
 

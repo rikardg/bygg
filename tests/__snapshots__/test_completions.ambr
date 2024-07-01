@@ -4,6 +4,7 @@
     'all_checks',
     'check_inputs_outputs',
     'output_file_missing',
+    'same_output_files',
   ])
 # ---
 # name: test_actions_completions[checks].1
@@ -11,6 +12,7 @@
     'all_checks',
     'check_inputs_outputs',
     'output_file_missing',
+    'same_output_files',
   ])
 # ---
 # name: test_actions_completions[checks].2
@@ -18,6 +20,7 @@
     'all_checks',
     'check_inputs_outputs',
     'output_file_missing',
+    'same_output_files',
   ])
 # ---
 # name: test_actions_completions[environments]
