@@ -59,15 +59,13 @@ class ByggDag(Dag):
         finished_jobs: dict[str, Any],
         running_jobs: dict[str, Any],
     ) -> list[str]:
-        finished = set(finished_jobs.keys())
-        running = set(running_jobs.keys())
         nodes = set(self.nodes.keys())
         ready_jobs = []
 
         for node, dependencies in self.nodes.items():
             # Successful and skipped jobs will have been removed from the graph, while
             # failed jobs remain.
-            if node in finished or node in running:
+            if node in finished_jobs or node in running_jobs:
                 continue
             if len(nodes & dependencies) == 0:
                 ready_jobs.append(node)
