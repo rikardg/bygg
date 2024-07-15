@@ -67,6 +67,7 @@ class ByggDag(Dag):
             # failed jobs remain.
             if node in finished_jobs or node in running_jobs:
                 continue
+            # The job is ready to run if its dependencies are no longer in the graph.
             if len(nodes & dependencies) == 0:
                 ready_jobs.append(node)
         return ready_jobs
