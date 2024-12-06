@@ -7,7 +7,6 @@ from bygg.core.dag import Dag, create_dag
 from bygg.core.digest import calculate_dependency_digest, calculate_digest
 from bygg.output.status_display import on_check_failed
 from loguru import logger
-import msgspec
 
 
 class Job:
@@ -31,11 +30,6 @@ class Job:
 
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, Job) and self.name == __o.name
-
-
-class ActionDigestItem(msgspec.Struct):
-    inputs_digest: str
-    outputs_digest: str
 
 
 class Scheduler:
