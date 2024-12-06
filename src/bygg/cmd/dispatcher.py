@@ -1,5 +1,6 @@
 import argparse
 import os
+import pickle
 import subprocess
 import sys
 import tempfile
@@ -37,7 +38,6 @@ from bygg.output.status_display import (
     on_runner_status,
 )
 from loguru import logger
-import msgspec
 
 
 def init_bygg_context(configuration: ByggFile):
@@ -231,10 +231,8 @@ def dispatch_for_toplevel_process(
         finally:
             try:
                 with open(ipc_filename, "rb") as f:
-                    subprocess_output[environment] = msgspec.msgpack.decode(
-                        f.read(), type=SubProcessIpcData
-                    )
-            except (FileNotFoundError, msgspec.DecodeError) as e:
+                    subprocess_output[environment] = pickle.load(f)
+            except (FileNotFoundError, pickle.PickleError) as e:
                 print(e)
                 pass
             os.remove(ipc_filename)
@@ -265,7 +263,7 @@ def dispatch_for_subprocess(
     if ipc_filename:
         logger.debug("Writing IPC data to {}", args.ipc_filename)
         with open(ipc_filename, "wb") as f:
-            f.write(msgspec.msgpack.encode(ctx.ipc_data))
+            pickle.dump(ctx.ipc_data, f)
 
     if is_completing():
         sys.exit(DISPATCHER_IS_COMPLETING_EXIT_CODE)
