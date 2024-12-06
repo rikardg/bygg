@@ -1,31 +1,33 @@
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from bygg.cmd.configuration import ByggFile
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
-import msgspec
 
 
-class SubProcessIpcDataList(msgspec.Struct):
+@dataclass
+class SubProcessIpcDataList:
     """Holds the data for --list from a subprocess."""
 
     actions: dict[str, str]
     default_action: Optional[str] = None
 
 
-class SubProcessIpcDataTree(msgspec.Struct):
+@dataclass
+class SubProcessIpcDataTree:
     """Holds the data for --tree from a subprocess."""
 
     actions: dict[str, str]
 
 
-class SubProcessIpcData(msgspec.Struct):
+@dataclass
+class SubProcessIpcData:
     """Holds the results for metadata from a subprocess."""
 
     # Actions that were found
-    found_actions: set[str] = msgspec.field(default_factory=set)
+    found_actions: set[str] = field(default_factory=set)
     list: Optional[SubProcessIpcDataList] = None
     tree: Optional[SubProcessIpcDataTree] = None
 
