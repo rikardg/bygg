@@ -10,7 +10,7 @@ jobs:
   nox:
     strategy:
       matrix:
-        python_version: ["3.11.9", "3.12.3"]
+        python_version: ["3.11.9", "3.12.8"]
         nox_session: [tests, basics, examples]
         os: [ubuntu-latest, macos-latest, macos-14]
         install_uv: [0, 1]
