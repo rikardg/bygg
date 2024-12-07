@@ -3,7 +3,7 @@ import nox
 nox.options.error_on_external_run = True
 nox.options.stop_on_first_error
 
-python_versions = ["3.11", "3.12"]
+python_versions = ["3.11", "3.12", "3.13"]
 
 
 @nox.session(python=python_versions)

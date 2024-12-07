@@ -88,7 +88,14 @@ class Action(ActionContext):
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
-        self.description = description if description else command.__doc__
+
+        self.description = (
+            description
+            if description is not None
+            else command.__doc__
+            if command is not None and command.__doc__ is not None
+            else None
+        )
 
         self.dependency_files = set()
 
