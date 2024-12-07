@@ -318,6 +318,8 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     return status
 
 
+# TODO: error in typing in argcomplete; fixed in https://github.com/kislyuk/argcomplete/pull/423
+# pyright: reportIncompatibleMethodOverride=warning
 class EntrypointCompleter(BaseCompleter):
     def __call__(
         self,
