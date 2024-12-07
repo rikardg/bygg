@@ -1,10 +1,11 @@
+import dataclasses
 import os
 import sys
 from typing import Optional
 
 from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
-import msgspec
+import dc_schema
 
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"
@@ -12,11 +13,16 @@ YAML_INPUTFILE = "Byggfile.yml"
 DEFAULT_ENVIRONMENT_NAME = "default"
 
 
-class Settings(msgspec.Struct, forbid_unknown_fields=True):
+@dataclasses.dataclass
+class Settings:
+    __doc__ = """
+    The global settings object for Bygg.
+    """
     default_action: Optional[str] = None
 
 
-class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
+@dataclasses.dataclass
+class ActionItem:
     __doc__ = f"""
     This is a representation of the Action class used for deserialising from YAML.
 
@@ -55,7 +61,8 @@ class ActionItem(msgspec.Struct, forbid_unknown_fields=True):
     shell: Optional[str] = None
 
 
-class Environment(msgspec.Struct, forbid_unknown_fields=True):
+@dataclasses.dataclass
+class Environment:
     """
     A class used to represent a virtual environment that actions can be run in.
 
@@ -82,10 +89,16 @@ class Environment(msgspec.Struct, forbid_unknown_fields=True):
     name: Optional[str] = None
 
 
-class ByggFile(msgspec.Struct, forbid_unknown_fields=True):
-    actions: list[ActionItem] = msgspec.field(default_factory=list)
-    settings: Settings = msgspec.field(default_factory=Settings)
-    environments: dict[str, Environment] = msgspec.field(default_factory=dict)
+@dataclasses.dataclass
+class ByggFile:
+    class SchemaConfig:
+        annotation = dc_schema.SchemaAnnotation(
+            title="Schema for the configuration files for Bygg",
+        )
+
+    actions: list[ActionItem] = dataclasses.field(default_factory=list)
+    settings: Settings = dataclasses.field(default_factory=Settings)
+    environments: dict[str, Environment] = dataclasses.field(default_factory=dict)
 
 
 def read_config_file() -> ByggFile:
@@ -93,8 +106,12 @@ def read_config_file() -> ByggFile:
         return ByggFile(actions=[], settings=Settings(), environments={})
 
     try:
+        from cattrs.preconf.pyyaml import make_converter
+
+        cattrs_converter = make_converter()
+        cattrs_converter.forbid_extra_keys = True
         with open(YAML_INPUTFILE, "r") as f:
-            config_file = msgspec.yaml.decode(f.read(), type=ByggFile)
+            config_file = cattrs_converter.loads(f.read(), ByggFile)
         for action in config_file.actions:
             if action.is_entrypoint is None:
                 action.is_entrypoint = True
@@ -112,6 +129,34 @@ def read_config_file() -> ByggFile:
 
 def dump_schema():
     import json
+    import textwrap
 
-    schema = msgspec.json.schema(ByggFile)
+    schema = dc_schema.get_schema(ByggFile)
+
+    # Additional properties are not allowed, but dc_schema does not yet support this.
+    # See https://github.com/Peter554/dc_schema/issues/6 .
+    schema["additionalProperties"] = False
+
+    classes_to_properties = {
+        "ActionItem": "actions",
+        "Environment": "environments",
+        "Settings": "settings",
+    }
+
+    for k in schema["$defs"].keys():
+        if k in classes_to_properties:
+            schema["$defs"][k]["title"] = k
+            schema["$defs"][k]["additionalProperties"] = False
+            docstring = globals()[k].__doc__
+            if docstring is not None:
+                # Add the docstrings to the field types
+                formatted_docstring = textwrap.dedent(docstring).strip()
+                schema["$defs"][k]["description"] = formatted_docstring
+
+                # Also add the docstrings to the containers
+                schema["properties"][classes_to_properties[k]]["title"] = k
+                schema["properties"][classes_to_properties[k]]["description"] = (
+                    formatted_docstring
+                )
+
     print(json.dumps(schema, indent=2))
