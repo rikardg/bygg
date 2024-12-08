@@ -6,6 +6,8 @@ import sys
 import tempfile
 
 from argcomplete.completers import BaseCompleter
+from loguru import logger
+
 from bygg.cmd.apply_configuration import apply_configuration
 from bygg.cmd.argument_parsing import create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
@@ -37,7 +39,6 @@ from bygg.output.status_display import (
     on_job_status,
     on_runner_status,
 )
-from loguru import logger
 
 
 def init_bygg_context(configuration: ByggFile):

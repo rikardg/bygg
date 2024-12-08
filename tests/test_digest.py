@@ -2,12 +2,13 @@ import os
 from pathlib import Path
 import time
 
+import pytest
+
 from bygg.core.digest import (
     calculate_dependency_digest,
     calculate_file_digest,
     file_digest_memo,
 )
-import pytest
 
 pytestmark = pytest.mark.digest
 

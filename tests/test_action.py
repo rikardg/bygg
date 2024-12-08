@@ -1,6 +1,7 @@
+import pytest
+
 from bygg.core.action import Action, ActionContext, CommandStatus
 from bygg.core.scheduler import Scheduler
-import pytest
 
 
 @pytest.fixture

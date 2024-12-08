@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from bygg.system_helpers import (
     ExitCode,
     call,
@@ -7,7 +9,6 @@ from bygg.system_helpers import (
     subprocess_tty,
     subprocess_tty_print,
 )
-import pytest
 
 
 def test_ExitCode():

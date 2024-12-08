@@ -1,6 +1,7 @@
+import pytest
+
 from bygg.core.action import Action
 from bygg.util import create_shell_command, filenames_from_pattern
-import pytest
 
 test_cases_filenames_from_pattern = [
     (

@@ -1,6 +1,7 @@
+import rich
+
 from bygg.core.action import ActionContext, action
 from bygg.core.common_types import CommandStatus
-import rich
 
 
 @action("default_action_python")

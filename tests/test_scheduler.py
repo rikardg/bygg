@@ -1,5 +1,6 @@
-from bygg.core.action import Action, ActionContext, CommandStatus
 import pytest
+
+from bygg.core.action import Action, ActionContext, CommandStatus
 
 pytestmark = pytest.mark.scheduler
 
