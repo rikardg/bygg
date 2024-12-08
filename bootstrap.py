@@ -10,7 +10,7 @@ venv = Path(".venv")
 
 uv_bin = shutil.which("uv")
 venv_command = "python3 -m venv" if not uv_bin else f"{uv_bin} venv"
-pip_install_command = ".venv/bin/pip install" if not uv_bin else f"{uv_bin} pip install"
+pip_install_command = ".venv/bin/pip install" if not uv_bin else f"{uv_bin} pip install --reinstall"
 
 # Always remove existing venv, to make sure requirements are correctly installed.
 if venv.exists():
