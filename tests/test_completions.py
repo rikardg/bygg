@@ -1,9 +1,10 @@
 from pathlib import Path
 
+import pytest
+
 from bygg.cmd.completions import ByggCompletionFinder
 from bygg.cmd.dispatcher import EntrypointCompleter, create_argument_parser
 from bygg.system_helpers import change_dir
-import pytest
 
 
 def dummy_exit_method(status):

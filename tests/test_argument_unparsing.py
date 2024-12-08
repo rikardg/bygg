@@ -1,6 +1,7 @@
+import pytest
+
 from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.dispatcher import EntrypointCompleter, create_argument_parser
-import pytest
 
 args = [
     (["-v"], ["--version"]),

@@ -8,6 +8,7 @@ from typing import Any, Generator
 
 from argcomplete.completers import DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
+
 from bygg.output.output import output_plain
 
 

@@ -3,9 +3,10 @@ import os
 import sys
 from typing import Optional
 
+import dc_schema
+
 from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
-import dc_schema
 
 PYTHON_INPUTFILE = "Byggfile.py"
 YAML_INPUTFILE = "Byggfile.yml"

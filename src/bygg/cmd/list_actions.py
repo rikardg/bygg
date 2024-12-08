@@ -4,6 +4,8 @@ import shutil
 import sys
 import textwrap
 
+from loguru import logger
+
 from bygg.cmd.configuration import DEFAULT_ENVIRONMENT_NAME
 from bygg.cmd.datastructures import (
     ByggContext,
@@ -16,7 +18,6 @@ from bygg.output.output import (
     TerminalStyle as TS,
 )
 from bygg.output.output import output_error
-from loguru import logger
 
 list_actions_style = "B"
 
