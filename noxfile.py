@@ -1,4 +1,9 @@
+import shutil
+
 import nox
+
+if shutil.which("uv"):
+    nox.options.default_venv_backend = "uv"
 
 nox.options.error_on_external_run = True
 nox.options.stop_on_first_error
