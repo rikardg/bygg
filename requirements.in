@@ -3,6 +3,5 @@ argcomplete==3.5.2
 cattrs==24.1.2
 dc-schema==0.0.8
 dill==0.3.9
-loguru==0.7.2
 multiprocess==0.70.17
 PyYAML==6.0.2 # cattrs requires this as an ambient

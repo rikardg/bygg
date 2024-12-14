@@ -5,11 +5,10 @@ import subprocess
 import sys
 import textwrap
 
-from loguru import logger
-
 from bygg.cmd.configuration import PYTHON_INPUTFILE, ByggFile, Environment
 from bygg.core.action import Action
 from bygg.core.digest import calculate_string_digest
+from bygg.logging import logger
 from bygg.output.output import output_error, output_info, output_plain
 from bygg.util import create_shell_command
 

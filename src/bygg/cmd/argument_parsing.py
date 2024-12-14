@@ -2,9 +2,9 @@ import argparse
 from typing import Any
 
 from argcomplete.completers import BaseCompleter
-from loguru import logger
 
 from bygg.cmd.completions import ByggfileDirectoriesCompleter
+from bygg.logging import logger
 
 
 def create_argument_parser(entrypoint_completions: BaseCompleter):
