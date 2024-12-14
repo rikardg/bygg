@@ -6,7 +6,6 @@ import sys
 import tempfile
 
 from argcomplete.completers import BaseCompleter
-from loguru import logger
 
 from bygg.cmd.apply_configuration import apply_configuration
 from bygg.cmd.argument_parsing import create_argument_parser
@@ -30,6 +29,7 @@ from bygg.cmd.list_actions import list_actions, list_collect_subprocess, print_a
 from bygg.cmd.tree import display_tree, print_tree
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
+from bygg.logging import logger
 from bygg.output.output import (
     output_error,
     output_info,
