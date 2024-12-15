@@ -44,10 +44,12 @@ class CustomLogFormatter(logging.Formatter):
             else f"{TS.Fg.CYAN}{record.filename + ':' + TS.Fg.WHITE + str(record.lineno) :<{color_filename_width}}{TS.RESET}"
         )
 
-        if self.no_colors:
-            return f"{self.formatTime(record)} | {record.name} | {record.levelname:<8} | {filename} | {record.msg.format(*record.args) if record.args else record.getMessage()}"
+        message = record.getMessage()
 
-        return f"{self.formatTime(record)} | {TS.Fg.MAGENTA}{record.name}{TS.RESET} | {level_color}{record.levelname:<8}{TS.RESET} | {filename} | {record.msg.format(*record.args) if record.args else record.getMessage()}"
+        if self.no_colors:
+            return f"{self.formatTime(record)} | {record.name} | {record.levelname:<8} | {filename} | {message}"
+
+        return f"{self.formatTime(record)} | {TS.Fg.MAGENTA}{record.name}{TS.RESET} | {level_color}{record.levelname:<8}{TS.RESET} | {filename} | {message}"
 
     def formatTime(self, record: logging.LogRecord, datefmt: str | None = None) -> str:
         formatted_time = super().formatTime(record, datefmt)
