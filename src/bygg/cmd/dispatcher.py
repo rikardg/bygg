@@ -18,10 +18,9 @@ from bygg.cmd.completions import (
 )
 from bygg.cmd.configuration import (
     DEFAULT_ENVIRONMENT_NAME,
-    PYTHON_INPUTFILE,
-    YAML_INPUTFILE,
     ByggFile,
     dump_schema,
+    has_byggfile,
     read_config_file,
 )
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcData
@@ -100,7 +99,7 @@ def dispatcher(
         output_info(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
 
-    if not os.path.isfile(PYTHON_INPUTFILE) and not os.path.isfile(YAML_INPUTFILE):
+    if not has_byggfile():
         output_error("No build files found.")
         sys.exit(1)
 
@@ -108,7 +107,7 @@ def dispatcher(
     ctx = init_bygg_context(configuration)
 
     if not configuration.environments:
-        if os.path.isfile(PYTHON_INPUTFILE) or os.path.isfile(YAML_INPUTFILE):
+        if has_byggfile():
             # No environments, so just load the Python build file directly.
             apply_configuration(configuration, None, None)
 

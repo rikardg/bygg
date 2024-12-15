@@ -2,6 +2,9 @@
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
+  "evenBetterToml.schema.associations": {
+    "Byggfile.toml": "file://schemas/Byggfile_yml_schema.json",
+  },
   "yaml.schemas": {
     "schemas/Byggfile_yml_schema.json": "Byggfile.yml"
   },
