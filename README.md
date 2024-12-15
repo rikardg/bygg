@@ -89,13 +89,17 @@ Bygg will check for the presence of `Byggfile.py` in the current directory. The
 actions above would be built with `bygg build1` and `bygg build2`,
 respectively. See the `examples/` directory for worked examples.
 
-### Settings file
+### Settings files
 
-There is also support for declaring actions in a YAML settings file,
-`Byggfile.yml`. This is intended primarily for configuring static settings like
-which virtual environment to use and their respective entrypoints, but can also
-be used for declaring other (static) actions. See
+There is also support for declaring actions, environments and settings in YAML
+and TOML files called `Byggfile.yml` and `Byggfile.toml`, respectively. This is
+intended primarily for configuring static settings like which virtual
+environment to use and their respective entrypoints, but can also be used for
+declaring static actions. See `examples/taskrunner/Byggfile.toml`,
 `examples/taskrunner/Byggfile.yml` and `examples/environments/Byggfile.yml`.
+
+The evaluation order is TOML -> YAML -> Python. Actions and settings declared
+later will override earlier ones.
 
 ## Shell tab completions
 

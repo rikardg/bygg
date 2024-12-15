@@ -327,6 +327,9 @@
   touch a file (default)
       No description
   
+  do something from TOML
+      A test action in a TOML file
+  
   
   '''
 # ---
@@ -455,6 +458,9 @@
   
   touch a file (default)
       No description
+  
+  do something from TOML
+      A test action in a TOML file
   
   
   '''

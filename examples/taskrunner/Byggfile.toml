@@ -1,0 +1,6 @@
+[[actions]]
+name = "do something from TOML"
+description = "A test action in a TOML file"
+message = "I did something from TOML"
+shell = "touch foo_toml"
+dependencies = ["ls", "do something more"]

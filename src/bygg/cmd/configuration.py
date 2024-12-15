@@ -1,14 +1,17 @@
 import dataclasses
 import os
+from pathlib import Path
 import sys
 from typing import Optional
 
 import dc_schema
 
+from bygg.logging import logger
 from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
 
 PYTHON_INPUTFILE = "Byggfile.py"
+TOML_INPUTFILE = "Byggfile.toml"
 YAML_INPUTFILE = "Byggfile.yml"
 
 DEFAULT_ENVIRONMENT_NAME = "default"
@@ -19,6 +22,14 @@ class Settings:
     __doc__ = """
     The global settings object for Bygg.
     """
+
+    def merge(self, other: "Settings"):
+        """
+        Merges the settings with another Settings object.
+        """
+        if other.default_action is not None:
+            self.default_action = other.default_action
+
     default_action: Optional[str] = None
 
 
@@ -102,30 +113,82 @@ class ByggFile:
     environments: dict[str, Environment] = dataclasses.field(default_factory=dict)
 
 
+def has_byggfile() -> bool:
+    """
+    Checks if a Byggfile (in any format, including Python) exists in the current
+    directory.
+
+    Returns
+    -------
+    bool
+        True if a Byggfile exists, False otherwise.
+    """
+    return len(get_config_files()) > 0 or os.path.isfile(PYTHON_INPUTFILE)
+
+
+def get_config_files() -> list[Path]:
+    """
+    Checks if a static config file (a Byggfile that is not written in Python) is present
+    in the current directory.
+    """
+    return [p for p in [Path(TOML_INPUTFILE), Path(YAML_INPUTFILE)] if p.is_file()]
+
+
 def read_config_file() -> ByggFile:
-    if not os.path.isfile(YAML_INPUTFILE):
+    config_files = get_config_files()
+    if not config_files:
         return ByggFile(actions=[], settings=Settings(), environments={})
 
     try:
-        from cattrs.preconf.pyyaml import make_converter
+        byggfiles: list[ByggFile] = []
+        for cf in config_files:
+            if cf.suffix == ".toml":
+                import tomllib
 
-        cattrs_converter = make_converter()
-        cattrs_converter.forbid_extra_keys = True
-        with open(YAML_INPUTFILE, "r") as f:
-            config_file = cattrs_converter.loads(f.read(), ByggFile)
-        for action in config_file.actions:
-            if action.is_entrypoint is None:
-                action.is_entrypoint = True
-        return config_file
+                from cattrs import structure
+
+                with cf.open("rb") as f:
+                    config_file = tomllib.load(f)
+                byggfiles.append(structure(config_file, ByggFile))
+            if cf.suffix == ".yml":
+                from cattrs.preconf.pyyaml import make_converter as make_yaml_converter
+
+                cattrs_converter = make_yaml_converter()
+                cattrs_converter.forbid_extra_keys = True
+                with open(YAML_INPUTFILE, "r") as f:
+                    byggfiles.append(cattrs_converter.loads(f.read(), ByggFile))
+
+        # Actions in byggfiles are entrypoints by default, unlike the actions
+        # declared in Python files
+        for bf in byggfiles:
+            for action in bf.actions:
+                if action.is_entrypoint is None:
+                    action.is_entrypoint = True
+        return merge_byggfiles(byggfiles)
+
     except Exception as e:
         output_plain(
             Symbols.RED_X
             + TS.Fg.RED
-            + " Error while reading configuration file "
+            + " Error while reading configuration file."
             + TS.Fg.RESET
-            + f"{TS.BOLD}{YAML_INPUTFILE}{TS.RESET}. {e}"
+            + f" {e}"
         )
         sys.exit(1)
+
+
+def merge_byggfiles(byggfiles: list[ByggFile]) -> ByggFile:
+    """
+    Merges a list of ByggFile objects into a single one.
+    """
+    logger.debug("Merging Byggfiles: %s", byggfiles)
+    merged_byggfile = ByggFile()
+    for bf in byggfiles:
+        merged_byggfile.actions.extend(bf.actions)
+        merged_byggfile.settings.merge(bf.settings)
+        merged_byggfile.environments.update(bf.environments)
+    logger.debug("Merged Byggfile: %s", merged_byggfile)
+    return merged_byggfile
 
 
 def dump_schema():

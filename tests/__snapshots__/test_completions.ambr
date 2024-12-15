@@ -115,16 +115,19 @@
 # ---
 # name: test_actions_completions[taskrunner]
   list([
+    'do\\ something\\ from\\ TOML',
     'touch\\ a\\ file',
   ])
 # ---
 # name: test_actions_completions[taskrunner].1
   list([
+    'do\\ something\\ from\\ TOML',
     'touch\\ a\\ file',
   ])
 # ---
 # name: test_actions_completions[taskrunner].2
   list([
+    'do\\ something\\ from\\ TOML',
     'touch\\ a\\ file',
   ])
 # ---
