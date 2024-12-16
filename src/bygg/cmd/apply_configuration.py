@@ -5,7 +5,7 @@ import subprocess
 import sys
 import textwrap
 
-from bygg.cmd.configuration import PYTHON_INPUTFILE, ByggFile, Environment
+from bygg.cmd.configuration import PYTHON_INPUTFILE, Byggfile, Environment
 from bygg.core.action import Action
 from bygg.core.digest import calculate_string_digest
 from bygg.logging import logger
@@ -78,7 +78,7 @@ def should_restart_with(environment: Environment) -> str | None:
 
 
 def register_actions_from_configuration(
-    configuration: ByggFile, is_restarted_with_env: str | None
+    configuration: Byggfile, is_restarted_with_env: str | None
 ):
     logger.info(f"Registering actions from configuration for '{is_restarted_with_env}'")
     for action in configuration.actions:
@@ -105,7 +105,7 @@ def register_actions_from_configuration(
 
 
 def apply_configuration(
-    configuration: ByggFile,
+    configuration: Byggfile,
     environment_name: str | None,
     is_restarted_with_env: str | None,
 ) -> str | None:

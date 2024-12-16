@@ -102,7 +102,7 @@ class Environment:
 
 
 @dataclasses.dataclass
-class ByggFile:
+class Byggfile:
     class SchemaConfig:
         annotation = dc_schema.SchemaAnnotation(
             title="Schema for the configuration files for Bygg",
@@ -134,13 +134,13 @@ def get_config_files() -> list[Path]:
     return [p for p in [Path(TOML_INPUTFILE), Path(YAML_INPUTFILE)] if p.is_file()]
 
 
-def read_config_file() -> ByggFile:
+def read_config_file() -> Byggfile:
     config_files = get_config_files()
     if not config_files:
-        return ByggFile(actions=[], settings=Settings(), environments={})
+        return Byggfile(actions=[], settings=Settings(), environments={})
 
     try:
-        byggfiles: list[ByggFile] = []
+        byggfiles: list[Byggfile] = []
         for cf in config_files:
             if cf.suffix == ".toml":
                 import tomllib
@@ -149,14 +149,14 @@ def read_config_file() -> ByggFile:
 
                 with cf.open("rb") as f:
                     config_file = tomllib.load(f)
-                byggfiles.append(structure(config_file, ByggFile))
+                byggfiles.append(structure(config_file, Byggfile))
             if cf.suffix == ".yml":
                 from cattrs.preconf.pyyaml import make_converter as make_yaml_converter
 
                 cattrs_converter = make_yaml_converter()
                 cattrs_converter.forbid_extra_keys = True
                 with open(YAML_INPUTFILE, "r") as f:
-                    byggfiles.append(cattrs_converter.loads(f.read(), ByggFile))
+                    byggfiles.append(cattrs_converter.loads(f.read(), Byggfile))
 
         # Actions in byggfiles are entrypoints by default, unlike the actions
         # declared in Python files
@@ -177,12 +177,12 @@ def read_config_file() -> ByggFile:
         sys.exit(1)
 
 
-def merge_byggfiles(byggfiles: list[ByggFile]) -> ByggFile:
+def merge_byggfiles(byggfiles: list[Byggfile]) -> Byggfile:
     """
     Merges a list of ByggFile objects into a single one.
     """
     logger.debug("Merging Byggfiles: %s", byggfiles)
-    merged_byggfile = ByggFile()
+    merged_byggfile = Byggfile()
     for bf in byggfiles:
         merged_byggfile.actions.extend(bf.actions)
         merged_byggfile.settings.merge(bf.settings)
@@ -195,7 +195,7 @@ def dump_schema():
     import json
     import textwrap
 
-    schema = dc_schema.get_schema(ByggFile)
+    schema = dc_schema.get_schema(Byggfile)
 
     # Additional properties are not allowed, but dc_schema does not yet support this.
     # See https://github.com/Peter554/dc_schema/issues/6 .
