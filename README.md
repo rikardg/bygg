@@ -38,13 +38,13 @@ providing correctness and minimal rebuilds.
 
 ## Installation
 
-Bygg requires Python 3.11 or 3.12.
+Bygg requires Python 3.11 or higher.
 
 Install with
 
-`pip install bygg`
+`pipx install bygg` (recommended)
 or
-`pipx install bygg`
+`pip install bygg`
 
 or in a virtual environment.
 
@@ -106,13 +106,12 @@ later will override earlier ones.
 TL;DR: `bygg --completions`
 
 Bygg has support for Bash and Zsh tab completions of arguments and entrypoint
-actions. The completions will be loaded:
+actions. The completions will be loaded from the files that exist out of
+`Byggfile.toml`, `Byggfile.yml` and `Byggfile.py`, in that order.
 
-- from `Byggfile.py` if `Byggfile.yml` doesn't exist, or if there are no
-  environments declared in `Byggfile.yml`.
-- from `Byggfile.yml` if it exists. If it has environments, each environment
-  will be installed if needed and its respective Byggfile evaluated to collect
-  all entrypoint actions.
+Any environments declared in the static config files will be installed as
+needed and their respective Byggfiles will be evaluated to collect entrypoint
+actions.
 
 To install completions, do:
 
@@ -124,6 +123,8 @@ It will output a line that you can then add to `.bashrc` or `.zshrc`.
 
 _Don't forget to open a new shell instance after you've made changes to the
 settings files._
+
+### Notes
 
 <details>
 <summary>
@@ -171,6 +172,8 @@ regular `pip` will be used.
 ./bootstrap.py
 # Activate the virtual environment:
 . .venv/bin/activate
+# Optional: install and activate shell completions for this specific Bygg installation:
+eval "$(bygg --completions)"
 ```
 
 Now you can try out one of the examples:
