@@ -2,7 +2,7 @@ import argparse
 from dataclasses import dataclass, field
 from typing import Optional
 
-from bygg.cmd.configuration import ByggFile
+from bygg.cmd.configuration import Byggfile
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
 
@@ -38,7 +38,7 @@ class ByggContext:
 
     runner: ProcessRunner
     scheduler: Scheduler
-    configuration: ByggFile
+    configuration: Byggfile
     ipc_data: Optional[SubProcessIpcData] = None
 
 

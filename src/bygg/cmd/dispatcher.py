@@ -18,7 +18,7 @@ from bygg.cmd.completions import (
 )
 from bygg.cmd.configuration import (
     DEFAULT_ENVIRONMENT_NAME,
-    ByggFile,
+    Byggfile,
     dump_schema,
     has_byggfile,
     read_config_file,
@@ -40,7 +40,7 @@ from bygg.output.status_display import (
 )
 
 
-def init_bygg_context(configuration: ByggFile):
+def init_bygg_context(configuration: Byggfile):
     scheduler = Scheduler()
     runner = ProcessRunner(scheduler)
 
