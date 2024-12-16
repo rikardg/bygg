@@ -10,27 +10,43 @@ permissions:
   contents: read
 
 jobs:
-  publish_pypi:
+  build_release:
     env:
       SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.ref_name }}
-      HATCH_INDEX_USER: __token__
-      HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.11
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
       - name: Install dependencies
         run: |
           pipx install hatch
       - name: Build release
         run: |
           hatch build
-      - name: Publish release
-        run: |
-          hatch --no-interactive publish --repo main
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist/
+
+  publish_pypi:
+    runs-on: ubuntu-latest
+    environment: "PyPI publishing"
+    needs:
+      - build_release
+    permissions:
+      id-token: write
+    steps:
+      - name: Retrieve release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: dist/
+      - name: Publish release to PyPI
+        uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70 # v1.12.3
 
   publish_github:
     permissions:
