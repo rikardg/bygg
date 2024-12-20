@@ -1,9 +1,9 @@
-import argparse
 import os
 import shutil
 import sys
 import textwrap
 
+from bygg.cmd.argument_parsing import ByggNamespace
 from bygg.cmd.configuration import DEFAULT_ENVIRONMENT_NAME
 from bygg.cmd.datastructures import (
     ByggContext,
@@ -25,7 +25,7 @@ HEADER = f"{TS.BOLD}Available actions:{TS.RESET}"
 
 def list_collect_subprocess(
     ctx: ByggContext,
-    args: argparse.Namespace,
+    args: ByggNamespace,
 ) -> bool:
     entrypoints = get_entrypoints(ctx, args)
 
@@ -46,7 +46,7 @@ def list_collect_subprocess(
     return False
 
 
-def list_actions(ctx: ByggContext, args: argparse.Namespace) -> bool:
+def list_actions(ctx: ByggContext, args: ByggNamespace) -> bool:
     # TODO consider consolidating this function with print_actions
 
     entrypoints = get_entrypoints(ctx, args)

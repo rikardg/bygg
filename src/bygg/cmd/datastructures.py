@@ -1,7 +1,7 @@
-import argparse
 from dataclasses import dataclass, field
 from typing import Optional
 
+from bygg.cmd.argument_parsing import ByggNamespace
 from bygg.cmd.configuration import Byggfile
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
@@ -51,7 +51,7 @@ class EntryPoint:
 NO_DESCRIPTION = "No description"
 
 
-def get_entrypoints(ctx: ByggContext, args: argparse.Namespace) -> list[EntryPoint]:
+def get_entrypoints(ctx: ByggContext, args: ByggNamespace) -> list[EntryPoint]:
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()

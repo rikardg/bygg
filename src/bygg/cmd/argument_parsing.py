@@ -1,10 +1,31 @@
 import argparse
+from dataclasses import dataclass, field
 from typing import Any
 
 from argcomplete.completers import BaseCompleter
 
 from bygg.cmd.completions import ByggfileDirectoriesCompleter
 from bygg.logging import logger
+
+
+@dataclass
+class ByggNamespace:
+    """Wrapper for the arguments parsed by argparse. Improves ergonimics when working
+    with the arguments."""
+
+    actions: list[str]
+    version: bool
+    is_restarted_with_env: str | None
+    ipc_filename: list[str] | None
+    clean: bool
+    list_actions: bool
+    tree: bool
+    jobs: int | None
+    always_make: bool
+    check: bool
+    completions: bool
+    dump_schema: bool
+    directory: list[str] = field(default_factory=list)
 
 
 def create_argument_parser(entrypoint_completions: BaseCompleter):
@@ -70,6 +91,7 @@ List available actions:
         "-l",
         "--list",
         action="store_true",
+        dest="list_actions",
         help="List available actions.",
     )
     build_setup_group.add_argument(
