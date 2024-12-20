@@ -4,11 +4,12 @@ import pickle
 import subprocess
 import sys
 import tempfile
+from typing import Sequence
 
 from argcomplete.completers import BaseCompleter
 
 from bygg.cmd.apply_configuration import apply_configuration
-from bygg.cmd.argument_parsing import create_argument_parser
+from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.build_clean import build, clean
 from bygg.cmd.completions import (
@@ -76,12 +77,15 @@ def bygg():
 
 
 def dispatcher(
-    parser: argparse.ArgumentParser, args: argparse.Namespace
+    parser: argparse.ArgumentParser, args_namespace: argparse.Namespace
 ) -> dict[str, SubProcessIpcData] | None:
     """
     Takes both argparse.ArgumentParser and argparse.Namespace arguments since it can be
     called also from completers.
     """
+
+    args = ByggNamespace(**vars(args_namespace))
+
     generate_shell_completions(args.completions)
 
     if args.dump_schema:
@@ -130,14 +134,16 @@ def dispatcher(
     # Parent process
     if not args.is_restarted_with_env:
         subprocess_output: dict[str, SubProcessIpcData] = {}
-        actions: list[str | None] = (
+        actions: Sequence[str | None] = (
             args.actions
             if len(args.actions) > 0
             else [configuration.settings.default_action]
         )
 
         for action in actions:
-            dispatch_for_toplevel_process(ctx, args, parser, subprocess_output, action)
+            dispatch_for_toplevel_process(
+                ctx, args_namespace, parser, subprocess_output, action
+            )
 
             # Act on results from subprocess execution. Only actions that are to be
             # built or cleaned need to continue the loop beyond the first pass.
@@ -145,7 +151,7 @@ def dispatcher(
             if is_completing():
                 return subprocess_output
 
-            if args.list:
+            if args.list_actions:
                 print_actions(ctx, subprocess_output)
                 sys.exit(0)
 
@@ -238,9 +244,7 @@ def dispatch_for_toplevel_process(
             os.remove(ipc_filename)
 
 
-def dispatch_for_subprocess(
-    ctx: ByggContext, args: argparse.Namespace, action: str | None
-):
+def dispatch_for_subprocess(ctx: ByggContext, args: ByggNamespace, action: str | None):
     logger.info("Dispatch for subprocess")
     logger.debug("Action: {}", action)
     # We're in subprocess
@@ -276,7 +280,7 @@ def dispatch_for_subprocess(
         sys.exit(1)
 
 
-def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
+def inner_dispatch(ctx: ByggContext, args: ByggNamespace) -> bool:
     """
     Executes the appropriate bygg commands on the supplied action list. Used both from
     the toplevel in the case where there is no dedicated environment as well as when
@@ -286,7 +290,7 @@ def inner_dispatch(ctx: ByggContext, args: argparse.Namespace) -> bool:
     # Analysis implies building:
     always_make = args.always_make or args.check
 
-    if args.list:
+    if args.list_actions:
         list_actions(ctx, args)
         return True
 
