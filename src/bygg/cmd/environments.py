@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import sys
 
-from bygg.cmd.configuration import Environment
+from bygg.cmd.configuration import Byggfile, Environment
 from bygg.core.digest import calculate_string_digest
 from bygg.output.output import output_error, output_info, output_plain
 
@@ -58,3 +58,14 @@ def setup_environment(environment: Environment):
         f.write(environment_hash)
 
     return True
+
+
+def remove_environments(configuration: Byggfile) -> list[str]:
+    removed_environments: list[str] = []
+    for name, env in configuration.environments.items():
+        venv_path = Path(env.venv_directory)
+        if venv_path.exists():
+            output_info(f"Removing venv {name} at {venv_path}")
+            shutil.rmtree(venv_path)
+            removed_environments.append(name)
+    return removed_environments

@@ -26,6 +26,7 @@ from bygg.cmd.configuration import (
 )
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcData
 from bygg.cmd.list_actions import list_actions, list_collect_subprocess, print_actions
+from bygg.cmd.maintenance import perform_maintenance
 from bygg.cmd.tree import display_tree, print_tree
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
@@ -108,6 +109,11 @@ def dispatcher(
         sys.exit(1)
 
     configuration = read_config_file()
+
+    if args.maintenance_commands and not args.is_restarted_with_env:
+        perform_maintenance(configuration, args.maintenance_commands)
+        sys.exit(0)
+
     ctx = init_bygg_context(configuration)
 
     if not configuration.environments:
@@ -214,7 +220,11 @@ def dispatch_for_toplevel_process(
         exec_list += [restart_with]
         if action:
             exec_list += [action]
-        exec_list += unparse_args(parser, args, drop=["actions"])
+        exec_list += unparse_args(
+            parser,
+            args,
+            drop=["actions", "maintenance_commands"],
+        )
         exec_list += ["--is_restarted_with_env", environment]
         exec_list += ["--ipc_filename", ipc_filename]
 

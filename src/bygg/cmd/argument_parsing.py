@@ -1,11 +1,13 @@
 import argparse
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal, TypeAlias
 
 from argcomplete.completers import BaseCompleter
 
 from bygg.cmd.completions import ByggfileDirectoriesCompleter
 from bygg.logging import logger
+
+MaintenanceCommand: TypeAlias = Literal["remove_cache", "remove_environments"]
 
 
 @dataclass
@@ -23,6 +25,7 @@ class ByggNamespace:
     jobs: int | None
     always_make: bool
     check: bool
+    maintenance_commands: list[MaintenanceCommand]
     completions: bool
     dump_schema: bool
     directory: list[str] = field(default_factory=list)
@@ -137,6 +140,34 @@ List available actions:
         help="Perform various checks on the action tree. Implies -B",
     )
 
+    # Maintenance arguments:
+    maintenance_group = parser.add_argument_group(
+        "Maintenance",
+        "These commands operate on Bygg's build state. When given a maintenance command, Bygg will just perform the maintenance and exit; it will neither build anything nor perform any other actions.",
+    )
+    maintenance_group.add_argument(
+        "--reset",
+        action=AppendConstList,
+        const=["remove_cache", "remove_environments"],
+        nargs=0,
+        dest="maintenance_commands",
+        help="Remove the cache and the Python environments. Same as giving --remove-cache and --remove-environments.",
+    )
+    maintenance_group.add_argument(
+        "--remove-cache",
+        action="append_const",
+        const="remove_cache",
+        dest="maintenance_commands",
+        help="Remove the build cache.",
+    )
+    maintenance_group.add_argument(
+        "--remove-environments",
+        action="append_const",
+        const="remove_environments",
+        dest="maintenance_commands",
+        help="Remove the Python environments.",
+    )
+
     # Meta arguments:
     meta_group = parser.add_argument_group("Meta arguments")
     meta_group.add_argument(
@@ -151,3 +182,12 @@ List available actions:
     )
 
     return parser
+
+
+class AppendConstList(argparse.Action):
+    """Custom action to append the elements from a list to dest."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        const_list = getattr(namespace, self.dest) or list()
+        const_list.extend(self.const)
+        setattr(namespace, self.dest, const_list)

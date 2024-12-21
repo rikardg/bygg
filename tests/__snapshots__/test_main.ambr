@@ -534,6 +534,166 @@
   
   '''
 # ---
+# name: test_reset_remove_cache[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[environments]
+  '''
+  🛈 Entering directory 'examples/environments'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_cache[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_remove_environments[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_remove_environments[environments]
+  '''
+  🛈 Entering directory 'examples/environments'
+  🛈 Removing environments
+  🛈 Removing venv env1 at .venv1
+  🛈 Removing venv env2 at .venv2
+  🛈 Removing venv default at .venv
+  
+  '''
+# ---
+# name: test_reset_remove_environments[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_remove_environments[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_remove_environments[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_remove_environments[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_remove_environments[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  🛈 Removing environments
+  
+  '''
+# ---
+# name: test_reset_reset[checks]
+  '''
+  🛈 Entering directory 'examples/checks'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[environments]
+  '''
+  🛈 Entering directory 'examples/environments'
+  🛈 Removing environments
+  🛈 Removing venv env1 at .venv1
+  🛈 Removing venv env2 at .venv2
+  🛈 Removing venv default at .venv
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[failing_jobs]
+  '''
+  🛈 Entering directory 'examples/failing_jobs'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[only_python]
+  '''
+  🛈 Entering directory 'examples/only_python'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[parametric]
+  '''
+  🛈 Entering directory 'examples/parametric'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[taskrunner]
+  '''
+  🛈 Entering directory 'examples/taskrunner'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
+# name: test_reset_reset[trivial]
+  '''
+  🛈 Entering directory 'examples/trivial'
+  🛈 Removing environments
+  🛈 Removing cache
+  
+  '''
+# ---
 # name: test_tree[checks]
   '''
   
