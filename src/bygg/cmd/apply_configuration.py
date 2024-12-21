@@ -25,9 +25,11 @@ def should_restart_with(environment: Environment) -> str | None:
 def register_actions_from_configuration(
     configuration: Byggfile, is_restarted_with_env: str | None
 ):
-    logger.info(f"Registering actions from configuration for '{is_restarted_with_env}'")
+    logger.info(
+        "Registering actions from configuration for '%s'", is_restarted_with_env
+    )
     for action in configuration.actions:
-        logger.debug(f"Action '{action.name}'")
+        logger.debug("Action '%s'", action.name)
 
         if is_restarted_with_env and action.environment != is_restarted_with_env:
             logger.debug(

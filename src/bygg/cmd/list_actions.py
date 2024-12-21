@@ -36,7 +36,7 @@ def list_collect_subprocess(
     default_action_name = ctx.configuration.settings.default_action
 
     if ctx.ipc_data:
-        logger.debug("Sorted actions: {}", sorted_actions)
+        logger.debug("Sorted actions: %s", sorted_actions)
         ctx.ipc_data.list = SubProcessIpcDataList(
             actions={x.name: x.description for x in sorted_actions},
             default_action=default_action_name,
@@ -66,7 +66,7 @@ def list_actions(ctx: ByggContext, args: ByggNamespace) -> bool:
     default_action_name = ctx.configuration.settings.default_action
 
     if ctx.ipc_data:
-        logger.debug("Sorted actions: {}", sorted_actions)
+        logger.debug("Sorted actions: %s", sorted_actions)
         ctx.ipc_data.list = SubProcessIpcDataList(
             actions={x.name: x.description for x in sorted_actions},
             default_action=default_action_name,
