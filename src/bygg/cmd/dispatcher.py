@@ -198,7 +198,7 @@ def dispatch_for_toplevel_process(
     action: str | None,
 ):
     """Dispatches an action in all environments."""
-    logger.info("Dispatch for toplevel process, action: {}", action)
+    logger.info("Dispatch for toplevel process, action: %s", action)
     for environment in ctx.configuration.environments:
         assert environment
         # Check if we should restart with another Python interpreter (e.g. from a
@@ -218,7 +218,7 @@ def dispatch_for_toplevel_process(
         exec_list += ["--is_restarted_with_env", environment]
         exec_list += ["--ipc_filename", ipc_filename]
 
-        logger.debug("Restarting with: {}", exec_list)
+        logger.debug("Restarting with: %s", exec_list)
         try:
             process = subprocess.run(exec_list, encoding="utf-8")
             if (
@@ -246,7 +246,7 @@ def dispatch_for_toplevel_process(
 
 def dispatch_for_subprocess(ctx: ByggContext, args: ByggNamespace, action: str | None):
     logger.info("Dispatch for subprocess")
-    logger.debug("Action: {}", action)
+    logger.debug("Action: %s", action)
     # We're in subprocess
     ctx.ipc_data = SubProcessIpcData()
     apply_configuration(
@@ -265,7 +265,7 @@ def dispatch_for_subprocess(ctx: ByggContext, args: ByggNamespace, action: str |
 
     ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
     if ipc_filename:
-        logger.debug("Writing IPC data to {}", args.ipc_filename)
+        logger.debug("Writing IPC data to %s", args.ipc_filename)
         with open(ipc_filename, "wb") as f:
             pickle.dump(ctx.ipc_data, f)
 
