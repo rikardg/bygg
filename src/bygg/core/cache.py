@@ -27,6 +27,10 @@ class Cache:
         self.data = CacheState({})
         self.db_file = db_file
 
+    @classmethod
+    def reset(cls):
+        DEFAULT_DB_FILE.unlink(missing_ok=True)
+
     def load(self):
         make_sure_status_dir_exists()
         try:

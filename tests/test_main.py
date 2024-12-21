@@ -1,9 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import re
 import subprocess
 
 import pytest
+
+from bygg.core.cache import DEFAULT_DB_FILE
 
 
 @dataclass
@@ -11,13 +13,19 @@ class ExampleParameters:
     name: str
     list_rc: int = 0
     tree_rc: int = 0
+    build_rc: int = 0
+    environments: list[str] = field(default_factory=list)
+    build_yields_cache: bool = True
 
 
 examples = [
     ExampleParameters("checks"),
-    ExampleParameters("environments"),
-    ExampleParameters("failing_jobs"),
-    ExampleParameters("only_python", tree_rc=1),
+    ExampleParameters(
+        "environments",
+        environments=[".venv", ".venv1", ".venv2"],
+    ),
+    ExampleParameters("failing_jobs", build_rc=1),
+    ExampleParameters("only_python", tree_rc=1, build_rc=1, build_yields_cache=False),
     ExampleParameters("parametric"),
     ExampleParameters("taskrunner"),
     ExampleParameters("trivial"),
@@ -126,3 +134,103 @@ def test_non_existing_action(snapshot, clean_bygg_tree, example):
     )
     assert process.returncode == 1
     assert process.stdout == snapshot
+
+
+@pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
+def test_reset_remove_environments(
+    snapshot, clean_bygg_tree, example: ExampleParameters
+):
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == example.build_rc
+
+    for environment in example.environments:
+        assert Path(
+            clean_bygg_tree / examples_dir / example.name / environment
+        ).exists()
+
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name, "--remove-environments"],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout == snapshot
+
+    for environment in example.environments:
+        assert not Path(
+            clean_bygg_tree / examples_dir / example.name / environment
+        ).exists()
+
+
+@pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
+def test_reset_remove_cache(snapshot, clean_bygg_tree, example: ExampleParameters):
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == example.build_rc
+
+    assert (
+        Path(clean_bygg_tree / examples_dir / example.name / DEFAULT_DB_FILE).exists()
+        == example.build_yields_cache
+    )
+
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name, "--remove-cache"],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout == snapshot
+
+    assert not Path(
+        clean_bygg_tree / examples_dir / example.name / DEFAULT_DB_FILE
+    ).exists()
+
+
+@pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
+def test_reset_reset(snapshot, clean_bygg_tree, example: ExampleParameters):
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == example.build_rc
+
+    for environment in example.environments:
+        assert Path(
+            clean_bygg_tree / examples_dir / example.name / environment
+        ).exists()
+
+    assert (
+        Path(clean_bygg_tree / examples_dir / example.name / DEFAULT_DB_FILE).exists()
+        == example.build_yields_cache
+    )
+
+    process = subprocess.run(
+        ["bygg", "-C", examples_dir / example.name, "--reset"],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout == snapshot
+
+    for environment in example.environments:
+        assert not Path(
+            clean_bygg_tree / examples_dir / example.name / environment
+        ).exists()
+
+    assert not Path(
+        clean_bygg_tree / examples_dir / example.name / DEFAULT_DB_FILE
+    ).exists()
