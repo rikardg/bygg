@@ -34,7 +34,7 @@ jobs:
         run: |
           nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
 
-  pyright_and_ruff:
+  mypy_pyright_ruff:
     strategy:
       matrix:
         python_version: ["3.11.9", "3.12.3"]
@@ -61,6 +61,10 @@ jobs:
           # calm. Errors with regards to use of this dependency will be detected by nox.
           pip install rich
           pyright examples/
+      - name: Type check with mypy
+        run: |
+          .venv/bin/pip install -e .
+          .venv/bin/python3 mypy.py
 
   audit:
     runs-on: ubuntu-latest
