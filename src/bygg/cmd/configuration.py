@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 from typing import Optional
 
-import dc_schema
+import dc_schema  # type: ignore
 
 from bygg.logging import logger
 from bygg.output.output import Symbols, output_plain
