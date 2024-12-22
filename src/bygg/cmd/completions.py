@@ -17,7 +17,8 @@ class ByggfileDirectoriesCompleter(DirectoriesCompleter):
     A completer for directories that contain Bygg files.
     """
 
-    def __call__(self, prefix, **kwargs) -> Generator[str, Any, None]:
+    # TODO: error in typing in argcomplete, see https://github.com/rikardg/bygg/issues/192.
+    def __call__(self, prefix, **kwargs) -> Generator[str, Any, None]:  # type: ignore
         directories = super().__call__(prefix, **kwargs)
         byggfile_dirs = set()
         for dir in directories:

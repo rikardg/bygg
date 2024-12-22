@@ -1,5 +1,5 @@
 # Development
-mypy==1.10.1
+mypy==1.14.0
 pip==24.3.1
 pyright==1.1.391
 pytest==8.3.4

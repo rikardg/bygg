@@ -4,7 +4,6 @@ import pickle
 import subprocess
 import sys
 import tempfile
-from typing import Sequence
 
 from argcomplete.completers import BaseCompleter
 
@@ -140,8 +139,8 @@ def dispatcher(
     # Parent process
     if not args.is_restarted_with_env:
         subprocess_output: dict[str, SubProcessIpcData] = {}
-        actions: Sequence[str | None] = (
-            args.actions
+        actions: list[str | None] = (
+            [*args.actions]
             if len(args.actions) > 0
             else [configuration.settings.default_action]
         )
@@ -187,13 +186,15 @@ def dispatcher(
     # We're in subprocess
 
     # Always called with at most one action at a time; it is up to the caller to loop
-    # over the action list
+    # over the action list.
+    # The list also always contains at least the null element so that
+    # dispatch_for_subprocess will get called.
     assert len(args.actions) <= 1
     subprocess_actions: list[str | None] = (
         [args.actions[0]] if len(args.actions) > 0 else [None]
     )
-    for action in subprocess_actions:
-        dispatch_for_subprocess(ctx, args, action)
+    for sp_action in subprocess_actions:
+        dispatch_for_subprocess(ctx, args, sp_action)
 
 
 def dispatch_for_toplevel_process(
@@ -332,7 +333,7 @@ def inner_dispatch(ctx: ByggContext, args: ByggNamespace) -> bool:
     return status
 
 
-# TODO: error in typing in argcomplete; fixed in https://github.com/kislyuk/argcomplete/pull/423
+# TODO: error in typing in argcomplete, see https://github.com/rikardg/bygg/issues/192.
 # pyright: reportIncompatibleMethodOverride=warning
 class EntrypointCompleter(BaseCompleter):
     def __call__(
