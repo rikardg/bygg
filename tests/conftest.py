@@ -101,3 +101,8 @@ def clean_bygg_tree(tmp_path):
         ignore=shutil.ignore_patterns(*clean_bygg_tree_exclusions),
     )
     return clean_path
+
+
+@pytest.fixture(autouse=True)
+def set_is_CI():
+    os.environ["CI"] = "1"
