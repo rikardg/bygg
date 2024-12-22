@@ -4,6 +4,6 @@ pip==24.3.1
 pyright==1.1.391
 pytest==8.3.4
 pytest-mock==3.14.0
-ruff==0.8.3
+ruff==0.8.4
 setuptools==75.6.0
 syrupy==4.8.0
