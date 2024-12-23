@@ -37,11 +37,10 @@ class Settings:
 class ActionItem:
     __doc__ = f"""
     This is a representation of the Action class used for deserialising from YAML.
+    The name of the action is the key in the dictionary in the config file.
 
     Parameters
     ----------
-    name : str
-        The name of the action.
     description : str, optional
         A description of the action. Used in e.g. action listings. Default is None.
     message : str, optional
@@ -62,7 +61,6 @@ class ActionItem:
         The shell command to execute when the action is run. Default is None.
     """
 
-    name: str
     description: Optional[str] = None
     message: Optional[str] = None
     inputs: Optional[list[str]] = None
@@ -108,7 +106,7 @@ class Byggfile:
             title="Schema for the configuration files for Bygg",
         )
 
-    actions: list[ActionItem] = dataclasses.field(default_factory=list)
+    actions: dict[str, ActionItem] = dataclasses.field(default_factory=dict)
     settings: Settings = dataclasses.field(default_factory=Settings)
     environments: dict[str, Environment] = dataclasses.field(default_factory=dict)
 
@@ -137,7 +135,7 @@ def get_config_files() -> list[Path]:
 def read_config_file() -> Byggfile:
     config_files = get_config_files()
     if not config_files:
-        return Byggfile(actions=[], settings=Settings(), environments={})
+        return Byggfile(actions={}, settings=Settings(), environments={})
 
     try:
         byggfiles: list[Byggfile] = []
@@ -161,7 +159,7 @@ def read_config_file() -> Byggfile:
         # Actions in byggfiles are entrypoints by default, unlike the actions
         # declared in Python files
         for bf in byggfiles:
-            for action in bf.actions:
+            for _, action in bf.actions.items():
                 if action.is_entrypoint is None:
                     action.is_entrypoint = True
         return merge_byggfiles(byggfiles)
@@ -184,7 +182,7 @@ def merge_byggfiles(byggfiles: list[Byggfile]) -> Byggfile:
     logger.debug("Merging Byggfiles: %s", byggfiles)
     merged_byggfile = Byggfile()
     for bf in byggfiles:
-        merged_byggfile.actions.extend(bf.actions)
+        merged_byggfile.actions.update(bf.actions)
         merged_byggfile.settings.merge(bf.settings)
         merged_byggfile.environments.update(bf.environments)
     logger.debug("Merged Byggfile: %s", merged_byggfile)

@@ -28,13 +28,13 @@ def register_actions_from_configuration(
     logger.info(
         "Registering actions from configuration for '%s'", is_restarted_with_env
     )
-    for action in configuration.actions:
-        logger.debug("Action '%s'", action.name)
+    for action_name, action in configuration.actions.items():
+        logger.debug("Action '%s'", action_name)
 
         if is_restarted_with_env and action.environment != is_restarted_with_env:
             logger.debug(
                 "Skipping action '%s' for environment '%s', it belongs to '%s'",
-                action.name,
+                action_name,
                 is_restarted_with_env,
                 action.environment,
             )
@@ -44,7 +44,7 @@ def register_actions_from_configuration(
             create_shell_command(action.shell, action.message) if action.shell else None
         )
         Action(
-            action.name,
+            action_name,
             description=action.description,
             is_entrypoint=bool(action.is_entrypoint),
             inputs=action.inputs,

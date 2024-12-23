@@ -2,10 +2,10 @@ settings:
   default_action: "sort"
 
 actions:
-  - name: "sort"
+  sort:
     description: "Sort all test files. Also sets up test files if needed."
     dependencies: ["sort_test_files"]
 
-  - name: "setup"
+  setup:
     description: "Set up test files."
     dependencies: ["setup_test_files"]

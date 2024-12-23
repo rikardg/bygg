@@ -2,7 +2,7 @@ settings:
   default_action: all_checks
 
 actions:
-  - name: "all_checks"
+  all_checks:
     description: |
       Run all test actions declared in this file. Should trigger all tested checks when run with
       --check.
@@ -12,13 +12,13 @@ actions:
       - same_output_files
 
   # Circular dependencies
-  - name: "circular_A"
+  circular_A:
     is_entrypoint: false
     outputs: ["foo"]
     shell: |
       touch foo
 
-  - name: "circular_B"
+  circular_B:
     is_entrypoint: false
     dependencies: ["circular_A"]
     inputs: ["foo"]
@@ -26,20 +26,20 @@ actions:
     shell: |
       touch bar
 
-  - name: "circular_C"
+  circular_C:
     is_entrypoint: false
     dependencies: ["circular_B"]
     inputs: ["bar"]
     outputs: ["foo"]
 
-  - name: "check_inputs_outputs"
+  check_inputs_outputs:
     description: |
       Example where a later action has the input of an earlier one as its output. This should
       trigger check_inputs_outputs when run with --check.
     dependencies: ["circular_C"]
 
   # Actions that don't create their outputs
-  - name: "output_file_missing"
+  output_file_missing:
     description: |
       Example that doesn't create the outputs that it declares. This should trigger
       output_file_missing when run with --check.
@@ -48,24 +48,24 @@ actions:
     outputs: ["no_outputs"]
     shell: "true"
 
-  - name: "no_outputs_A"
+  no_outputs_A:
     is_entrypoint: false
     outputs: ["no_outputs_A"]
     shell: "true"
 
   # Actions that create the same outputs
-  - name: "same_output_files"
+  same_output_files:
     description: |
       Example where several actions create the same outputs. This should trigger same_output_files
       when run with --check.
     dependencies: ["same_output_file_A", "same_output_file_B"]
 
-  - name: "same_output_file_A"
+  same_output_file_A:
     is_entrypoint: false
     outputs: ["same_output_file_A.txt", "common_output_file.txt"]
     shell: "true"
 
-  - name: "same_output_file_B"
+  same_output_file_B:
     is_entrypoint: false
     outputs: ["same_output_file_B.txt", "common_output_file.txt"]
     shell: "true"
