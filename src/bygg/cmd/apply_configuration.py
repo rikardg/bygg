@@ -33,7 +33,10 @@ def register_actions_from_configuration(
 
         if is_restarted_with_env and action.environment != is_restarted_with_env:
             logger.debug(
-                f"Skipping action '{action.name}' for environment '{is_restarted_with_env}', it belongs to '{action.environment}'"
+                "Skipping action '%s' for environment '%s', it belongs to '%s'",
+                action.name,
+                is_restarted_with_env,
+                action.environment,
             )
             continue
 
