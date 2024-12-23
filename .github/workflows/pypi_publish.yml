@@ -33,10 +33,10 @@ jobs:
           path: dist/
 
   publish_pypi:
-    runs-on: ubuntu-latest
-    environment: "PyPI publishing"
     needs:
       - build_release
+    runs-on: ubuntu-latest
+    environment: "PyPI publishing"
     permissions:
       id-token: write
     steps:
@@ -49,6 +49,8 @@ jobs:
         uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70 # v1.12.3
 
   publish_github:
+    needs:
+      - publish_pypi
     permissions:
       contents: write
     runs-on: ubuntu-latest
