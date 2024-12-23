@@ -57,7 +57,7 @@ def get_entrypoints(ctx: ByggContext, args: ByggNamespace) -> list[EntryPoint]:
         for x in ctx.scheduler.build_actions.values()
         if x.is_entrypoint
     ] or [
-        EntryPoint(x.name, x.description or NO_DESCRIPTION)
-        for x in ctx.configuration.actions
+        EntryPoint(action_name, x.description or NO_DESCRIPTION)
+        for action_name, x in ctx.configuration.actions.items()
         if x.is_entrypoint and x.environment == args.is_restarted_with_env
     ]
