@@ -7,10 +7,23 @@ permissions:
   contents: read
 
 jobs:
+  declare_variables:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - id: read_mise_toml
+        run: python3 -c "import json ; import tomllib; print(f'PYTHON_VERSION={ json.dumps(tomllib.loads(open('.mise.toml').read())['tools']['python'])}')" >> "$GITHUB_OUTPUT"
+    outputs:
+      python_versions: ${{ steps.read_mise_toml.outputs.PYTHON_VERSION }}
+
   nox:
+    needs: declare_variables
     strategy:
       matrix:
-        python_version: ["3.11.9", "3.12.8"]
+        python_version: ${{ fromJson(needs.declare_variables.outputs.python_versions) }}
         nox_session: [tests, basics, examples]
         os: [ubuntu-24.04, macos-14]
         install_uv: [0, 1]
@@ -31,9 +44,10 @@ jobs:
           mise x -- nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
 
   mypy_pyright_ruff:
+    needs: declare_variables
     strategy:
       matrix:
-        python_version: ["3.11.9", "3.12.3"]
+        python_version: ${{ fromJson(needs.declare_variables.outputs.python_versions) }}
       fail-fast: false
     runs-on: "ubuntu-latest"
     steps:
