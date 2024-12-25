@@ -2,8 +2,9 @@ import dataclasses
 import os
 from pathlib import Path
 import sys
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, Union
 
+import cattrs
 import dc_schema  # type: ignore
 
 from bygg.logging import logger
@@ -106,7 +107,8 @@ class Byggfile:
             title="Schema for the configuration files for Bygg",
         )
 
-    actions: dict[str, ActionItem] = dataclasses.field(default_factory=dict)
+    # Have to use Union here since dc_schema doesn't support the | notation
+    actions: dict[str, Union[ActionItem, str]] = dataclasses.field(default_factory=dict)
     settings: Settings = dataclasses.field(default_factory=Settings)
     environments: dict[str, Environment] = dataclasses.field(default_factory=dict)
 
@@ -138,32 +140,47 @@ def read_config_files() -> Byggfile:
     if not config_files:
         return Byggfile(actions={}, settings=Settings(), environments={})
 
+    converter = cattrs.Converter()
+    converter.forbid_extra_keys = True
+
+    def action_item_hook(val, _):
+        if isinstance(val, str):
+            # Convert shortform actions to objects
+            return ActionItem(shell=val)
+        return converter.structure(val, ActionItem)
+
+    converter.register_structure_hook(Union[ActionItem, str], action_item_hook)
+
     try:
-        byggfiles: list[Byggfile] = []
+        byggfile_objects: list[Byggfile] = []
         for cf in config_files:
-            if cf.suffix == ".toml":
-                import tomllib
+            match cf.suffix:
+                case ".toml":
+                    import tomllib
 
-                from cattrs import structure
+                    with cf.open("rb") as toml_file:
+                        byggfile_objects.append(
+                            converter.structure(tomllib.load(toml_file), Byggfile)
+                        )
+                case ".yml":
+                    import yaml
 
-                with cf.open("rb") as f:
-                    config_file = tomllib.load(f)
-                byggfiles.append(structure(config_file, Byggfile))
-            if cf.suffix == ".yml":
-                from cattrs.preconf.pyyaml import make_converter as make_yaml_converter
+                    with cf.open("r", encoding="utf-8") as yaml_file:
+                        byggfile_objects.append(
+                            converter.structure(yaml.safe_load(yaml_file), Byggfile)
+                        )
+                case _:
+                    raise ValueError(f"Unknown file extension {cf.suffix}")
 
-                cattrs_converter = make_yaml_converter()
-                cattrs_converter.forbid_extra_keys = True
-                with open(YAML_INPUTFILE, "r") as f:
-                    byggfiles.append(cattrs_converter.loads(f.read(), Byggfile))
-
-        # Actions in byggfiles are entrypoints by default, unlike the actions
-        # declared in Python files
-        for bf in byggfiles:
-            for _, action in bf.actions.items():
+        for bfo in byggfile_objects:
+            for _, action in bfo.actions.items():
+                if TYPE_CHECKING:
+                    assert not isinstance(action, str)
+                # Actions in byggfiles are entrypoints by default, unlike the actions
+                # declared in Python files
                 if action.is_entrypoint is None:
                     action.is_entrypoint = True
-        return merge_byggfiles(byggfiles)
+        return merge_byggfiles(byggfile_objects)
 
     except Exception as e:
         output_plain(

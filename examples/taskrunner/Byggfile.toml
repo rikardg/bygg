@@ -3,3 +3,7 @@ description = "A test action in a TOML file"
 message = "I did something from TOML"
 shell = "touch foo_toml"
 dependencies = ["ls", "do something more"]
+
+[actions]
+shorthand_action_toml = "ls -l"
+"shorthand action toml, with spaces" = "ls -hal"

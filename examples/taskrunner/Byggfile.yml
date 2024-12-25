@@ -2,6 +2,8 @@ settings:
   default_action: "touch a file"
 
 actions:
+  shorthand_action_yaml: "ls -l"
+
   "touch a file":
     message: "I touched a file"
     shell: "touch foo"
@@ -18,3 +20,5 @@ actions:
       echo "foo"
       ls -hal ..
       echo "bar"
+
+  "shorthand action yaml, with spaces": "ls -hal"
