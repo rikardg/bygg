@@ -19,20 +19,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python interpreter
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install nox
-          if [ ${{ matrix.install_uv }} -eq 1 ]; then
-            pip install uv
-          fi
+      - uses: jdx/mise-action@v2
       - name: Test with nox
         run: |
-          nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
+          mise use python@${{ matrix.python_version }}
+          mise x -- python3 -m pip install --upgrade pip
+          mise x -- pip install nox
+          if [ ${{ matrix.install_uv }} -eq 1 ]; then
+            mise x -- pip install uv
+          fi
+          mise x -- nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
 
   mypy_pyright_ruff:
     strategy:
@@ -42,13 +38,11 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python_version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python_version }}
+      - uses: jdx/mise-action@v2
       - name: Install dependencies
         run: |
-          python3 -m venv .venv
+          mise use python@${{ matrix.python_version }}
+          mise x -- python3 -m venv .venv
           .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
       - name: Run Ruff
         run: ".venv/bin/ruff check src/ tests/ examples/"
