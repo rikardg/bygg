@@ -5,8 +5,8 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: Bygg examples/trivial",
-      "type": "python",
+      "name": "Python: Bygg debug task",
+      "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/.venv/bin/bygg",
       "cwd": "${workspaceFolder}/examples/trivial",
