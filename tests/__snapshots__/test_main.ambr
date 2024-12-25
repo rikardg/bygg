@@ -9,9 +9,16 @@
       "actions": {
         "type": "object",
         "additionalProperties": {
-          "allOf": [
+          "anyOf": [
             {
-              "$ref": "#/$defs/ActionItem"
+              "allOf": [
+                {
+                  "$ref": "#/$defs/ActionItem"
+                }
+              ]
+            },
+            {
+              "type": "string"
             }
           ]
         },
@@ -319,10 +326,22 @@
   Available actions:
   
   touch a file (default)
-      No description
+      `touch foo`
   
   do something from TOML
       A test action in a TOML file
+  
+  shorthand action toml, with spaces
+      `ls -hal`
+  
+  shorthand action yaml, with spaces
+      `ls -hal`
+  
+  shorthand_action_toml
+      `ls -l`
+  
+  shorthand_action_yaml
+      `ls -l`
   
   
   '''
@@ -451,10 +470,22 @@
   Available actions:
   
   touch a file (default)
-      No description
+      `touch foo`
   
   do something from TOML
       A test action in a TOML file
+  
+  shorthand action toml, with spaces
+      `ls -hal`
+  
+  shorthand action yaml, with spaces
+      `ls -hal`
+  
+  shorthand_action_toml
+      `ls -l`
+  
+  shorthand_action_yaml
+      `ls -l`
   
   
   '''

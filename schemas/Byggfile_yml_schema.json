@@ -6,9 +6,16 @@
     "actions": {
       "type": "object",
       "additionalProperties": {
-        "allOf": [
+        "anyOf": [
           {
-            "$ref": "#/$defs/ActionItem"
+            "allOf": [
+              {
+                "$ref": "#/$defs/ActionItem"
+              }
+            ]
+          },
+          {
+            "type": "string"
           }
         ]
       },

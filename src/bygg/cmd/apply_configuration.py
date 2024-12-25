@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import sys
 import textwrap
+from typing import TYPE_CHECKING
 
 from bygg.cmd.configuration import PYTHON_INPUTFILE, Byggfile, Environment
 from bygg.cmd.environments import setup_environment
@@ -30,6 +31,8 @@ def register_actions_from_configuration(
     )
     for action_name, action in configuration.actions.items():
         logger.debug("Action '%s'", action_name)
+        if TYPE_CHECKING:
+            assert not isinstance(action, str)
 
         if is_restarted_with_env and action.environment != is_restarted_with_env:
             logger.debug(
@@ -45,7 +48,8 @@ def register_actions_from_configuration(
         )
         Action(
             action_name,
-            description=action.description,
+            # Use the shell command as fallback for the description
+            description=action.description or f"`{action.shell}`",
             is_entrypoint=bool(action.is_entrypoint),
             inputs=action.inputs,
             outputs=action.outputs,
