@@ -21,7 +21,7 @@ from bygg.cmd.configuration import (
     Byggfile,
     dump_schema,
     has_byggfile,
-    read_config_file,
+    read_config_files,
 )
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcData
 from bygg.cmd.list_actions import list_actions, list_collect_subprocess, print_actions
@@ -107,7 +107,7 @@ def dispatcher(
         output_error("No build files found.")
         sys.exit(1)
 
-    configuration = read_config_file()
+    configuration = read_config_files()
 
     if args.maintenance_commands and not args.is_restarted_with_env:
         perform_maintenance(configuration, args.maintenance_commands)

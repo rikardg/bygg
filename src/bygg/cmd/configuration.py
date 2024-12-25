@@ -132,7 +132,8 @@ def get_config_files() -> list[Path]:
     return [p for p in [Path(TOML_INPUTFILE), Path(YAML_INPUTFILE)] if p.is_file()]
 
 
-def read_config_file() -> Byggfile:
+def read_config_files() -> Byggfile:
+    """Read all static config files and return them merged into one Byggfile object."""
     config_files = get_config_files()
     if not config_files:
         return Byggfile(actions={}, settings=Settings(), environments={})
