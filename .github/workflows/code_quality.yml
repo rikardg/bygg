@@ -25,7 +25,7 @@ jobs:
       matrix:
         python_version: ${{ fromJson(needs.declare_variables.outputs.python_versions) }}
         nox_session: [tests, basics, examples]
-        os: [ubuntu-24.04, macos-14]
+        os: [ubuntu-24.04, macos-15]
         install_uv: [0, 1]
       fail-fast: false
     runs-on: ${{ matrix.os }}
