@@ -11,11 +11,26 @@ nox.options.stop_on_first_error
 python_versions = ["3.11", "3.12", "3.13"]
 
 
+# Not a test, but utility functionality for updating the help snapshots across all
+# tested Python versions.
+# Run with `nox -s update_help_snapshots`.
+@nox.session(default=False, python=python_versions)
+def update_help_snapshots(session):
+    session.install("-r", "requirements.txt", "-r", "requirements-dev.txt")
+    session.install(".")
+    session.run("pytest", "-m", "help", "--snapshot-update")
+
+
 @nox.session(python=python_versions)
 def tests(session):
     session.install("-r", "requirements.txt", "-r", "requirements-dev.txt")
     session.install(".")
-    session.run("pytest", "-vv")
+    session.run("pytest", "-vv", "-m", "not help")
+    # The help test needs separate snapshots for each Python version, and the snapshot
+    # package for pytest (syrupy) will report the snapshots for the Python version not
+    # running currently as unused. Run the help test with the --snapshot-warn-unused
+    # flag.
+    session.run("pytest", "-vv", "-m", "help", "--snapshot-warn-unused")
 
 
 @nox.session(python=python_versions)

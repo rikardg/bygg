@@ -218,6 +218,206 @@
   
   '''
 # ---
+# name: test_help[3.11]
+  '''
+  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
+              [--check] [--reset] [--remove-cache] [--remove-environments]
+              [--dump-schema] [--completions]
+              [actions ...]
+  
+  A build tool written in Python, where all actions can be written in Python.
+  
+  Build the default action:
+   bygg
+  
+  Build ACTION:
+   bygg ACTION
+  
+  Clean ACTION:
+   bygg ACTION --clean
+  
+  List available actions:
+   bygg --list
+  
+  POSITIONAL ARGUMENTS:
+    actions               Entrypoint actions to operate on.
+  
+  OPTIONS:
+    -h, --help            show this help message and exit
+    -v, --version         Show version string and exit.
+  
+  Commands that operate on the build setup:
+    --clean               Clean the outputs of the specified actions.
+    -l, --list            List available actions.
+    --tree                Display the dependency tree starting from the specified
+                          action(s).
+  
+  Make-like arguments:
+    -C DIRECTORY, --directory DIRECTORY
+                          Change to the specified directory.
+    -j [JOBS], --jobs [JOBS]
+                          Specify the number of jobs to run simultaneously. None
+                          means to use the number of available cores.
+    -B, --always-make     Always build all actions.
+  
+  Analyse and verify:
+    Arguments in this group will add more analysis to the build process. Actions
+    will be built and the analysis result will be reported.
+  
+    --check               Perform various checks on the action tree. Implies -B
+  
+  Maintenance:
+    These commands operate on Bygg's build state. When given a maintenance
+    command, Bygg will just perform the maintenance and exit; it will neither
+    build anything nor perform any other actions.
+  
+    --reset               Remove the cache and the Python environments. Same as
+                          giving --remove-cache and --remove-environments.
+    --remove-cache        Remove the build cache.
+    --remove-environments
+                          Remove the Python environments.
+  
+  Meta arguments:
+    --dump-schema         Generate a JSON Schema for the Byggfile.yml files. The
+                          schema will be printed to stdout.
+    --completions         Output instructions for how to set up shell completions
+                          via the shell's startup script.
+  
+  '''
+# ---
+# name: test_help[3.12]
+  '''
+  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
+              [--check] [--reset] [--remove-cache] [--remove-environments]
+              [--dump-schema] [--completions]
+              [actions ...]
+  
+  A build tool written in Python, where all actions can be written in Python.
+  
+  Build the default action:
+   bygg
+  
+  Build ACTION:
+   bygg ACTION
+  
+  Clean ACTION:
+   bygg ACTION --clean
+  
+  List available actions:
+   bygg --list
+  
+  POSITIONAL ARGUMENTS:
+    actions               Entrypoint actions to operate on.
+  
+  OPTIONS:
+    -h, --help            show this help message and exit
+    -v, --version         Show version string and exit.
+  
+  Commands that operate on the build setup:
+    --clean               Clean the outputs of the specified actions.
+    -l, --list            List available actions.
+    --tree                Display the dependency tree starting from the specified
+                          action(s).
+  
+  Make-like arguments:
+    -C DIRECTORY, --directory DIRECTORY
+                          Change to the specified directory.
+    -j [JOBS], --jobs [JOBS]
+                          Specify the number of jobs to run simultaneously. None
+                          means to use the number of available cores.
+    -B, --always-make     Always build all actions.
+  
+  Analyse and verify:
+    Arguments in this group will add more analysis to the build process. Actions
+    will be built and the analysis result will be reported.
+  
+    --check               Perform various checks on the action tree. Implies -B
+  
+  Maintenance:
+    These commands operate on Bygg's build state. When given a maintenance
+    command, Bygg will just perform the maintenance and exit; it will neither
+    build anything nor perform any other actions.
+  
+    --reset               Remove the cache and the Python environments. Same as
+                          giving --remove-cache and --remove-environments.
+    --remove-cache        Remove the build cache.
+    --remove-environments
+                          Remove the Python environments.
+  
+  Meta arguments:
+    --dump-schema         Generate a JSON Schema for the Byggfile.yml files. The
+                          schema will be printed to stdout.
+    --completions         Output instructions for how to set up shell completions
+                          via the shell's startup script.
+  
+  '''
+# ---
+# name: test_help[3.13]
+  '''
+  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
+              [--check] [--reset] [--remove-cache] [--remove-environments]
+              [--dump-schema] [--completions]
+              [actions ...]
+  
+  A build tool written in Python, where all actions can be written in Python.
+  
+  Build the default action:
+   bygg
+  
+  Build ACTION:
+   bygg ACTION
+  
+  Clean ACTION:
+   bygg ACTION --clean
+  
+  List available actions:
+   bygg --list
+  
+  POSITIONAL ARGUMENTS:
+    actions               Entrypoint actions to operate on.
+  
+  OPTIONS:
+    -h, --help            show this help message and exit
+    -v, --version         Show version string and exit.
+  
+  Commands that operate on the build setup:
+    --clean               Clean the outputs of the specified actions.
+    -l, --list            List available actions.
+    --tree                Display the dependency tree starting from the specified
+                          action(s).
+  
+  Make-like arguments:
+    -C, --directory DIRECTORY
+                          Change to the specified directory.
+    -j, --jobs [JOBS]     Specify the number of jobs to run simultaneously. None
+                          means to use the number of available cores.
+    -B, --always-make     Always build all actions.
+  
+  Analyse and verify:
+    Arguments in this group will add more analysis to the build process. Actions
+    will be built and the analysis result will be reported.
+  
+    --check               Perform various checks on the action tree. Implies -B
+  
+  Maintenance:
+    These commands operate on Bygg's build state. When given a maintenance
+    command, Bygg will just perform the maintenance and exit; it will neither
+    build anything nor perform any other actions.
+  
+    --reset               Remove the cache and the Python environments. Same as
+                          giving --remove-cache and --remove-environments.
+    --remove-cache        Remove the build cache.
+    --remove-environments
+                          Remove the Python environments.
+  
+  Meta arguments:
+    --dump-schema         Generate a JSON Schema for the Byggfile.yml files. The
+                          schema will be printed to stdout.
+    --completions         Output instructions for how to set up shell completions
+                          via the shell's startup script.
+  
+  '''
+# ---
 # name: test_list[checks]
   '''
   Available actions:

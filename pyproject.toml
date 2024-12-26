@@ -47,6 +47,7 @@ addopts = ["-vv", "--import-mode=importlib", "tests/"]
 markers = [
   "digest: Tests for digest functionality.",
   "scheduler: Tests for the scheduler.",
+  "help: Tests for the help functionality.",
 ]
 
 [tool.ruff]
