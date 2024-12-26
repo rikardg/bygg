@@ -1,5 +1,7 @@
 import argparse
 from dataclasses import dataclass, field
+import shutil
+import textwrap
 from typing import Any, Literal, TypeAlias
 
 from argcomplete.completers import BaseCompleter
@@ -31,11 +33,38 @@ class ByggNamespace:
     directory: list[str] = field(default_factory=list)
 
 
+class ByggHelpFormatter(argparse.RawDescriptionHelpFormatter):
+    formatting_width = 80
+
+    def __init__(self, prog):
+        terminal_cols, terminal_rows = shutil.get_terminal_size()
+        self.formatting_width = min(terminal_cols, self.formatting_width)
+
+        indent_increment = 2
+        max_help_position = 24
+
+        super().__init__(
+            prog, indent_increment, max_help_position, self.formatting_width
+        )
+
+    def _fill_text(self, text, width, indent):
+        # Assuming main description starts with a newline
+        if text.startswith("\n"):
+            return "\n".join(
+                [
+                    "\n".join(textwrap.wrap(line, width=width))
+                    for line in text.splitlines(keepends=True)
+                ]
+            )
+        # Group descriptions
+        return argparse.HelpFormatter._fill_text(self, text, width, indent)
+
+
 def create_argument_parser(entrypoint_completions: BaseCompleter):
     logger.info("Creating argument parser")
 
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        formatter_class=ByggHelpFormatter,
         description="""
 A build tool written in Python, where all actions can be written in Python.
 
@@ -53,7 +82,11 @@ List available actions:
 """,
     )
 
+    parser._positionals.title = "POSITIONAL ARGUMENTS"
+    parser._optionals.title = "OPTIONS"
+
     # Use Any to get around type checking for argcomplete:
+
     arg: Any = parser.add_argument(
         "actions",
         nargs="*",

@@ -2,10 +2,25 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 import subprocess
+import sys
 
 import pytest
 
 from bygg.core.cache import DEFAULT_DB_FILE
+
+
+@pytest.mark.help
+@pytest.mark.parametrize(
+    "python_version", [f"{sys.version_info.major}.{sys.version_info.minor}"]
+)
+def test_help(snapshot, clean_bygg_tree, python_version):
+    process = subprocess.run(
+        ["bygg", "--help"],
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    assert process.stdout == snapshot
 
 
 @dataclass
