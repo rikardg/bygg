@@ -5,13 +5,12 @@ import subprocess
 import sys
 import tempfile
 
-from argcomplete.completers import BaseCompleter
-
 from bygg.cmd.apply_configuration import apply_configuration
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.build_clean import build, clean
 from bygg.cmd.completions import (
+    EntrypointCompleter,
     do_completion,
     generate_shell_completions,
     is_completing,
@@ -331,46 +330,3 @@ def inner_dispatch(ctx: ByggContext, args: ByggNamespace) -> bool:
         status = build(ctx, actions, jobs, always_make, args.check)
 
     return status
-
-
-# TODO: error in typing in argcomplete, see https://github.com/rikardg/bygg/issues/192.
-# pyright: reportIncompatibleMethodOverride=warning
-class EntrypointCompleter(BaseCompleter):
-    def __call__(
-        self,
-        *,
-        prefix,
-        action: argparse.Action,
-        parser: argparse.ArgumentParser,
-        parsed_args: argparse.Namespace,
-        **kwargs,
-    ):
-        import textwrap
-
-        subprocess_data = dispatcher(parser, parsed_args)
-        if not subprocess_data:
-            return {}
-
-        # There can technically only be one default_action, but easy way to consolidate:
-        default_actions = {
-            ipc_data.list.default_action
-            for env, ipc_data in subprocess_data.items()
-            if ipc_data.list is not None
-        }
-
-        env_actions = [
-            ipc_data.list.actions
-            for env, ipc_data in subprocess_data.items()
-            if ipc_data.list is not None
-        ]
-
-        actions = {
-            name: textwrap.fill(
-                f"{'(default) ' if name in default_actions else ''}{description}", 7000
-            )
-            for action_set in env_actions
-            for name, description in action_set.items()
-            if name not in parsed_args.actions
-        }
-
-        return actions
