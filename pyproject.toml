@@ -43,7 +43,7 @@ bygg = "bygg.main:main"
 include = ["src/bygg", "tests"]
 
 [tool.pytest.ini_options]
-addopts = ["-vv", "--import-mode=importlib", "tests/"]
+addopts = ["-vv", "--import-mode=importlib", "tests/", "--snapshot-warn-unused"]
 markers = [
   "digest: Tests for digest functionality.",
   "scheduler: Tests for the scheduler.",
