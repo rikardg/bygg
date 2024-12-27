@@ -31,11 +31,6 @@ def tests(session):
     # running currently as unused. Run the help test with the --snapshot-warn-unused
     # flag.
     session.run("pytest", "-vv", "-m", "help", "--snapshot-warn-unused")
-
-
-@nox.session(python=python_versions)
-def basics(session):
-    session.install(".")
     session.run("bygg", success_codes=[1], silent=True)
     session.run("bygg", "--help", silent=True)
 
