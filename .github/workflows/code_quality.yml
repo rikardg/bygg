@@ -26,7 +26,7 @@ jobs:
         python_version: ${{ fromJson(needs.declare_variables.outputs.python_versions) }}
         nox_session: [tests, examples]
         os: [ubuntu-24.04, macos-15]
-        install_uv: [0, 1]
+        nox_env_manager: ["virtualenv", "uv"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -38,10 +38,10 @@ jobs:
           mise use python@${{ matrix.python_version }}
           mise x -- python3 -m pip install --upgrade pip
           mise x -- pip install nox
-          if [ ${{ matrix.install_uv }} -eq 1 ]; then
+          if [ ${{ matrix.nox_env_manager }} = "uv" ]; then
             mise x -- pip install uv
           fi
-          mise x -- nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.install_uv == 1 && 'uv' || 'virtualenv' }}
+          mise x -- nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }}
 
   mypy_pyright_ruff:
     needs: declare_variables
