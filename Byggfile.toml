@@ -1,0 +1,3 @@
+[actions]
+uv_compile_dev = "uv pip compile --generate-hashes requirements-dev.in --output-file requirements-dev.txt"
+uv_compile_prod = "uv pip compile --generate-hashes requirements.in --output-file requirements.txt"
