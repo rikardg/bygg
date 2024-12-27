@@ -6,7 +6,7 @@ import sys
 import textwrap
 from typing import Any, Generator
 
-from argcomplete.completers import DirectoriesCompleter
+from argcomplete.completers import BaseCompleter, DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
 
 from bygg.output.output import output_plain
@@ -147,3 +147,48 @@ def generate_shell_completions(print_and_exit: bool):
         output_plain(f"\nsource {bygg_completions}")
 
         sys.exit(0)
+
+
+# TODO: error in typing in argcomplete, see https://github.com/rikardg/bygg/issues/192.
+# pyright: reportIncompatibleMethodOverride=warning
+class EntrypointCompleter(BaseCompleter):
+    def __call__(
+        self,
+        *,
+        prefix,
+        action: argparse.Action,
+        parser: argparse.ArgumentParser,
+        parsed_args: argparse.Namespace,
+        **kwargs,
+    ):
+        import textwrap
+
+        from bygg.cmd.dispatcher import dispatcher
+
+        subprocess_data = dispatcher(parser, parsed_args)
+        if not subprocess_data:
+            return {}
+
+        # There can technically only be one default_action, but easy way to consolidate:
+        default_actions = {
+            ipc_data.list.default_action
+            for env, ipc_data in subprocess_data.items()
+            if ipc_data.list is not None
+        }
+
+        env_actions = [
+            ipc_data.list.actions
+            for env, ipc_data in subprocess_data.items()
+            if ipc_data.list is not None
+        ]
+
+        actions = {
+            name: textwrap.fill(
+                f"{'(default) ' if name in default_actions else ''}{description}", 7000
+            )
+            for action_set in env_actions
+            for name, description in action_set.items()
+            if name not in parsed_args.actions
+        }
+
+        return actions
