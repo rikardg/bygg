@@ -103,8 +103,6 @@ later will override earlier ones.
 
 ## Shell tab completions
 
-TL;DR: `bygg --completions`
-
 Bygg has support for Bash and Zsh tab completions of arguments and entrypoint
 actions. The completions will be loaded from the files that exist out of
 `Byggfile.toml`, `Byggfile.yml` and `Byggfile.py`, in that order.
@@ -123,6 +121,13 @@ It will output a line that you can then add to `.bashrc` or `.zshrc`.
 
 _Don't forget to open a new shell instance after you've made changes to the
 settings files._
+
+Note: if you reinstall Bygg with `pipx`, the completions file will probably
+have been removed, but the path to `bygg` will be the same. In this case, just
+run the reinstalled `bygg` once to create the completions file and then restart
+your shell. If the completions still don't work, you might have to compare the
+output of `bygg --completions` with the settings in the shell configuration
+file per above.
 
 ### Notes
 
