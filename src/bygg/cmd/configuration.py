@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Optional, Union
 import cattrs
 import dc_schema  # type: ignore
 
-from bygg.logging import logger
 from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
 
@@ -195,15 +194,13 @@ def read_config_files() -> Byggfile:
 
 def merge_byggfiles(byggfiles: list[Byggfile]) -> Byggfile:
     """
-    Merges a list of ByggFile objects into a single one.
+    Merges a list of Byggfile objects into a single one.
     """
-    logger.debug("Merging Byggfiles: %s", byggfiles)
     merged_byggfile = Byggfile()
     for bf in byggfiles:
         merged_byggfile.actions.update(bf.actions)
         merged_byggfile.settings.merge(bf.settings)
         merged_byggfile.environments.update(bf.environments)
-    logger.debug("Merged Byggfile: %s", merged_byggfile)
     return merged_byggfile
 
 
