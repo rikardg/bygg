@@ -27,7 +27,7 @@ def list_collect_subprocess(
     ctx: ByggContext,
     args: ByggNamespace,
 ) -> bool:
-    entrypoints = get_entrypoints(ctx, args)
+    entrypoints = get_entrypoints(ctx)
 
     if args.is_restarted_with_env and not entrypoints:
         return False
@@ -49,7 +49,7 @@ def list_collect_subprocess(
 def list_actions(ctx: ByggContext, args: ByggNamespace) -> bool:
     # TODO consider consolidating this function with print_actions
 
-    entrypoints = get_entrypoints(ctx, args)
+    entrypoints = get_entrypoints(ctx)
 
     if args.is_restarted_with_env and not entrypoints:
         return False
