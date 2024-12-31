@@ -9,6 +9,7 @@ class TerminalStyle:
     CLEARLINE = "\033[2K\r" if isatty else ""
     RESET = "\033[0m" if isatty else ""
     BOLD = "\033[1m" if isatty else ""
+    NOBOLD = "\033[22m" if isatty else ""
     DIM = "\033[2m" if isatty else ""
     UNDERLINE = "\033[4m" if isatty else ""
     BLINK = "\033[5m" if isatty else ""
