@@ -48,6 +48,7 @@ markers = [
   "digest: Tests for digest functionality.",
   "scheduler: Tests for the scheduler.",
   "help: Tests for the help functionality.",
+  "focus: Marker for test(s) to focus on currently.",
 ]
 
 [tool.ruff]
