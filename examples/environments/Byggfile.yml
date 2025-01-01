@@ -9,9 +9,10 @@ actions:
       rm -Rf .venv .venv1 .venv2
 
   default_action:
-    description: "The default action. Runs in the default environment."
-    message: "Running in default env"
+    description: "The default action. Runs in the base environment."
+    message: "Running in base env"
     dependencies: ["default_action_python"]
+    environment: base
 
   action1:
     description: "Action that runs in env1."
@@ -60,8 +61,8 @@ environments:
         .venv2/bin/pip install -e ../../
       fi
 
-  default:
-    name: "Default environment"
+  base:
+    name: "Base environment"
     byggfile: "Byggfile.py"
     inputs:
       - requirements.txt

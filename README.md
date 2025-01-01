@@ -89,6 +89,23 @@ Bygg will check for the presence of `Byggfile.py` in the current directory. The
 actions above would be built with `bygg build1` and `bygg build2`,
 respectively. See the `examples/` directory for worked examples.
 
+### Environments
+
+Bygg can manage virtual environments. See `examples/environments/Byggfile.yml`
+for an example.
+
+Python files and the actions declared therein will run in the environment that
+the Python file was declared to belong to in the static configuration.
+
+No environment will be managed or loaded implicitly for actions that are
+declared in the static configuration. Actions that need an environment must
+declare the `environment` property.
+
+Any `shell` commands will need to have their respective environments activated
+as needed (e.g. by prefacing them with `. .venv/bin/activate`) even if they are
+declared from Python code that runs in an environment. This is because shells
+are not intrinsically aware of virtual environments.
+
 ### Settings files
 
 There is also support for declaring actions, environments and settings in YAML

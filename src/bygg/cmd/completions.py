@@ -163,9 +163,9 @@ class EntrypointCompleter(BaseCompleter):
     ):
         import textwrap
 
-        from bygg.cmd.dispatcher import dispatcher
+        from bygg.cmd.dispatcher import parent_dispatcher
 
-        subprocess_data = dispatcher(parser, parsed_args)
+        subprocess_data = parent_dispatcher(parser, parsed_args)
         if not subprocess_data:
             return {}
 
