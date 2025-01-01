@@ -1,8 +1,7 @@
 import itertools
 
-from bygg.cmd.datastructures import ByggContext, SubProcessIpcDataTree
+from bygg.cmd.datastructures import SubProcessIpcDataTree, get_entrypoints
 from bygg.output.output import TerminalStyle as TS
-from bygg.output.output import output_error
 
 
 class TreeStyle:
@@ -41,9 +40,20 @@ class TreeStyleAscii(TreeStyle):
         self.HANGER = f"{self.END_CORNER + self.BAR * (indent - 1 - len(self.END_CORNER)):<{indent}}"
 
 
-def display_tree(ctx: ByggContext, entrypoints: list[str]):
-    """
-    Display the dependency tree for the given entry points.
+def print_tree(ipc_data_tree: SubProcessIpcDataTree, actions: list[str]):
+    """Print the dependency tree from the IPC data."""
+    actions_to_list = actions if actions else sorted(ipc_data_tree.actions)
+    trees = [
+        x for x in [ipc_data_tree.actions.get(a, "") for a in actions_to_list] if x
+    ]
+    if trees:
+        # Python 3.11 f-strings don't support `\n`
+        print("\n" + "\n".join(trees))
+
+
+def tree_collect_for_environment(ctx) -> SubProcessIpcDataTree:
+    """Collect the currently loaded entrypoints and render their respective dependency
+    trees.
 
     Example output:
 
@@ -56,15 +66,14 @@ def display_tree(ctx: ByggContext, entrypoints: list[str]):
         └── no_outputs_A
     """
 
+    entrypoints = get_entrypoints(ctx)
+
     indent = 4
     style = TreeStyleUnicode(indent)
 
     formatted_data: dict[str, str] = {}
 
     for entrypoint in entrypoints:
-        if not ctx.ipc_data and entrypoint not in ctx.scheduler.build_actions:
-            output_error(f"Error: Action '{entrypoint}' not found.")
-            return False
 
         def format_children(name: str, last_sibling: bool, depth: int) -> list[str]:
             action = ctx.scheduler.build_actions[name]
@@ -88,25 +97,8 @@ def display_tree(ctx: ByggContext, entrypoints: list[str]):
             )
             return subtree
 
-        formatted_data[entrypoint] = "\n".join(format_children(entrypoint, True, 0))
-
-    tree_data = SubProcessIpcDataTree(actions=formatted_data)
-    if ctx.ipc_data:
-        ctx.ipc_data.tree = tree_data
-    else:
-        print_tree(tree_data, entrypoints)
-    return len(entrypoints) > 0
-
-
-def print_tree(ipc_data_tree: SubProcessIpcDataTree, actions: list[str]):
-    """Print the dependency tree from the IPC data."""
-    actions_to_list = actions if actions else sorted(ipc_data_tree.actions.keys())
-    trees = list(
-        filter(
-            lambda x: len(x) > 0,
-            [ipc_data_tree.actions.get(a, "") for a in actions_to_list],
+        formatted_data[entrypoint.name] = "\n".join(
+            format_children(entrypoint.name, True, 0)
         )
-    )
-    if trees:
-        print()
-        print("\n".join(trees))
+
+    return SubProcessIpcDataTree(actions=formatted_data)

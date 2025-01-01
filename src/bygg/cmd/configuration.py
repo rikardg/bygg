@@ -14,7 +14,7 @@ PYTHON_INPUTFILE = "Byggfile.py"
 TOML_INPUTFILE = "Byggfile.toml"
 YAML_INPUTFILE = "Byggfile.yml"
 
-DEFAULT_ENVIRONMENT_NAME = "default"
+DEFAULT_ENVIRONMENT_NAME = "_BYGG_DEFAULT_NULL_ENVIRONMENT"
 
 
 @dataclasses.dataclass
@@ -35,7 +35,7 @@ class Settings:
 
 @dataclasses.dataclass
 class ActionItem:
-    __doc__ = f"""
+    """
     This is a representation of the Action class used for deserialising from YAML.
     The name of the action is the key in the dictionary in the config file.
 
@@ -56,7 +56,7 @@ class ActionItem:
         executed directly from the command line. If not set, this is treated as true by
         default in Byggfile.yml and false when used from Python. Default is None.
     environment : str, optional
-        The environment for the action. Default is "{DEFAULT_ENVIRONMENT_NAME}".
+        The environment for the action. Default is to run in the ambient environment.
     shell : str, optional
         The shell command to execute when the action is run. Default is None.
     """

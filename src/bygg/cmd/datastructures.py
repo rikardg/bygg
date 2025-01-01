@@ -1,6 +1,8 @@
+import argparse
 from dataclasses import dataclass, field
 from typing import Optional
 
+from bygg.cmd.argument_parsing import ByggNamespace
 from bygg.cmd.configuration import Byggfile
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
@@ -29,6 +31,7 @@ class SubProcessIpcData:
     found_actions: set[str] = field(default_factory=set)
     list: Optional[SubProcessIpcDataList] = None
     tree: Optional[SubProcessIpcDataTree] = None
+    return_code: int = 0
 
 
 @dataclass
@@ -38,7 +41,10 @@ class ByggContext:
     runner: ProcessRunner
     scheduler: Scheduler
     configuration: Byggfile
-    ipc_data: Optional[SubProcessIpcData] = None
+    parser: argparse.ArgumentParser
+    args_namespace: argparse.Namespace
+    bygg_namespace: ByggNamespace
+    ipc_data: SubProcessIpcData
 
 
 @dataclass
