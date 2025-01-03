@@ -6,6 +6,7 @@ import pickle
 import subprocess
 import sys
 import tempfile
+from typing import Optional
 
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
@@ -23,7 +24,12 @@ from bygg.cmd.configuration import (
     has_byggfile,
     read_config_files,
 )
-from bygg.cmd.datastructures import ByggContext, SubProcessIpcData, get_entrypoints
+from bygg.cmd.datastructures import (
+    ByggContext,
+    SubProcessIpcData,
+    SubProcessIpcDataTree,
+    get_entrypoints,
+)
 from bygg.cmd.environments import (
     load_environment,
     setup_environment,
@@ -151,7 +157,7 @@ def parent_dispatcher(
 
     # We have nothing to build, but other things to do
     if only_collect:
-        environment_data = do_in_all_environments(ctx, collect_environment_data)
+        environment_data = do_in_all_environments(ctx, run_or_collect_in_environment)
 
         if is_completing():
             return environment_data
@@ -193,7 +199,7 @@ def parent_dispatcher(
     for action in actions_to_build:
         environment_data = do_in_all_environments(
             ctx,
-            lambda ctx, environment_name: run_action_in_environment(
+            lambda ctx, environment_name: run_or_collect_in_environment(
                 ctx, environment_name, action=action
             ),
         )
@@ -220,102 +226,75 @@ def do_in_all_environments(
     """
     environment_data: dict[str, SubProcessIpcData] = {}
     environment_names = [DEFAULT_ENVIRONMENT_NAME, *ctx.configuration.environments]
+
     for environment_name in environment_names:
         environment_data[environment_name] = doer(ctx, environment_name)
     return environment_data
 
 
-def collect_environment_data(
-    ctx: ByggContext, environment_name: str
-) -> SubProcessIpcData:
-    """
-    Collects data about the given environment.
-    """
-    subprocess_data = SubProcessIpcData()
-    if environment_name == DEFAULT_ENVIRONMENT_NAME:
-        # collect data
-        load_environment(ctx, environment_name)
-        subprocess_data.found_actions = {e.name for e in get_entrypoints(ctx)}
-        subprocess_data.list = list_collect_for_environment(ctx)
-        if is_completing():
-            # Early-out if completing; the completion tester in pytest messes with code
-            # that is loaded dynamically in examples/trivial so that tree doesn't work.
-            # Might be fixable, but that's for future Homer. Completion code works fine
-            # when called interactively and not from pytest.
-            return subprocess_data
-        subprocess_data.tree = tree_collect_for_environment(ctx)
-    else:
-        environment = ctx.configuration.environments.get(environment_name, None)
-        assert environment
-        setup_environment(environment)
-        subprocess_bygg_path = should_restart_with(environment)
-
-        if not subprocess_bygg_path:
-            output_error(
-                f"Environment '{environment_name}' is not configured properly."
-            )
-            sys.exit(1)
-
-        subprocess_data = spawn_subprocess(
-            ctx,
-            environment_name=environment_name,
-            subprocess_bygg_path=subprocess_bygg_path,
-        )
-
-    # All critical errors will already have done sys.exit
-    return subprocess_data
-
-
-def run_action_in_environment(
+def run_or_collect_in_environment(
     ctx: ByggContext,
     environment_name: str,
     *,
-    action: str,
+    action: Optional[str] = None,
 ) -> SubProcessIpcData:
     """
-    Runs the given action in the given environment.
+    Runs the given action in the given environment or just collects data about the
+    environment. These two flows are roughly the same.
     """
     subprocess_data = SubProcessIpcData()
-    if environment_name == DEFAULT_ENVIRONMENT_NAME:
-        load_environment(ctx, environment_name)
-        subprocess_data.found_actions = {e.name for e in get_entrypoints(ctx)}
-        subprocess_data.list = list_collect_for_environment(ctx)
-        subprocess_data.tree = tree_collect_for_environment(ctx)
 
-        if action not in subprocess_data.found_actions:
-            return subprocess_data
-
-        status = False
-        if ctx.bygg_namespace.clean:
-            status = clean(ctx, [action])
-        else:
-            status = build(
-                ctx,
-                [action],
-                ctx.bygg_namespace.jobs,
-                ctx.bygg_namespace.always_make,
-                ctx.bygg_namespace.check,
-            )
-        if not status:
-            sys.exit(1)
-    else:
+    if environment_name != DEFAULT_ENVIRONMENT_NAME:
+        # Set up the environment if we should not run in the ambient one. Spawn
+        # subprocess if necessary.
+        logger.info("Running-collecting: setting up environment %s", environment_name)
         environment = ctx.configuration.environments.get(environment_name, None)
         assert environment
         setup_environment(environment)
         subprocess_bygg_path = should_restart_with(environment)
 
-        if not subprocess_bygg_path:
-            output_error(
-                f"Environment '{environment_name}' is not configured properly."
+        logger.info("Running action: should restart with %s", subprocess_bygg_path)
+        if subprocess_bygg_path:
+            return spawn_subprocess(
+                ctx,
+                environment_name=environment_name,
+                subprocess_bygg_path=subprocess_bygg_path,
+                action=action,
             )
-            sys.exit(1)
 
-        subprocess_data = spawn_subprocess(
+    logger.info("Running-collecting: in ambient environment")
+    load_environment(ctx, environment_name)
+    logger.debug("morot %s", get_entrypoints(ctx))
+    subprocess_data.found_actions = {e.name for e in get_entrypoints(ctx)}
+    subprocess_data.list = list_collect_for_environment(ctx)
+    subprocess_data.tree = (
+        # Only collect tree data if not completing, since the completion tester in
+        # pytest messes with code that is loaded dynamically in examples/trivial so that
+        # tree doesn't work. Might be fixable, but that's for future Homer. Completion
+        # code works fine when called interactively and not from pytest.
+        tree_collect_for_environment(ctx)
+        if not is_completing()
+        else SubProcessIpcDataTree({})
+    )
+
+    # Our work here is done, or, we had nothing to do
+    if action is None or action not in subprocess_data.found_actions:
+        return subprocess_data
+
+    # Build or clean handled below. These are the only commands handled here.
+    status = False
+    if ctx.bygg_namespace.clean:
+        status = clean(ctx, [action])
+    else:
+        status = build(
             ctx,
-            environment_name=environment_name,
-            subprocess_bygg_path=subprocess_bygg_path,
-            action=action,
+            [action],
+            ctx.bygg_namespace.jobs,
+            ctx.bygg_namespace.always_make,
+            ctx.bygg_namespace.check,
         )
+    if not status:
+        sys.exit(1)
 
     # All critical errors will already have done sys.exit
     return subprocess_data
