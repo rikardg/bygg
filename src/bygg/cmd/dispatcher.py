@@ -174,7 +174,7 @@ def parent_dispatcher(
             for v in environment_data.values():
                 if v.tree:
                     tree_actions = tree_actions - v.found_actions
-                    print_tree(v.tree, list(actions_to_build))
+                    print_tree(v.tree, actions_to_build)
             if tree_actions:
                 not_found_actions = [
                     f"'{a}'"
