@@ -1,9 +1,6 @@
-import os
 import shutil
-import sys
 import textwrap
 
-from bygg.cmd.argument_parsing import ByggNamespace
 from bygg.cmd.configuration import DEFAULT_ENVIRONMENT_NAME
 from bygg.cmd.datastructures import (
     ByggContext,
@@ -12,11 +9,9 @@ from bygg.cmd.datastructures import (
     SubProcessIpcDataList,
     get_entrypoints,
 )
-from bygg.logging import logger
 from bygg.output.output import (
     TerminalStyle as TS,
 )
-from bygg.output.output import output_error
 
 list_actions_style = "B"
 
@@ -33,55 +28,6 @@ def list_collect_for_environment(ctx: ByggContext) -> SubProcessIpcDataList:
         actions={x.name: x.description for x in sorted_actions},
         default_action=default_action_name,
     )
-
-
-def list_actions(ctx: ByggContext, args: ByggNamespace) -> bool:
-    # TODO consider consolidating this function with print_actions
-
-    entrypoints = get_entrypoints(ctx)
-
-    if args.is_restarted_with_env and not entrypoints:
-        return False
-
-    if not entrypoints:
-        program_name = os.path.basename(sys.argv[0])
-        output_error("Loaded build files but no entrypoints were found.")
-        output_error(f"Type `{program_name} --help` for help.")
-        return False
-
-    output = [HEADER]
-
-    sorted_actions = sorted(entrypoints, key=lambda x: x.name)
-    default_action_name = ctx.configuration.settings.default_action
-
-    if ctx.ipc_data:
-        logger.debug("Sorted actions: %s", sorted_actions)
-        ctx.ipc_data.list = SubProcessIpcDataList(
-            actions={x.name: x.description for x in sorted_actions},
-            default_action=default_action_name,
-        )
-        return True
-
-    if default_action_name:
-        default_action_list = [
-            x for x in sorted_actions if x.name == default_action_name
-        ]
-
-        if default_action_list:
-            default_action = default_action_list[0]
-            default_action_name = default_action.name
-            sorted_actions.remove(default_action)
-            sorted_actions.insert(0, default_action)
-
-    if list_actions_style == "A":
-        output += list_actions_A(sorted_actions)
-
-    if list_actions_style == "B":
-        output += list_actions_B(sorted_actions, default_action_name)
-
-    print("\n".join(output))
-
-    return True
 
 
 def list_actions_A(actions: list[EntryPoint]) -> list[str]:
