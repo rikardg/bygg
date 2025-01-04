@@ -7,7 +7,9 @@ from bygg.core.scheduler import Scheduler
 @pytest.fixture
 def init_scheduler():
     Scheduler()
+    Action._current_environment = "test_Action"
     yield
+    Action._current_environment = None
     Action.scheduler = None
 
 
