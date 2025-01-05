@@ -19,7 +19,6 @@ def get_closed_tmpfile() -> Path:
 def scheduler_fixture():
     """Return a scheduler and a cache file."""
     scheduler = Scheduler()
-    scheduler.__init__()
     cache_file = get_closed_tmpfile()
     scheduler.init_cache(cache_file)
     yield (scheduler, cache_file)
