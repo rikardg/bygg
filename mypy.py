@@ -9,6 +9,7 @@ from src.bygg.system_helpers import call
 directories = [
     Path("src/bygg"),
     *{p.parent for p in Path("examples").glob("*/*.py")},
+    Path("tests"),
 ]
 mypy = Path(".venv/bin/mypy")
 extra_arguments = {
