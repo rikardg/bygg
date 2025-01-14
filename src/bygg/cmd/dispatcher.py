@@ -264,15 +264,21 @@ def run_or_collect_in_environment(
 
     logger.info("Running-collecting: in ambient environment")
     load_environment(ctx, environment_name)
-    logger.debug("morot %s", get_entrypoints(ctx))
-    subprocess_data.found_actions = {e.name for e in get_entrypoints(ctx)}
-    subprocess_data.list = list_collect_for_environment(ctx)
+    logger.debug(
+        "Entrypoints found for %s: %s",
+        environment_name,
+        get_entrypoints(ctx, environment_name),
+    )
+    subprocess_data.found_actions = {
+        e.name for e in get_entrypoints(ctx, environment_name)
+    }
+    subprocess_data.list = list_collect_for_environment(ctx, environment_name)
     subprocess_data.tree = (
         # Only collect tree data if not completing, since the completion tester in
         # pytest messes with code that is loaded dynamically in examples/trivial so that
         # tree doesn't work. Might be fixable, but that's for future Homer. Completion
         # code works fine when called interactively and not from pytest.
-        tree_collect_for_environment(ctx)
+        tree_collect_for_environment(ctx, environment_name)
         if not is_completing()
         else SubProcessIpcDataTree({})
     )
@@ -388,10 +394,11 @@ def subprocess_dispatcher(parser, args_namespace):
 
     args = ByggNamespace(**vars(args_namespace))
     assert args.is_restarted_with_env
+    environment_name = args.is_restarted_with_env
     logger.info(
         "Running action '%s' in environment '%s'.",
         args.actions,
-        args.is_restarted_with_env,
+        environment_name,
     )
 
     # Read static configuration
@@ -401,13 +408,20 @@ def subprocess_dispatcher(parser, args_namespace):
     ctx = init_bygg_context(configuration, parser, args_namespace)
 
     ctx.ipc_data = SubProcessIpcData()
-    load_environment(ctx, args.is_restarted_with_env)
+    load_environment(ctx, environment_name)
 
-    ctx.ipc_data.found_actions = {e.name for e in get_entrypoints(ctx)}
+    logger.debug(
+        "Entrypoints found for %s: %s",
+        environment_name,
+        get_entrypoints(ctx, environment_name),
+    )
+    ctx.ipc_data.found_actions = {
+        e.name for e in get_entrypoints(ctx, environment_name)
+    }
     action = args.actions[0] if args.actions else None
 
-    ctx.ipc_data.list = list_collect_for_environment(ctx)
-    ctx.ipc_data.tree = tree_collect_for_environment(ctx)
+    ctx.ipc_data.list = list_collect_for_environment(ctx, environment_name)
+    ctx.ipc_data.tree = tree_collect_for_environment(ctx, environment_name)
 
     ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
     if ipc_filename:

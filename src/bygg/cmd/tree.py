@@ -1,6 +1,6 @@
 import itertools
 
-from bygg.cmd.datastructures import SubProcessIpcDataTree, get_entrypoints
+from bygg.cmd.datastructures import ByggContext, SubProcessIpcDataTree, get_entrypoints
 from bygg.output.output import TerminalStyle as TS
 
 
@@ -51,7 +51,9 @@ def print_tree(ipc_data_tree: SubProcessIpcDataTree, actions: list[str]):
         print("\n" + "\n".join(trees))
 
 
-def tree_collect_for_environment(ctx) -> SubProcessIpcDataTree:
+def tree_collect_for_environment(
+    ctx: ByggContext, environment_name: str
+) -> SubProcessIpcDataTree:
     """Collect the currently loaded entrypoints and render their respective dependency
     trees.
 
@@ -66,7 +68,7 @@ def tree_collect_for_environment(ctx) -> SubProcessIpcDataTree:
         └── no_outputs_A
     """
 
-    entrypoints = get_entrypoints(ctx)
+    entrypoints = get_entrypoints(ctx, environment_name)
 
     indent = 4
     style = TreeStyleUnicode(indent)

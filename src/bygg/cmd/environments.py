@@ -112,7 +112,7 @@ def load_environment(ctx: ByggContext, environment_name: str):
         return None
 
     python_build_file = environment.byggfile if environment else PYTHON_INPUTFILE
-    load_python_build_file(python_build_file)
+    load_python_build_file(python_build_file, environment_name)
     return None
 
 
@@ -149,10 +149,11 @@ def register_actions_from_configuration(
             outputs=action.outputs,
             dependencies=action.dependencies,
             command=shell_command,
+            environment=action.environment,
         )
 
 
-def load_python_build_file(build_file: str):
+def load_python_build_file(build_file: str, environment_name: str):
     # modify load path to make the current directory importable
     preamble = """\
         import os
@@ -163,4 +164,16 @@ def load_python_build_file(build_file: str):
 
     if os.path.isfile(build_file):
         with open(build_file, "r") as f:
+            Action._current_environment = environment_name
+            logger.info(
+                "Loading Python file %s for environment %s",
+                build_file,
+                environment_name,
+            )
             exec(textwrap.dedent(preamble) + f.read(), globals())
+            logger.info(
+                "Back from loading Python file %s for environment %s",
+                build_file,
+                environment_name,
+            )
+            Action._current_environment = None

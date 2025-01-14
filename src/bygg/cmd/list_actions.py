@@ -18,9 +18,11 @@ list_actions_style = "B"
 HEADER = f"{TS.BOLD}Available actions:{TS.RESET}"
 
 
-def list_collect_for_environment(ctx: ByggContext) -> SubProcessIpcDataList:
+def list_collect_for_environment(
+    ctx: ByggContext, environment_name: str
+) -> SubProcessIpcDataList:
     """Collects the currently loaded entrypoints"""
-    entrypoints = get_entrypoints(ctx)
+    entrypoints = get_entrypoints(ctx, environment_name)
     sorted_actions = sorted(entrypoints, key=lambda x: x.name)
     default_action_name = ctx.configuration.settings.default_action
 

@@ -21,7 +21,9 @@ def scheduler_fixture():
     scheduler = Scheduler()
     cache_file = get_closed_tmpfile()
     scheduler.init_cache(cache_file)
+    Action._current_environment = "scheduler_fixture"
     yield (scheduler, cache_file)
+    Action._current_environment = None
     scheduler.shutdown()
 
 
