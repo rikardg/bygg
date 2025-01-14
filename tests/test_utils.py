@@ -53,8 +53,10 @@ def test_filenames_from_pattern(test_case):
 
 
 def test_shell_command():
+    Action._current_environment = "test_shell_command"
     shell_command = create_shell_command("echo 'shell action output'")
 
     status = shell_command(Action("test context", inputs=set(), outputs=set()))
     assert status.rc == 0
     assert status.output == "shell action output\n"
+    Action._current_environment = None

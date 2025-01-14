@@ -9,6 +9,7 @@ from bygg.cmd.completions import EntrypointCompleter
 from bygg.cmd.configuration import Byggfile
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcData
 from bygg.cmd.tree import print_tree, tree_collect_for_environment
+from bygg.core.action import Action
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
 
@@ -43,7 +44,10 @@ def test_tree_single_action(
 ):
     scheduler, _ = scheduler_single_action
     ctx = create_byggcontext(scheduler)
-    print_tree(tree_collect_for_environment(ctx), ["action1"])
+    assert Action._current_environment
+    print_tree(
+        tree_collect_for_environment(ctx, Action._current_environment), ["action1"]
+    )
     stdout, _ = capsys.readouterr()
     assert stdout == snapshot
 
@@ -53,7 +57,10 @@ def test_tree_four_nonbranching_actions(
 ):
     scheduler, _ = scheduler_four_nonbranching_actions
     ctx = create_byggcontext(scheduler)
-    print_tree(tree_collect_for_environment(ctx), ["action1"])
+    assert Action._current_environment
+    print_tree(
+        tree_collect_for_environment(ctx, Action._current_environment), ["action1"]
+    )
     stdout, _ = capsys.readouterr()
     assert stdout == snapshot
 
@@ -63,6 +70,9 @@ def test_tree_branching_actions(
 ):
     scheduler, _ = scheduler_branching_actions
     ctx = create_byggcontext(scheduler)
-    print_tree(tree_collect_for_environment(ctx), ["action1"])
+    assert Action._current_environment
+    print_tree(
+        tree_collect_for_environment(ctx, Action._current_environment), ["action1"]
+    )
     stdout, _ = capsys.readouterr()
     assert stdout == snapshot

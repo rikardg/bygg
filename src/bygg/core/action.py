@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional
 
 from bygg.core.common_types import CommandStatus
+from bygg.logging import logger
 
 if TYPE_CHECKING:
     from bygg.core.scheduler import Scheduler
@@ -62,6 +63,7 @@ class Action(ActionContext):
     """
 
     scheduler: Scheduler | None = None
+    _current_environment: str | None = None
 
     command: Command | None
     dependency_files: set[str]
@@ -78,6 +80,7 @@ class Action(ActionContext):
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
         description: str | None = None,
+        environment: Optional[str] = None,
     ):
         self.name = name
         self.message = message
@@ -96,6 +99,10 @@ class Action(ActionContext):
             if command is not None and command.__doc__ is not None
             else None
         )
+
+        self.environment = environment or Action._current_environment
+        assert self.environment
+        logger.info("Constructing Action for environment %s", self.environment)
 
         self.dependency_files = set()
 

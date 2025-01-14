@@ -49,6 +49,9 @@ class ByggContext:
 
 @dataclass
 class EntryPoint:
+    def __repr__(self):
+        return self.name
+
     name: str
     description: str
 
@@ -56,9 +59,9 @@ class EntryPoint:
 NO_DESCRIPTION = "No description"
 
 
-def get_entrypoints(ctx: ByggContext) -> list[EntryPoint]:
+def get_entrypoints(ctx: ByggContext, environment_name: str) -> list[EntryPoint]:
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
-        if x.is_entrypoint
+        if x.is_entrypoint and x.environment == environment_name
     ]
