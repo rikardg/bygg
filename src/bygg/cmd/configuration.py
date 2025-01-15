@@ -162,11 +162,12 @@ def read_config_files() -> Byggfile:
                             converter.structure(tomllib.load(toml_file), Byggfile)
                         )
                 case ".yml":
-                    import yaml
+                    import ruamel.yaml
+                    yaml = ruamel.yaml.YAML(typ="safe", pure=True)
 
                     with cf.open("r", encoding="utf-8") as yaml_file:
                         byggfile_objects.append(
-                            converter.structure(yaml.safe_load(yaml_file), Byggfile)
+                            converter.structure(yaml.load(yaml_file), Byggfile)
                         )
                 case _:
                     raise ValueError(f"Unknown file extension {cf.suffix}")
