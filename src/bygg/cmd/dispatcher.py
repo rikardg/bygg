@@ -6,7 +6,7 @@ import pickle
 import subprocess
 import sys
 import tempfile
-from typing import Optional
+from typing import Optional, TypeAlias
 
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
@@ -216,8 +216,13 @@ def parent_dispatcher(
     sys.exit(1)
 
 
+DoerType: TypeAlias = Callable[[ByggContext, str], tuple[SubProcessIpcData, bool]]
+"""Takes a ByggContext and an action name as arguments and returns a tuple of the
+subprocess IPC data and whether the action was handled."""
+
+
 def do_in_all_environments(
-    ctx: ByggContext, doer: Callable[[ByggContext, str], SubProcessIpcData]
+    ctx: ByggContext, doer: DoerType
 ) -> dict[str, SubProcessIpcData]:
     """
     Runs doer for all environments and returns the environment data.
@@ -226,7 +231,9 @@ def do_in_all_environments(
     environment_names = [DEFAULT_ENVIRONMENT_NAME, *ctx.configuration.environments]
 
     for environment_name in environment_names:
-        environment_data[environment_name] = doer(ctx, environment_name)
+        environment_data[environment_name], early_out = doer(ctx, environment_name)
+        if early_out:
+            break
     return environment_data
 
 
@@ -235,7 +242,7 @@ def run_or_collect_in_environment(
     environment_name: str,
     *,
     action: Optional[str] = None,
-) -> SubProcessIpcData:
+) -> tuple[SubProcessIpcData, bool]:
     """
     Runs the given action in the given environment or just collects data about the
     environment. These two flows are roughly the same.
@@ -253,12 +260,14 @@ def run_or_collect_in_environment(
 
         logger.info("Running action: should restart with %s", subprocess_bygg_path)
         if subprocess_bygg_path:
-            return spawn_subprocess(
+            result = spawn_subprocess(
                 ctx,
                 environment_name=environment_name,
                 subprocess_bygg_path=subprocess_bygg_path,
                 action=action,
             )
+            action_found = action is not None and action in result.found_actions
+            return (result, action_found)
 
     logger.info("Running-collecting: in ambient environment")
     load_environment(ctx, environment_name)
@@ -283,7 +292,7 @@ def run_or_collect_in_environment(
 
     # Our work here is done, or, we had nothing to do
     if action is None or action not in subprocess_data.found_actions:
-        return subprocess_data
+        return (subprocess_data, False)
 
     # Build or clean handled below. These are the only commands handled here.
     status = False
@@ -301,7 +310,7 @@ def run_or_collect_in_environment(
         sys.exit(1)
 
     # All critical errors will already have done sys.exit
-    return subprocess_data
+    return (subprocess_data, True)
 
 
 @contextlib.contextmanager
