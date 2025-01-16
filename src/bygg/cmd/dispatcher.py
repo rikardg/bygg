@@ -73,8 +73,6 @@ def print_version():
     output_info(f"bygg {importlib.metadata.version('bygg')}")
 
 
-MAKE_COMPATIBLE_PANEL = "(Roughly) Make-compatible options"
-
 DISPATCHER_IS_COMPLETING_EXIT_CODE = 126
 """Exit code returned by a subprocess when completing."""
 
