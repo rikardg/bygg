@@ -31,6 +31,7 @@ class ExampleParameters:
     build_rc: int = 0
     environments: list[str] = field(default_factory=list)
     build_yields_cache: bool = True
+    actions_for_all_environments: list[str] = field(default_factory=list)
 
 
 examples = [
@@ -38,6 +39,7 @@ examples = [
     ExampleParameters(
         "environments",
         environments=[".venv", ".venv1", ".venv2"],
+        actions_for_all_environments=["default_action", "action1", "action2"],
     ),
     ExampleParameters("failing_jobs", build_rc=1),
     ExampleParameters("only_python", tree_rc=1, build_rc=1, build_yields_cache=False),
@@ -179,7 +181,12 @@ def test_reset_remove_environments(
     snapshot, clean_bygg_tree, example: ExampleParameters
 ):
     process = subprocess.run(
-        ["bygg", "-C", examples_dir / example.name],
+        [
+            "bygg",
+            "-C",
+            examples_dir / example.name,
+            *example.actions_for_all_environments,
+        ],
         cwd=clean_bygg_tree,
         capture_output=True,
         encoding="utf-8",
@@ -238,7 +245,12 @@ def test_reset_remove_cache(snapshot, clean_bygg_tree, example: ExampleParameter
 @pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
 def test_reset_reset(snapshot, clean_bygg_tree, example: ExampleParameters):
     process = subprocess.run(
-        ["bygg", "-C", examples_dir / example.name],
+        [
+            "bygg",
+            "-C",
+            examples_dir / example.name,
+            *example.actions_for_all_environments,
+        ],
         cwd=clean_bygg_tree,
         capture_output=True,
         encoding="utf-8",

@@ -31,6 +31,7 @@ from bygg.cmd.datastructures import (
     get_entrypoints,
 )
 from bygg.cmd.environments import (
+    get_environment_for_action,
     load_environment,
     setup_environment,
     should_restart_with,
@@ -200,6 +201,7 @@ def parent_dispatcher(
             lambda ctx, environment_name: run_or_collect_in_environment(
                 ctx, environment_name, action=action
             ),
+            start_with_env=get_environment_for_action(ctx, action),
         )
         all_found_actions = set().union(
             *(env.found_actions for env in environment_data.values())
@@ -219,13 +221,20 @@ subprocess IPC data and whether the action was handled."""
 
 
 def do_in_all_environments(
-    ctx: ByggContext, doer: DoerType
+    ctx: ByggContext,
+    doer: DoerType,
+    *,
+    start_with_env: Optional[str] = None,
 ) -> dict[str, SubProcessIpcData]:
     """
     Runs doer for all environments and returns the environment data.
+    Starts with start_with_env if specified.
     """
     environment_data: dict[str, SubProcessIpcData] = {}
     environment_names = [DEFAULT_ENVIRONMENT_NAME, *ctx.configuration.environments]
+    if start_with_env:
+        environment_names.remove(start_with_env)
+        environment_names.insert(0, start_with_env)
 
     for environment_name in environment_names:
         environment_data[environment_name], early_out = doer(ctx, environment_name)
