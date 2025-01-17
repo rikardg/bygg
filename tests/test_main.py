@@ -151,6 +151,29 @@ def test_non_existing_action(snapshot, clean_bygg_tree, example):
     assert process.stdout == snapshot
 
 
+def test_build_multiple_actions(snapshot, clean_bygg_tree):
+    process = subprocess.run(
+        [
+            "bygg",
+            "-C",
+            examples_dir / "taskrunner",
+            "shorthand_action_yaml",
+            "touch a file",
+            "shorthand action yaml, with spaces",
+        ],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    cleaned_result = [
+        line
+        for line in process.stdout.split("\n")
+        if "Starting process" not in line and "completed in" not in line
+    ]
+    assert "\n".join(sorted(cleaned_result)) == snapshot
+
+
 @pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
 def test_reset_remove_environments(
     snapshot, clean_bygg_tree, example: ExampleParameters

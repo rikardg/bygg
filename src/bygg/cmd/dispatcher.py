@@ -210,10 +210,7 @@ def parent_dispatcher(
                 f"Error: The following action could not be found: {TS.BOLD}'{action}'{TS.NOBOLD}."
             )
             sys.exit(1)
-        sys.exit(0)
-
-    assert not "this point should not be reached"
-    sys.exit(1)
+    sys.exit(0)
 
 
 DoerType: TypeAlias = Callable[[ByggContext, str], tuple[SubProcessIpcData, bool]]
