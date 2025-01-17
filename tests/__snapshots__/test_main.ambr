@@ -1,4 +1,18 @@
 # serializer version: 1
+# name: test_build_multiple_actions
+  '''
+  
+  ✓ do something more     : I did something more
+  ✓ ls                    : 
+  ✓ shorthand action yaml, with spaces : 
+  ✓ shorthand_action_yaml : 
+  ✓ touch a file          : I touched a file
+  🛈 Building action 'shorthand action yaml, with spaces':
+  🛈 Building action 'shorthand_action_yaml':
+  🛈 Building action 'touch a file':
+  🛈 Entering directory 'examples/taskrunner'
+  '''
+# ---
 # name: test_dump_schema
   '''
   {
