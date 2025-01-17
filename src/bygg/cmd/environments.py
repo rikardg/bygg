@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 from bygg.cmd.configuration import (
     DEFAULT_ENVIRONMENT_NAME,
     PYTHON_INPUTFILE,
+    ActionItem,
     Byggfile,
     Environment,
 )
@@ -177,3 +178,9 @@ def load_python_build_file(build_file: str, environment_name: str):
                 environment_name,
             )
             Action._current_environment = None
+
+
+def get_environment_for_action(ctx: ByggContext, action_name: str) -> str | None:
+    if isinstance(action := ctx.configuration.actions.get(action_name), ActionItem):
+        return action.environment
+    return None
