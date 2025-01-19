@@ -176,6 +176,35 @@ def test_build_multiple_actions(snapshot, clean_bygg_tree):
     assert "\n".join(sorted(cleaned_result)) == snapshot
 
 
+def test_check(clean_bygg_tree):
+    process = subprocess.run(
+        [
+            "bygg",
+            "-C",
+            examples_dir / "checks",
+        ],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+
+    assert process.returncode == 0
+
+    process = subprocess.run(
+        [
+            "bygg",
+            "-C",
+            examples_dir / "checks",
+            "--check",
+        ],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 1
+    assert "The following checks reported issues:" in process.stdout
+
+
 @pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
 def test_reset_remove_environments(
     snapshot, clean_bygg_tree, example: ExampleParameters

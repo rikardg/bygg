@@ -147,11 +147,7 @@ def parent_dispatcher(
     logger.info("Actions to be built: %s", actions_to_build)
 
     only_collect = (
-        not actions_to_build
-        or args.list_actions
-        or args.check
-        or args.tree
-        or is_completing()
+        not actions_to_build or args.list_actions or args.tree or is_completing()
     )
 
     # We have nothing to build, but other things to do
