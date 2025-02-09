@@ -14,6 +14,8 @@ PYTHON_INPUTFILE = "Byggfile.py"
 TOML_INPUTFILE = "Byggfile.toml"
 YAML_INPUTFILE = "Byggfile.yml"
 
+BYGGFILE_SUFFIXES = (".toml", ".yml", ".py")
+
 DEFAULT_ENVIRONMENT_NAME = "_BYGG_DEFAULT_NULL_ENVIRONMENT"
 
 
