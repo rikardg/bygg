@@ -9,6 +9,7 @@ from typing import Any, Generator
 from argcomplete.completers import BaseCompleter, DirectoriesCompleter
 from argcomplete.finders import CompletionFinder
 
+from bygg.cmd.configuration import BYGGFILE_SUFFIXES
 from bygg.output.output import output_plain
 
 
@@ -25,7 +26,7 @@ class ByggfileDirectoriesCompleter(DirectoriesCompleter):
             byggfile_dirs |= {
                 str(b.parent)
                 for b in Path(dir).rglob("Byggfile.*")
-                if b.suffix in {".py", ".yml"}
+                if b.suffix in BYGGFILE_SUFFIXES
             }
         for f in sorted(list(byggfile_dirs)):
             yield f
