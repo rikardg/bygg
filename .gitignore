@@ -4,3 +4,4 @@
 .venv/
 __pycache__/
 **/action_digests.json
+_version.py
