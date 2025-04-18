@@ -16,7 +16,9 @@ venv_command = (
     else f"{uv_bin} venv --no-project --no-managed-python"
 )
 pip_install_command = (
-    ".venv/bin/pip install" if not uv_bin else f"{uv_bin} pip install --reinstall"
+    ".venv/bin/pip install"
+    if not uv_bin
+    else f"{uv_bin} pip install --reinstall --no-progress"
 )
 
 # Always remove existing venv, to make sure requirements are correctly installed.
