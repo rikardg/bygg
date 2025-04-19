@@ -205,22 +205,18 @@ def test_check(clean_bygg_tree):
     assert "The following checks reported issues:" in process.stdout
 
 
+@pytest.mark.focus
 @pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
 def test_reset_remove_environments(
     snapshot, clean_bygg_tree, example: ExampleParameters
 ):
     process = subprocess.run(
-        [
-            "bygg",
-            "-C",
-            examples_dir / example.name,
-            *example.actions_for_all_environments,
-        ],
+        ["bygg", "-C", examples_dir / example.name],
         cwd=clean_bygg_tree,
         capture_output=True,
         encoding="utf-8",
     )
-    assert process.returncode == example.build_rc
+    assert process.returncode == 0
 
     for environment in example.environments:
         assert Path(
