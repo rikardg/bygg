@@ -151,17 +151,18 @@ def test_non_existing_action(snapshot, clean_bygg_tree, example):
     assert process.stdout == snapshot
 
 
+@pytest.mark.focus
 @pytest.mark.parametrize("example", examples, ids=lambda x: x.name)
 def test_reset_remove_environments(
     snapshot, clean_bygg_tree, example: ExampleParameters
 ):
     process = subprocess.run(
-        ["bygg", "-C", examples_dir / example.name],
+        ["bygg", "-C", examples_dir / example.name, "--list"],
         cwd=clean_bygg_tree,
         capture_output=True,
         encoding="utf-8",
     )
-    assert process.returncode == example.build_rc
+    assert process.returncode == 0
 
     for environment in example.environments:
         assert Path(

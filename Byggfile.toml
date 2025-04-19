@@ -1,3 +1,46 @@
 [actions]
 uv_compile_dev = "uv pip compile --generate-hashes requirements-dev.in --output-file requirements-dev.txt"
 uv_compile_prod = "uv pip compile --generate-hashes requirements.in --output-file requirements.txt"
+
+
+[actions.init]
+description = "Bootstrap Bygg development environment"
+environment = "bygg_development"
+
+[actions.an_action]
+description = "An action"
+shell = "echo 'Output from An action'"
+
+[actions.mypy]
+description = "Run mypy"
+environment = "morot"
+# shell = "./mypy.py"
+shell = '''
+# . .venv_morot/bin/activate
+echo `which python3`
+echo `/usr/bin/env python3 -V`
+./mypy.py
+false
+'''
+
+[environments.morot]
+name = "Morot environment"
+byggfile = "Byggfile.py"
+inputs = ["requirements-dev.txt", "requirements.txt"]
+venv_directory = ".venv_morot"
+shell = '''
+uv venv .venv_morot
+VIRTUAL_ENV=.venv_morot uv pip install -r requirements-dev.txt -r requirements.txt
+VIRTUAL_ENV=.venv_morot uv pip install -e .
+'''
+
+[environments.bygg_development]
+name = "Bygg development environment"
+byggfile = "Byggfile.py"
+inputs = ["requirements-dev.txt", "requirements.txt"]
+venv_directory = ".venv"
+shell = '''
+uv venv
+uv pip install -r requirements-dev.txt -r requirements.txt
+uv pip install -e .
+'''
