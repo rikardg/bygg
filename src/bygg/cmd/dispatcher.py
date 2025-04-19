@@ -19,6 +19,7 @@ from bygg.cmd.completions import (
 )
 from bygg.cmd.configuration import (
     DEFAULT_ENVIRONMENT_NAME,
+    ActionItem,
     Byggfile,
     dump_schema,
     has_byggfile,
@@ -153,6 +154,11 @@ def parent_dispatcher(
     # We have nothing to build, but other things to do
     if only_collect:
         environment_data = do_in_all_environments(ctx, run_or_collect_in_environment)
+        # for k, v in environment_data.items():
+        #     if k != DEFAULT_ENVIRONMENT_NAME:
+        #         v.found_actions -= environment_data[
+        #             DEFAULT_ENVIRONMENT_NAME
+        #         ].found_actions
 
         if is_completing():
             return environment_data
@@ -192,12 +198,22 @@ def parent_dispatcher(
 
     # Here we have something to build
     for action in actions_to_build:
+        # Check if we know what environment the action is in, so we can start with that
+        # one
+        configuration_action = ctx.configuration.actions.get(action, None)
+        start_with_env = (
+            isinstance(configuration_action, ActionItem)
+            and configuration_action.environment
+        ) or None
+
         environment_data = do_in_all_environments(
             ctx,
             lambda ctx, environment_name: run_or_collect_in_environment(
                 ctx, environment_name, action=action
             ),
             start_with_env=get_environment_for_action(ctx, action),
+            early_out_predidate=lambda ipc_data: action in ipc_data.found_actions,
+            start_with_env=start_with_env,
         )
         all_found_actions = set().union(
             *(env.found_actions for env in environment_data.values())
@@ -221,6 +237,11 @@ def do_in_all_environments(
     doer: DoerType,
     *,
     start_with_env: Optional[str] = None,
+    ctx: ByggContext,
+    doer: Callable[[ByggContext, str], SubProcessIpcData],
+    *,
+    early_out_predidate: Optional[Callable[[SubProcessIpcData], bool]] = None,
+    start_with_env: Optional[str] = None,
 ) -> dict[str, SubProcessIpcData]:
     """
     Runs doer for all environments and returns the environment data.
@@ -232,10 +253,18 @@ def do_in_all_environments(
         environment_names.remove(start_with_env)
         environment_names.insert(0, start_with_env)
 
+    if start_with_env:
+        # Start with a specific environment
+        env = environment_names.pop()
+        environment_names.insert(0, env)
+
     for environment_name in environment_names:
         environment_data[environment_name], early_out = doer(ctx, environment_name)
         if early_out:
             break
+        environment_data[environment_name] = doer_value = doer(ctx, environment_name)
+        if early_out_predidate and early_out_predidate(doer_value):
+            return environment_data
     return environment_data
 
 
