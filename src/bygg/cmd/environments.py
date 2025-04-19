@@ -113,7 +113,8 @@ def load_environment(ctx: ByggContext, environment_name: str):
         return None
 
     python_build_file = environment.byggfile if environment else PYTHON_INPUTFILE
-    load_python_build_file(python_build_file, environment_name)
+    if python_build_file:
+        load_python_build_file(python_build_file, environment_name)
     return None
 
 

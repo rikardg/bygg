@@ -80,8 +80,6 @@ class Environment:
 
     Attributes
     ----------
-    byggfile : str
-        The Python Byggfile that uses this environment.
     inputs : list[str]
         A list of files that are used as input to the environment. Typically pip
         requirements files, but can be any files.
@@ -90,14 +88,18 @@ class Environment:
         Bygg if any of the inputs are modified.
     shell : str
         The shell command for creating the environment.
+    byggfile : str
+        The Python Byggfile that uses this environment. This is the entrypoint for where
+        actions declared in Python are looked up. Optional.
     name : str, optional
-        A human-friendly name for the environment. Used in e.g. help messages, by default None
+        A human-friendly name for the environment. Used in e.g. help messages, by
+        default None
     """
 
-    byggfile: str
     inputs: list[str]
     venv_directory: str
     shell: str
+    byggfile: Optional[str] = None
     name: Optional[str] = None
 
 
