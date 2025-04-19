@@ -1,6 +1,8 @@
 [actions]
 uv_compile_dev = "uv pip compile --generate-hashes requirements-dev.in --output-file requirements-dev.txt"
 uv_compile_prod = "uv pip compile --generate-hashes requirements.in --output-file requirements.txt"
+uv_compile_dev_upgrade = "uv pip compile --generate-hashes requirements-dev.in --output-file requirements-dev.txt --upgrade"
+uv_compile_prod_upgrade = "uv pip compile --generate-hashes requirements.in --output-file requirements.txt --upgrade"
 
 [actions.mypy]
 description = "Run mypy"
