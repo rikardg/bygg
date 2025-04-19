@@ -11,7 +11,6 @@ shell = ".venv/bin/python3 ./mypy.py"
 
 [environments.bygg_development]
 name = "Bygg development environment"
-byggfile = "Byggfile.py"
 inputs = ["requirements-dev.txt", "requirements.txt"]
 venv_directory = ".venv"
 shell = '''
