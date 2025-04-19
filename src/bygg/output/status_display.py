@@ -40,9 +40,12 @@ def print_job_ended(
     symbol = Symbols.RED_X if failed_or_stopped else Symbols.GREEN_CHECKMARK
     status_code_message = f"[{status.rc}] " if status else "?"
     status_message = status.message if status and status.message else ""
+    message_part = (
+        f"{status_code_message if status and status.rc else ''}{status_message}"
+    )
     output_with_status_line(
         format_queued_jobs_line(),
-        f"{symbol} {name:<{max_name_length}} : {status_code_message if status and status.rc else ''}{status_message}",
+        f"{symbol} {name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
     )
 
 

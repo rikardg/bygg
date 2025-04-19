@@ -3,9 +3,9 @@
   '''
   
   ✓ do something more     : I did something more
-  ✓ ls                    : 
-  ✓ shorthand action yaml, with spaces : 
-  ✓ shorthand_action_yaml : 
+  ✓ ls                   
+  ✓ shorthand action yaml, with spaces
+  ✓ shorthand_action_yaml
   ✓ touch a file          : I touched a file
   🛈 Building action 'shorthand action yaml, with spaces':
   🛈 Building action 'shorthand_action_yaml':
