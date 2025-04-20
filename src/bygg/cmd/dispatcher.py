@@ -299,11 +299,11 @@ def run_or_collect_in_environment(
     # Build or clean handled below. These are the only commands handled here.
     status = False
     if ctx.bygg_namespace.clean:
-        status = clean(ctx, [action])
+        status = clean(ctx, action)
     else:
         status = build(
             ctx,
-            [action],
+            action,
             ctx.bygg_namespace.jobs,
             ctx.bygg_namespace.always_make,
             ctx.bygg_namespace.check,
@@ -445,9 +445,9 @@ def subprocess_dispatcher(parser, args_namespace):
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
 
     if args.clean:
-        status = clean(ctx, [action])
+        status = clean(ctx, action)
     else:
-        status = build(ctx, [action], args.jobs, args.always_make, args.check)
+        status = build(ctx, action, args.jobs, args.always_make, args.check)
 
     if not status:
         sys.exit(1)
