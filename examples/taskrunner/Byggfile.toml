@@ -1,7 +1,7 @@
 [actions."do something from TOML"]
 description = "A test action in a TOML file"
 message = "I did something from TOML"
-shell = "touch foo_toml"
+shell = "touch something_from_toml.txt"
 dependencies = ["ls", "do something more"]
 
 [actions]
