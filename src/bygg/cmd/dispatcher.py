@@ -39,12 +39,14 @@ from bygg.cmd.environments import (
 from bygg.cmd.list_actions import list_collect_for_environment, print_actions
 from bygg.cmd.maintenance import perform_maintenance
 from bygg.cmd.tree import print_tree, tree_collect_for_environment
+from bygg.cmd.watch import do_watch
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
 from bygg.logging import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import output_error, output_info, output_warning
 from bygg.output.status_display import on_job_status, on_runner_status
+from bygg.system_helpers import change_dir
 
 
 def init_bygg_context(
@@ -87,16 +89,33 @@ def bygg():
     args = parser.parse_args()
     if not args.is_restarted_with_env:
         do_completion(parser)
-        parent_dispatcher(parser, args)
+
+        # Build and potentially watch:
+        while True:
+            with change_dir(None):  # change back to the starting dir
+                files_to_watch = extract_input_files(parent_dispatcher(parser, args))
+                if not args.watch or len(files_to_watch) == 0:
+                    break
+                output_info("Watching for changes")
+                do_watch(files_to_watch)
     else:
         subprocess_dispatcher(parser, args)
-    return True
+
+
+def extract_input_files(
+    environment_data_list: list[dict[str, SubProcessIpcData]],
+) -> set[str]:
+    files_to_watch: set[str] = set()
+    for environment_data in environment_data_list:
+        for env in environment_data.values():
+            files_to_watch.update(env.found_input_files)
+    return files_to_watch
 
 
 def parent_dispatcher(
     parser: argparse.ArgumentParser,
     args_namespace: argparse.Namespace,
-) -> dict[str, SubProcessIpcData] | None:
+) -> list[dict[str, SubProcessIpcData]]:
     """
     Takes both argparse.ArgumentParser and argparse.Namespace arguments since it can be
     called also from completers. However, it is not used by subprocesses.
@@ -123,6 +142,11 @@ def parent_dispatcher(
         directory_arg = args.directory[0]
         output_info(f"Entering directory '{directory_arg}'")
         os.chdir(directory_arg)
+
+    if args.watch and args.maintenance_commands is not None:
+        # The other build setup group commands are blocked by argparse
+        output_error("Cannot use -w/--watch with maintenance commands")
+        sys.exit(1)
 
     # No byggfiles
     if not has_byggfile():
@@ -155,7 +179,7 @@ def parent_dispatcher(
         environment_data = do_in_all_environments(ctx, run_or_collect_in_environment)
 
         if is_completing():
-            return environment_data
+            return [environment_data]
 
         if args.list_actions:
             print_actions(ctx, environment_data)
@@ -191,6 +215,9 @@ def parent_dispatcher(
         sys.exit(1)
 
     # Here we have something to build
+
+    environment_data_list = []
+
     for action in actions_to_build:
         environment_data = do_in_all_environments(
             ctx,
@@ -208,7 +235,10 @@ def parent_dispatcher(
                 f"Error: The following action could not be found: {TS.BOLD}'{action}'{TS.NOBOLD}."
             )
             sys.exit(1)
-    sys.exit(0)
+
+        environment_data_list.append(environment_data)
+
+    return environment_data_list
 
 
 DoerType: TypeAlias = Callable[[ByggContext, str], tuple[SubProcessIpcData, bool]]
@@ -297,17 +327,17 @@ def run_or_collect_in_environment(
         return (subprocess_data, False)
 
     # Build or clean handled below. These are the only commands handled here.
-    status = False
     if ctx.bygg_namespace.clean:
         status = clean(ctx, action)
     else:
-        status = build(
+        status, input_files = build(
             ctx,
             action,
             ctx.bygg_namespace.jobs,
             ctx.bygg_namespace.always_make,
             ctx.bygg_namespace.check,
         )
+        subprocess_data.found_input_files.update(input_files)
     if not status:
         sys.exit(1)
 
@@ -345,7 +375,7 @@ def spawn_subprocess(
         exec_list += unparse_args(
             ctx.parser,
             ctx.args_namespace,
-            drop=["actions", "maintenance_commands"],
+            drop=["actions", "maintenance_commands", "watch"],
         )
         exec_list += ["--is_restarted_with_env", environment_name]
         exec_list += ["--ipc_filename", ipc_filename]
@@ -435,23 +465,32 @@ def subprocess_dispatcher(parser, args_namespace):
     ctx.ipc_data.list = list_collect_for_environment(ctx, environment_name)
     ctx.ipc_data.tree = tree_collect_for_environment(ctx, environment_name)
 
-    ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
-    if ipc_filename:
-        logger.debug("Writing IPC data to %s", args.ipc_filename)
-        with open(ipc_filename, "wb") as f:
-            pickle.dump(ctx.ipc_data, f)
-
     if is_completing():
+        write_ipc_data(ctx, args)
         sys.exit(DISPATCHER_IS_COMPLETING_EXIT_CODE)
 
     if action and action not in ctx.scheduler.build_actions or not action:
+        write_ipc_data(ctx, args)
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
 
     if args.clean:
         status = clean(ctx, action)
     else:
-        status = build(ctx, action, args.jobs, args.always_make, args.check)
+        status, input_files = build(
+            ctx, action, args.jobs, args.always_make, args.check
+        )
+        ctx.ipc_data.found_input_files.update(input_files)
 
     if not status:
         sys.exit(1)
+
+    write_ipc_data(ctx, args)
     sys.exit(0)
+
+
+def write_ipc_data(ctx: ByggContext, args: ByggNamespace):
+    ipc_filename = args.ipc_filename[0] if args.ipc_filename else None
+    if ipc_filename:
+        logger.debug("Writing IPC data to %s", args.ipc_filename)
+        with open(ipc_filename, "wb") as f:
+            pickle.dump(ctx.ipc_data, f)

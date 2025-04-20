@@ -241,8 +241,8 @@
 # ---
 # name: test_help[3.11]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
-              [--check] [--reset] [--remove-cache] [--remove-environments]
+  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
   
@@ -272,6 +272,7 @@
     -l, --list            List available actions.
     --tree                Display the dependency tree starting from the specified
                           action(s).
+    -w, --watch           Watch the input files and rebuild when they change.
   
   Make-like arguments:
     -C DIRECTORY, --directory DIRECTORY
@@ -308,8 +309,8 @@
 # ---
 # name: test_help[3.12]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
-              [--check] [--reset] [--remove-cache] [--remove-environments]
+  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
   
@@ -339,6 +340,7 @@
     -l, --list            List available actions.
     --tree                Display the dependency tree starting from the specified
                           action(s).
+    -w, --watch           Watch the input files and rebuild when they change.
   
   Make-like arguments:
     -C DIRECTORY, --directory DIRECTORY
@@ -375,8 +377,8 @@
 # ---
 # name: test_help[3.13]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree] [-C DIRECTORY] [-j [JOBS]] [-B]
-              [--check] [--reset] [--remove-cache] [--remove-environments]
+  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
   
@@ -406,6 +408,7 @@
     -l, --list            List available actions.
     --tree                Display the dependency tree starting from the specified
                           action(s).
+    -w, --watch           Watch the input files and rebuild when they change.
   
   Make-like arguments:
     -C, --directory DIRECTORY

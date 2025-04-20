@@ -32,6 +32,7 @@ class SubProcessIpcData:
     list: Optional[SubProcessIpcDataList] = None
     tree: Optional[SubProcessIpcDataTree] = None
     return_code: int = 0
+    found_input_files: set[str] = field(default_factory=set)
 
 
 @dataclass

@@ -5,3 +5,4 @@ dc-schema==0.0.8
 dill==0.4.0
 multiprocess==0.70.18
 PyYAML==6.0.2 # cattrs requires this as an ambient
+watchdog==6.0.0

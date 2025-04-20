@@ -24,6 +24,7 @@ class ByggNamespace:
     clean: bool
     list_actions: bool
     tree: bool
+    watch: bool
     jobs: int | None
     always_make: bool
     check: bool
@@ -134,6 +135,13 @@ List available actions:
         "--tree",
         action="store_true",
         help="Display the dependency tree starting from the specified action(s).",
+    )
+    build_setup_group.add_argument(
+        "-w",
+        "--watch",
+        action="store_true",
+        dest="watch",
+        help="Watch the input files and rebuild when they change.",
     )
     # Some arguments inspired by Make:
     make_group = parser.add_argument_group("Make-like arguments")

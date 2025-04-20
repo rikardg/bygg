@@ -166,7 +166,7 @@ class EntrypointCompleter(BaseCompleter):
 
         from bygg.cmd.dispatcher import parent_dispatcher
 
-        subprocess_data = parent_dispatcher(parser, parsed_args)
+        subprocess_data = parent_dispatcher(parser, parsed_args)[0]
         if not subprocess_data:
             return {}
 
