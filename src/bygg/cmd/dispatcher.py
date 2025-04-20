@@ -356,7 +356,10 @@ def spawn_subprocess(
             subprocess.run(exec_list, encoding="utf-8", check=True)
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             match e:
-                case subprocess.CalledProcessError() if e.returncode == DISPATCHER_IS_COMPLETING_EXIT_CODE or e.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE:
+                case subprocess.CalledProcessError() if (
+                    e.returncode == DISPATCHER_IS_COMPLETING_EXIT_CODE
+                    or e.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE
+                ):
                     # NOP
                     logger.info("Subprocess returned with code %s", e.returncode)
                     return_code = e.returncode
