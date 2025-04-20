@@ -81,7 +81,7 @@ def examples(session):
 
     with session.chdir("examples/checks"):
         session.run("bygg")
-        session.run("bygg", "--check", success_codes=[1])
+        session.run("bygg", "--check")
         session.run("bygg", "--tree")
-        session.run("bygg", "all_checks", "--check", success_codes=[1])
+        session.run("bygg", "all_checks", "--check")
         session.run("bygg", "all_checks", "--tree")
