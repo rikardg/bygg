@@ -201,7 +201,7 @@ def test_check(clean_bygg_tree):
         capture_output=True,
         encoding="utf-8",
     )
-    assert process.returncode == 1
+    assert process.returncode == 0
     assert "The following checks reported issues:" in process.stdout
 
 

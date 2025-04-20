@@ -4,6 +4,7 @@ from typing import Optional
 
 from bygg.cmd.argument_parsing import ByggNamespace
 from bygg.cmd.configuration import Byggfile
+from bygg.core.common_types import CommandStatus
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
 
@@ -33,6 +34,7 @@ class SubProcessIpcData:
     tree: Optional[SubProcessIpcDataTree] = None
     return_code: int = 0
     found_input_files: set[str] = field(default_factory=set)
+    failed_jobs: dict[str, CommandStatus] = field(default_factory=dict)
 
 
 @dataclass

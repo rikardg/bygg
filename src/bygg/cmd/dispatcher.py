@@ -91,15 +91,42 @@ def bygg():
         do_completion(parser)
 
         # Build and potentially watch:
+        rc = 0
         while True:
             with change_dir(None):  # change back to the starting dir
-                files_to_watch = extract_input_files(parent_dispatcher(parser, args))
+                environment_data_list = parent_dispatcher(parser, args)
+
+                rc = output_status_codes(environment_data_list)
+                files_to_watch = extract_input_files(environment_data_list)
                 if not args.watch or len(files_to_watch) == 0:
                     break
                 output_info("Watching for changes")
                 do_watch(files_to_watch)
+        return rc
     else:
         subprocess_dispatcher(parser, args)
+
+
+def output_status_codes(
+    environment_data_list: list[dict[str, SubProcessIpcData]],
+) -> int:
+    rc = 0
+    error_lines: list[str] = []
+    for environment_data in environment_data_list:
+        for env in environment_data.values():
+            for name, command_status in env.failed_jobs.items():
+                if command_status.rc != 0:
+                    error_lines.append(f"{name} [{command_status.rc}]")
+                    rc = command_status.rc
+    if len(error_lines):
+        plural_s = "s" if len(error_lines) > 1 else ""
+        output_error(
+            f"The following action{plural_s} exited with a non-zero status code:"
+        )
+        for line in error_lines:
+            output_error(f"- {line}")
+
+    return rc
 
 
 def extract_input_files(
@@ -339,7 +366,11 @@ def run_or_collect_in_environment(
         )
         subprocess_data.found_input_files.update(input_files)
     if not status:
-        sys.exit(1)
+        subprocess_data.failed_jobs = {
+            job.name: job.status
+            for job in ctx.runner.failed_jobs
+            if job.status is not None
+        }
 
     # All critical errors will already have done sys.exit
     return (subprocess_data, True)
