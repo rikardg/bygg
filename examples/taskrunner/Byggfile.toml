@@ -7,3 +7,11 @@ dependencies = ["ls", "do something more"]
 [actions]
 shorthand_action_toml = "ls -l"
 "shorthand action toml, with spaces" = "ls -hal"
+
+[actions.succeed]
+shell = "true"
+inputs = ["Byggfile.toml"]
+
+[actions.fail]
+shell = "false"
+inputs = ["Byggfile.toml"]
