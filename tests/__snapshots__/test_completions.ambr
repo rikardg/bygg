@@ -116,30 +116,36 @@
 # name: test_actions_completions[taskrunner]
   list([
     'do\\ something\\ from\\ TOML',
+    'fail',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
     'shorthand_action_yaml',
+    'succeed',
     'touch\\ a\\ file',
   ])
 # ---
 # name: test_actions_completions[taskrunner].1
   list([
     'do\\ something\\ from\\ TOML',
+    'fail',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
     'shorthand_action_yaml',
+    'succeed',
     'touch\\ a\\ file',
   ])
 # ---
 # name: test_actions_completions[taskrunner].2
   list([
     'do\\ something\\ from\\ TOML',
+    'fail',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
     'shorthand_action_yaml',
+    'succeed',
     'touch\\ a\\ file',
   ])
 # ---

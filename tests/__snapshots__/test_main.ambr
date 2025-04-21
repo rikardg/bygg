@@ -554,6 +554,9 @@
   do something from TOML
       A test action in a TOML file
   
+  fail
+      `false`
+  
   shorthand action toml, with spaces
       `ls -hal`
   
@@ -565,6 +568,9 @@
   
   shorthand_action_yaml
       `ls -l`
+  
+  succeed
+      `true`
   
   touch a file (default)
       `touch foo`
@@ -700,6 +706,9 @@
   do something from TOML
       A test action in a TOML file
   
+  fail
+      `false`
+  
   shorthand action toml, with spaces
       `ls -hal`
   
@@ -711,6 +720,9 @@
   
   shorthand_action_yaml
       `ls -l`
+  
+  succeed
+      `true`
   
   touch a file (default)
       `touch foo`
