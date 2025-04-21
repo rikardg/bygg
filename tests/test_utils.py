@@ -32,6 +32,45 @@ test_cases_filenames_from_pattern = [
             [("foo.txt", "out_foo.txt"), ("bar.txt", "out_bar.txt")],
         )
     ),
+    (
+        (
+            "site/%.html.j2",
+            "output/%.html",
+            [
+                ("site/foo.html.j2", "output/foo.html"),
+                ("site/bar.html.j2", "output/bar.html"),
+            ],
+        )
+    ),
+    (
+        "%.c",
+        "%.o",
+        [
+            ("main.c", "main.o"),
+            ("src/util.c", "src/util.o"),
+            ("lib/helpers/string.c", "lib/helpers/string.o"),
+        ],
+    ),
+    (
+        "assets/%.scss",
+        "css/%.css",
+        [
+            ("assets/main.scss", "css/main.css"),
+            ("assets/components/button.scss", "css/components/button.css"),
+        ],
+    ),
+    (
+        "src/%.md",
+        "build/docs/%.html",
+        [
+            ("src/readme.md", "build/docs/readme.html"),
+            (
+                "src/tutorials/getting-started.md",
+                "build/docs/tutorials/getting-started.html",
+            ),
+        ],
+    ),
+    ("e%t", "c%r", [("eat", "car"), ("src/eat", "src/car"), ("east", "casr")]),
 ]
 
 
@@ -46,10 +85,12 @@ def construct_test_case_name(x: tuple):
 def test_filenames_from_pattern(test_case):
     in_pattern, out_pattern, input_output_files = test_case
     input_files = [x[0] for x in input_output_files]
-    assert (
-        filenames_from_pattern(input_files, in_pattern, out_pattern)
-        == input_output_files
-    )
+    output_files = [x[1] for x in input_output_files]
+
+    result = filenames_from_pattern(input_files, in_pattern, out_pattern)
+    assert result.input_files == input_files
+    assert result.output_files == output_files
+    assert not result.unmatched_input_files
 
 
 def test_shell_command():
