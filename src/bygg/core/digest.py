@@ -3,6 +3,7 @@ import functools
 import hashlib
 import io
 import os
+from pathlib import Path
 from typing import Callable
 
 DIGEST_TYPE = "sha1"
@@ -12,7 +13,7 @@ DIGEST_TYPE = "sha1"
 ALLOW_DIGEST_CACHING = True
 
 
-def file_digest(file: str) -> str:
+def file_digest(file: str | Path) -> str:
     with open(file, "rb") as f:
         return hashlib.file_digest(f, DIGEST_TYPE).hexdigest()
 
@@ -28,7 +29,7 @@ def file_digest_memo(
     return file_digest(file)
 
 
-def calculate_file_digest(file: str) -> str | None:
+def calculate_file_digest(file: str | Path) -> str | None:
     """
     Calculate the digest of a file.
 
@@ -46,7 +47,7 @@ def calculate_file_digest(file: str) -> str | None:
         return file_digest(real_path)
 
 
-def calculate_dependency_digest(filenames: set[str]) -> tuple[str, bool]:
+def calculate_dependency_digest(filenames: set[str] | set[Path]) -> tuple[str, bool]:
     """
     Calculate the digest of a set of files.
     filenames: The files to calculate the digest of.
