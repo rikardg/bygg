@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 from typing import TYPE_CHECKING, Optional, Union
 
-import cattrs
+import dacite
 import dc_schema  # type: ignore
 
 from bygg.output.output import Symbols, output_plain
@@ -143,16 +143,16 @@ def read_config_files() -> Byggfile:
     if not config_files:
         return Byggfile(actions={}, settings=Settings(), environments={})
 
-    converter = cattrs.Converter()
-    converter.forbid_extra_keys = True
-
-    def action_item_hook(val, _):
+    def action_item_hook(val):
         if isinstance(val, str):
             # Convert shortform actions to objects
             return ActionItem(shell=val)
-        return converter.structure(val, ActionItem)
+        return dacite.from_dict(data=val, data_class=ActionItem)
 
-    converter.register_structure_hook(Union[ActionItem, str], action_item_hook)
+    dacite_config = dacite.Config(
+        strict=True,
+        type_hooks={ActionItem: action_item_hook},
+    )
 
     try:
         byggfile_objects: list[Byggfile] = []
@@ -163,14 +163,22 @@ def read_config_files() -> Byggfile:
 
                     with cf.open("rb") as toml_file:
                         byggfile_objects.append(
-                            converter.structure(tomllib.load(toml_file), Byggfile)
+                            dacite.from_dict(
+                                config=dacite_config,
+                                data=tomllib.load(toml_file),
+                                data_class=Byggfile,
+                            )
                         )
                 case ".yml":
                     import yaml
 
                     with cf.open("r", encoding="utf-8") as yaml_file:
                         byggfile_objects.append(
-                            converter.structure(yaml.safe_load(yaml_file), Byggfile)
+                            dacite.from_dict(
+                                config=dacite_config,
+                                data=yaml.safe_load(yaml_file),
+                                data_class=Byggfile,
+                            )
                         )
                 case _:
                     raise ValueError(f"Unknown file extension {cf.suffix}")
