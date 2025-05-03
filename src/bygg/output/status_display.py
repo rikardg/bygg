@@ -57,7 +57,7 @@ def on_job_status(
             pass
         case "running":
             running_jobs.add(name)
-        case s if s in ("failed", "finished", "stopped"):
+        case "failed" | "finished" | "stopped":
             running_jobs.discard(name)
             print_job_ended(name, job_status, action, status)
         case _:
