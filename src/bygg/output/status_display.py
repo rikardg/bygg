@@ -5,11 +5,14 @@ from typing import Literal
 from bygg.core.action import Action
 from bygg.core.common_types import CommandStatus, JobStatus, Severity
 from bygg.output.output import (
-    Symbols,
+    STATUS_TEXT_FIELD_WIDTH,
     output_error,
     output_info,
     output_warning,
     output_with_status_line,
+)
+from bygg.output.output import (
+    TerminalStyle as TS,
 )
 
 
@@ -28,6 +31,20 @@ def format_queued_jobs_line() -> str:
     return output
 
 
+def format_result_status(
+    status: JobStatus,
+) -> str:
+    match status:
+        case "failed":
+            return f"{TS.BOLD}{TS.Fg.GREEN}{'FAILED':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+        case "stopped":
+            return f"{TS.BOLD}{TS.Fg.GREEN}{'STOPPED':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+        case "finished":
+            return f"{TS.BOLD}{TS.Fg.GREEN}{'OK':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+        case _:
+            return f"{TS.BOLD}{TS.Fg.BLUE}{'OTHER':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+
+
 max_name_length = 0
 
 
@@ -36,8 +53,7 @@ def print_job_ended(
 ):
     global max_name_length
     max_name_length = max(len(name), max_name_length)
-    failed_or_stopped = job_status in ("failed", "stopped")
-    symbol = Symbols.RED_X if failed_or_stopped else Symbols.GREEN_CHECKMARK
+    result_status = format_result_status(job_status)
     status_code_message = f"[{status.rc}] " if status else "?"
     status_message = status.message if status and status.message else ""
     message_part = (
@@ -45,7 +61,7 @@ def print_job_ended(
     )
     output_with_status_line(
         format_queued_jobs_line(),
-        f"{symbol} {name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
+        f"{result_status} {name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
     )
 
 

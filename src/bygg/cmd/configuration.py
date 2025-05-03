@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Optional, Union
 import dacite
 import dc_schema  # type: ignore
 
-from bygg.output.output import Symbols, output_plain
 from bygg.output.output import TerminalStyle as TS
+from bygg.output.output import output_plain
 
 PYTHON_INPUTFILE = "Byggfile.py"
 TOML_INPUTFILE = "Byggfile.toml"
@@ -195,8 +195,7 @@ def read_config_files() -> Byggfile:
 
     except Exception as e:
         output_plain(
-            Symbols.RED_X
-            + TS.Fg.RED
+            TS.Fg.RED
             + " Error while reading configuration file."
             + TS.Fg.RESET
             + f" {e}"
