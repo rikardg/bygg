@@ -43,12 +43,6 @@ class TerminalStyle:
         RESET = "\033[49m" if isatty else ""
 
 
-class Symbols:
-    GREEN_CHECKMARK = f"{TerminalStyle.Fg.GREEN}✓{TerminalStyle.Fg.RESET}"
-    RED_X = f"{ TerminalStyle.Fg.RED }✗{TerminalStyle.Fg.RESET}"
-    INFO = f"{TerminalStyle.Fg.BLUE}🛈{TerminalStyle.Fg.RESET}"
-
-
 def output_with_status_line(bottom: str | None, scroll: str | None):
     """
     Outputs a line of text at the bottom of the terminal which is cleared and reprinted,
@@ -67,20 +61,26 @@ def output_with_status_line(bottom: str | None, scroll: str | None):
     print(bottom if bottom is not None else "", end="\r")
 
 
+STATUS_TEXT_FIELD_WIDTH = 8
+
+
+bygg_prefix_string = f"{TerminalStyle.BOLD}{TerminalStyle.Fg.BLUE}{'bygg >>>':<{STATUS_TEXT_FIELD_WIDTH}}{TerminalStyle.Fg.RESET}{TerminalStyle.NOBOLD}"
+
+
 def output_info(s: str):
-    print(f"{Symbols.INFO} {s}")
+    print(f"{bygg_prefix_string} {TerminalStyle.Fg.BLUE}{s}{TerminalStyle.Fg.RESET}")
 
 
 def output_warning(s: str):
-    print(f"{TerminalStyle.Fg.YELLOW}{s}{TerminalStyle.Fg.RESET}")
+    print(f"{bygg_prefix_string} {TerminalStyle.Fg.YELLOW}{s}{TerminalStyle.Fg.RESET}")
 
 
 def output_error(s: str):
-    print(f"{TerminalStyle.Fg.RED}{s}{TerminalStyle.Fg.RESET}")
+    print(f"{bygg_prefix_string} {TerminalStyle.Fg.RED}{s}{TerminalStyle.Fg.RESET}")
 
 
 def output_ok(s: str):
-    print(f"{TerminalStyle.Fg.GREEN}{s}{TerminalStyle.Fg.RESET}")
+    print(f"{bygg_prefix_string} {TerminalStyle.Fg.GREEN}{s}{TerminalStyle.Fg.RESET}")
 
 
 def output_plain(s: str):
