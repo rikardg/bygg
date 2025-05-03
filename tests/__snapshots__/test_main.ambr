@@ -2,15 +2,15 @@
 # name: test_build_multiple_actions
   '''
   
-  ✓ do something more     : I did something more
-  ✓ ls                   
-  ✓ shorthand action yaml, with spaces
-  ✓ shorthand_action_yaml
-  ✓ touch a file          : I touched a file
-  🛈 Building action 'shorthand action yaml, with spaces':
-  🛈 Building action 'shorthand_action_yaml':
-  🛈 Building action 'touch a file':
-  🛈 Entering directory 'examples/taskrunner'
+        OK do something more     : I did something more
+        OK ls                   
+        OK shorthand action yaml, with spaces
+        OK shorthand_action_yaml
+        OK touch a file          : I touched a file
+  bygg >>> Building action 'shorthand action yaml, with spaces':
+  bygg >>> Building action 'shorthand_action_yaml':
+  bygg >>> Building action 'touch a file':
+  bygg >>> Entering directory 'examples/taskrunner'
   '''
 # ---
 # name: test_dump_schema
@@ -468,9 +468,9 @@
 # ---
 # name: test_list[environments]
   '''
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
   Available actions:
   
   ~~ No environment ~~
@@ -590,7 +590,7 @@
 # ---
 # name: test_list_directory[checks]
   '''
-  🛈 Entering directory 'examples/checks'
+  bygg >>> Entering directory 'examples/checks'
   Available actions:
   
   all_checks (default)
@@ -615,10 +615,10 @@
 # ---
 # name: test_list_directory[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
   Available actions:
   
   ~~ No environment ~~
@@ -649,7 +649,7 @@
 # ---
 # name: test_list_directory[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
+  bygg >>> Entering directory 'examples/failing_jobs'
   Available actions:
   
   all (default)
@@ -672,7 +672,7 @@
 # ---
 # name: test_list_directory[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
+  bygg >>> Entering directory 'examples/only_python'
   Available actions:
   
   hello
@@ -686,7 +686,7 @@
 # ---
 # name: test_list_directory[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
+  bygg >>> Entering directory 'examples/parametric'
   Available actions:
   
   setup
@@ -700,7 +700,7 @@
 # ---
 # name: test_list_directory[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
+  bygg >>> Entering directory 'examples/taskrunner'
   Available actions:
   
   do something from TOML
@@ -732,7 +732,7 @@
 # ---
 # name: test_list_directory[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
+  bygg >>> Entering directory 'examples/trivial'
   Available actions:
   
   transform (default)
@@ -743,213 +743,213 @@
 # ---
 # name: test_non_existing_action[checks]
   '''
-  🛈 Entering directory 'examples/checks'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/checks'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/failing_jobs'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/only_python'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/parametric'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/taskrunner'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_non_existing_action[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Entering directory 'examples/trivial'
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_reset_remove_cache[checks]
   '''
-  🛈 Entering directory 'examples/checks'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/checks'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/failing_jobs'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/only_python'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/parametric'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/taskrunner'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_cache[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/trivial'
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_remove_environments[checks]
   '''
-  🛈 Entering directory 'examples/checks'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/checks'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_remove_environments[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Removing environments
-  🛈 Removing venv env1 at .venv1
-  🛈 Removing venv env2 at .venv2
-  🛈 Removing venv base at .venv
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Removing environments
+  bygg >>> Removing venv env1 at .venv1
+  bygg >>> Removing venv env2 at .venv2
+  bygg >>> Removing venv base at .venv
   
   '''
 # ---
 # name: test_reset_remove_environments[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/failing_jobs'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_remove_environments[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/only_python'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_remove_environments[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/parametric'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_remove_environments[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/taskrunner'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_remove_environments[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
-  🛈 Removing environments
+  bygg >>> Entering directory 'examples/trivial'
+  bygg >>> Removing environments
   
   '''
 # ---
 # name: test_reset_reset[checks]
   '''
-  🛈 Entering directory 'examples/checks'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/checks'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Removing environments
-  🛈 Removing venv env1 at .venv1
-  🛈 Removing venv env2 at .venv2
-  🛈 Removing venv base at .venv
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Removing environments
+  bygg >>> Removing venv env1 at .venv1
+  bygg >>> Removing venv env2 at .venv2
+  bygg >>> Removing venv base at .venv
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/failing_jobs'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/only_python'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/parametric'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/taskrunner'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
 # name: test_reset_reset[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
-  🛈 Removing environments
-  🛈 Removing cache
+  bygg >>> Entering directory 'examples/trivial'
+  bygg >>> Removing environments
+  bygg >>> Removing cache
   
   '''
 # ---
@@ -971,9 +971,9 @@
 # ---
 # name: test_tree[environments]
   '''
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
   
   default_action
   └── default_action_python
@@ -993,8 +993,8 @@
 # ---
 # name: test_tree[only_python]
   '''
-  The --tree command requires at least one action to be specified.
-  No actions were specified and no default action is defined.
+  bygg >>> The --tree command requires at least one action to be specified.
+  bygg >>> No actions were specified and no default action is defined.
   Available actions:
   
   hello
@@ -1336,7 +1336,7 @@
 # ---
 # name: test_tree_directory[checks]
   '''
-  🛈 Entering directory 'examples/checks'
+  bygg >>> Entering directory 'examples/checks'
   
   all_checks
   ├── check_inputs_outputs
@@ -1353,10 +1353,10 @@
 # ---
 # name: test_tree_directory[environments]
   '''
-  🛈 Entering directory 'examples/environments'
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
+  bygg >>> Entering directory 'examples/environments'
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
   
   default_action
   └── default_action_python
@@ -1365,7 +1365,7 @@
 # ---
 # name: test_tree_directory[failing_jobs]
   '''
-  🛈 Entering directory 'examples/failing_jobs'
+  bygg >>> Entering directory 'examples/failing_jobs'
   
   all
   ├── gcc
@@ -1377,9 +1377,9 @@
 # ---
 # name: test_tree_directory[only_python]
   '''
-  🛈 Entering directory 'examples/only_python'
-  The --tree command requires at least one action to be specified.
-  No actions were specified and no default action is defined.
+  bygg >>> Entering directory 'examples/only_python'
+  bygg >>> The --tree command requires at least one action to be specified.
+  bygg >>> No actions were specified and no default action is defined.
   Available actions:
   
   hello
@@ -1393,7 +1393,7 @@
 # ---
 # name: test_tree_directory[parametric]
   '''
-  🛈 Entering directory 'examples/parametric'
+  bygg >>> Entering directory 'examples/parametric'
   
   sort
   └── sort_test_files
@@ -1702,7 +1702,7 @@
 # ---
 # name: test_tree_directory[taskrunner]
   '''
-  🛈 Entering directory 'examples/taskrunner'
+  bygg >>> Entering directory 'examples/taskrunner'
   
   touch a file
   ├── do something more
@@ -1712,7 +1712,7 @@
 # ---
 # name: test_tree_directory[trivial]
   '''
-  🛈 Entering directory 'examples/trivial'
+  bygg >>> Entering directory 'examples/trivial'
   
   transform
   ├── dynamic
@@ -1724,46 +1724,46 @@
 # ---
 # name: test_tree_non_existing_action[checks]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[environments]
   '''
-  🛈 Setting up environment "Environment 1" in .venv1
-  🛈 Setting up environment in .venv2
-  🛈 Setting up environment "Base environment" in .venv
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Setting up environment "Environment 1" in .venv1
+  bygg >>> Setting up environment in .venv2
+  bygg >>> Setting up environment "Base environment" in .venv
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[failing_jobs]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[only_python]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[parametric]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[taskrunner]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
 # name: test_tree_non_existing_action[trivial]
   '''
-  Error: The following action could not be found: 'no_such_action'.
+  bygg >>> Error: The following action could not be found: 'no_such_action'.
   
   '''
 # ---
