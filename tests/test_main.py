@@ -125,6 +125,20 @@ def test_dump_schema(snapshot):
     assert process.stdout == snapshot
 
 
+def test_schema_dump_is_uptodate():
+    process = subprocess.run(
+        ["bygg", "--dump-schema"],
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+
+    with open("schemas/Byggfile_yml_schema.json", "r", encoding="utf-8") as f:
+        schema = f.read()
+
+    assert process.stdout == schema
+
+
 def test_version():
     process = subprocess.run(
         ["bygg", "--version"],
