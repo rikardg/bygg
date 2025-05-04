@@ -2,9 +2,10 @@ import os
 import signal
 import sys
 from typing import Callable
+import warnings
 
-import multiprocess.managers  # type: ignore
-from multiprocess.pool import ApplyResult, Pool  # type: ignore
+from loky import Future, ProcessPoolExecutor, wait  # type: ignore
+from loky.backend import get_context  # type: ignore
 
 from bygg.core.action import Action, CommandStatus
 from bygg.core.common_types import JobStatus
@@ -14,6 +15,16 @@ from bygg.output.status_display import on_check_failed
 
 JobStatusListener = Callable[[str, JobStatus, Action, CommandStatus | None], None]
 RunnerStatusListener = Callable[[str], None]
+
+
+# Suppress the specific loky warning about fork start method. The current runner
+# architecture depends on forking, and at least from what I can discern from reading in
+# the loky source code, this is only a problem on Windows.
+warnings.filterwarnings(
+    "ignore",
+    message="`fork` start method should not be used with `loky`",
+    category=UserWarning,
+)
 
 
 class ProcessRunner:
@@ -37,20 +48,17 @@ class ProcessRunner:
             """Ignore CTRL+C in the worker process."""
             signal.signal(signal.SIGINT, signal.SIG_IGN)
 
-        with Pool(max_workers, init_worker) as pool:
-            scheduled_queue: list[ApplyResult] = []
+        with ProcessPoolExecutor(
+            max_workers=max_workers,
+            initializer=init_worker,
+            context=get_context("fork"),
+        ) as pool:
+            scheduled_jobs: dict[Job, Future] = {}
             backlog: list[Job] = []
 
-            manager = multiprocess.managers.SyncManager()
-            manager.start()
-            qq = manager.Queue()  # type: ignore # no/bad multiprocess types
-
-            def poll_msg_queue():
-                while not qq.empty():
-                    msg, job_msg = qq.get_nowait()
-                    self.job_status_listener(
-                        job_msg.name, "running", job_msg.action, None
-                    )
+            def call_status_listener():
+                for job in scheduled_jobs.keys():
+                    self.job_status_listener(job.name, "running", job.action, None)
 
             # If a job fails, we want to stop scheduling new jobs and just wait for the
             # ones that are already running to finish.
@@ -65,16 +73,17 @@ class ProcessRunner:
                     backlog += jobs
 
                 if (
-                    len(scheduled_queue) == 0
+                    len(scheduled_jobs) == 0
                     and len(backlog) == 0
                     and (self.scheduler.run_status() == "finished" or early_out)
                 ):
                     return not early_out
 
-                # Keep the scheduled queue relatively short since we're polling
+                # Keep the scheduled queue relatively short; no need to schedule much
+                # more than we have workers
                 batch_size = max_workers * 2
-                if len(scheduled_queue) < batch_size:
-                    for job in backlog[:batch_size]:
+                if len(scheduled_jobs) < batch_size:
+                    for job in backlog:
                         # Skip jobs with no command or ones that are clean
                         if job.action.command is None:
                             job.status = CommandStatus(
@@ -107,19 +116,21 @@ class ProcessRunner:
 
                         # Schedule job to be run on the worker processes
                         backlog.remove(job)
-                        scheduled_queue.append(pool.apply_async(run_job, (job, qq)))
+                        scheduled_jobs[job] = pool.submit(run_job, (job))
 
-                poll_msg_queue()
+                call_status_listener()
 
-                if len(scheduled_queue) == 0:
+                if len(scheduled_jobs) == 0:
                     continue
 
-                queued_job = scheduled_queue.pop(0)
-                queued_job.wait(0.1)
-                if not queued_job.ready():
-                    scheduled_queue.append(queued_job)  # add it back to the queue
-                else:
-                    job_result: Job = queued_job.get()
+                completed_jobs, _ = wait(
+                    scheduled_jobs.values(), timeout=0.1, return_when="FIRST_COMPLETED"
+                )
+                for future in completed_jobs:
+                    job_result = future.result()
+                    assert isinstance(job_result, Job)
+                    del scheduled_jobs[job_result]
+
                     self.check_for_missing_output_files(job_result)
 
                     self.scheduler.job_finished(job_result)
@@ -138,7 +149,7 @@ class ProcessRunner:
                             job_result.action,
                             job_result.status,
                         )
-                        poll_msg_queue()
+                        call_status_listener()
                         early_out = True
 
     def check_for_missing_output_files(self, job: Job):
@@ -155,8 +166,7 @@ class ProcessRunner:
             )
 
 
-def run_job(job: Job, qq):
-    qq.put_nowait(("START", job))
+def run_job(job: Job):
     try:
         if job.action.command is None:
             job.status = CommandStatus(0, "No command, skipping", None)
