@@ -1,5 +1,6 @@
 import os
 import signal
+import sys
 from typing import Callable
 
 import multiprocess.managers  # type: ignore
@@ -167,6 +168,8 @@ def run_job(job: Job, qq):
 
 
 def get_job_count_limit():
+    if sys.version_info >= (3, 13):
+        return os.process_cpu_count() or 1
     try:
         # Use os.sched_getaffinity where available (on U**X):
         # https://stackoverflow.com/a/55423170
