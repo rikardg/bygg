@@ -29,6 +29,14 @@ class TerminalStyle:
         WHITE = "\033[37m" if isatty else ""
         RESET = "\033[39m" if isatty else ""
 
+        BRIGHT_RED = "\033[91m" if isatty else ""
+        BRIGHT_GREEN = "\033[92m" if isatty else ""
+        BRIGHT_YELLOW = "\033[93m" if isatty else ""
+        BRIGHT_BLUE = "\033[94m" if isatty else ""
+        BRIGHT_MAGENTA = "\033[95m" if isatty else ""
+        BRIGHT_CYAN = "\033[96m" if isatty else ""
+        BRIGHT_WHITE = "\033[97m" if isatty else ""
+
     class Bg:
         """Background Text Color"""
 
@@ -41,6 +49,14 @@ class TerminalStyle:
         CYAN = "\033[46m" if isatty else ""
         WHITE = "\033[47m" if isatty else ""
         RESET = "\033[49m" if isatty else ""
+
+        BRIGHT_RED = "\033[101m" if isatty else ""
+        BRIGHT_GREEN = "\033[102m" if isatty else ""
+        BRIGHT_YELLOW = "\033[103m" if isatty else ""
+        BRIGHT_BLUE = "\033[104m" if isatty else ""
+        BRIGHT_MAGENTA = "\033[105m" if isatty else ""
+        BRIGHT_CYAN = "\033[106m" if isatty else ""
+        BRIGHT_WHITE = "\033[107m" if isatty else ""
 
 
 def output_with_status_line(bottom: str | None, scroll: str | None):
@@ -64,23 +80,31 @@ def output_with_status_line(bottom: str | None, scroll: str | None):
 STATUS_TEXT_FIELD_WIDTH = 8
 
 
-bygg_prefix_string = f"{TerminalStyle.BOLD}{TerminalStyle.Fg.BLUE}{'bygg >>>':<{STATUS_TEXT_FIELD_WIDTH}}{TerminalStyle.Fg.RESET}{TerminalStyle.NOBOLD}"
+bygg_prefix_string = f"{TerminalStyle.Fg.BRIGHT_CYAN}{'bygg >>>':<{STATUS_TEXT_FIELD_WIDTH}}{TerminalStyle.Fg.RESET}{TerminalStyle.NOBOLD}"
 
 
 def output_info(s: str):
-    print(f"{bygg_prefix_string} {TerminalStyle.Fg.BLUE}{s}{TerminalStyle.Fg.RESET}")
+    print(
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_CYAN}{s}{TerminalStyle.Fg.RESET}"
+    )
 
 
 def output_warning(s: str):
-    print(f"{bygg_prefix_string} {TerminalStyle.Fg.YELLOW}{s}{TerminalStyle.Fg.RESET}")
+    print(
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_YELLOW}{s}{TerminalStyle.Fg.RESET}"
+    )
 
 
 def output_error(s: str):
-    print(f"{bygg_prefix_string} {TerminalStyle.Fg.RED}{s}{TerminalStyle.Fg.RESET}")
+    print(
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_RED}{s}{TerminalStyle.Fg.RESET}"
+    )
 
 
 def output_ok(s: str):
-    print(f"{bygg_prefix_string} {TerminalStyle.Fg.GREEN}{s}{TerminalStyle.Fg.RESET}")
+    print(
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_GREEN}{s}{TerminalStyle.Fg.RESET}"
+    )
 
 
 def output_plain(s: str):
