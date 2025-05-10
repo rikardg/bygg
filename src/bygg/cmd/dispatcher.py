@@ -50,7 +50,10 @@ from bygg.system_helpers import change_dir
 
 
 def init_bygg_context(
-    configuration: Byggfile, parser: argparse.ArgumentParser, args: argparse.Namespace
+    configuration: Byggfile,
+    parser: argparse.ArgumentParser,
+    args_namespace: argparse.Namespace,
+    args: ByggNamespace,
 ) -> ByggContext:
     scheduler = Scheduler()
     runner = ProcessRunner(scheduler)
@@ -64,8 +67,8 @@ def init_bygg_context(
         scheduler,
         configuration,
         parser,
+        args_namespace,
         args,
-        ByggNamespace(**vars(args)),
         SubProcessIpcData(),
     )
 
@@ -189,7 +192,7 @@ def parent_dispatcher(
         sys.exit(0)
 
     # Create runner and scheduler and such
-    ctx = init_bygg_context(configuration, parser, args_namespace)
+    ctx = init_bygg_context(configuration, parser, args_namespace, args)
 
     actions_to_build = [*args.actions]
     if not args.actions and ctx.configuration.settings.default_action is not None:
@@ -478,7 +481,7 @@ def subprocess_dispatcher(parser, args_namespace):
     configuration = read_config_files()
 
     # Create runner and scheduler and such
-    ctx = init_bygg_context(configuration, parser, args_namespace)
+    ctx = init_bygg_context(configuration, parser, args_namespace, args)
 
     ctx.ipc_data = SubProcessIpcData()
     load_environment(ctx, environment_name)
