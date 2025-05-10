@@ -4,6 +4,7 @@ from typing import Literal
 
 from bygg.core.action import Action
 from bygg.core.common_types import CommandStatus, JobStatus, Severity
+from bygg.core.job import Job
 from bygg.output.output import (
     STATUS_TEXT_FIELD_WIDTH,
     output_error,
@@ -65,17 +66,15 @@ def print_job_ended(
     )
 
 
-def on_job_status(
-    name: str, job_status: JobStatus, action: Action, status: CommandStatus | None
-):
+def on_job_status(job_status: JobStatus, job: Job):
     match job_status:
         case "skipped":
             pass
         case "running":
-            running_jobs.add(name)
+            running_jobs.add(job.name)
         case "failed" | "finished" | "stopped":
-            running_jobs.discard(name)
-            print_job_ended(name, job_status, action, status)
+            running_jobs.discard(job.name)
+            print_job_ended(job.name, job_status, job.action, job.status)
         case _:
             raise ValueError(f"Unhandled job status {job_status}")
 
