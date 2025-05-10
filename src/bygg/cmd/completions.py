@@ -53,7 +53,7 @@ singular_options = {
     "--help",
     "--version",
     "-h",
-    "-v",
+    "-V",
 }
 
 directory_option = {"-C", "--directory"}

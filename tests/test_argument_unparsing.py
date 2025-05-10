@@ -4,7 +4,7 @@ from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.dispatcher import EntrypointCompleter, create_argument_parser
 
 args = [
-    (["-v"], ["--version"]),
+    (["-V"], ["--version"]),
     (["--version"], ["--version"]),
     (["--clean"], ["--clean"]),
     (["-l"], ["--list"]),

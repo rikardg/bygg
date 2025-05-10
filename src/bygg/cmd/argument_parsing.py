@@ -97,7 +97,7 @@ List available actions:
     arg.completer = entrypoint_completions
 
     parser.add_argument(
-        "-v", "--version", action="store_true", help="Show version string and exit."
+        "-V", "--version", action="store_true", help="Show version string and exit."
     )
 
     parser.add_argument(

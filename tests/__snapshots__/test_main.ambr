@@ -241,7 +241,7 @@
 # ---
 # name: test_help[3.11]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
               [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
@@ -265,7 +265,7 @@
   
   OPTIONS:
     -h, --help            show this help message and exit
-    -v, --version         Show version string and exit.
+    -V, --version         Show version string and exit.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
@@ -309,7 +309,7 @@
 # ---
 # name: test_help[3.12]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
               [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
@@ -333,7 +333,7 @@
   
   OPTIONS:
     -h, --help            show this help message and exit
-    -v, --version         Show version string and exit.
+    -V, --version         Show version string and exit.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
@@ -377,7 +377,7 @@
 # ---
 # name: test_help[3.13]
   '''
-  usage: bygg [-h] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
+  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
               [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
               [--dump-schema] [--completions]
               [actions ...]
@@ -401,7 +401,7 @@
   
   OPTIONS:
     -h, --help            show this help message and exit
-    -v, --version         Show version string and exit.
+    -V, --version         Show version string and exit.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
