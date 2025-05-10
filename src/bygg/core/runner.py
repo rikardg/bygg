@@ -7,13 +7,13 @@ import warnings
 from loky import Future, ProcessPoolExecutor, wait  # type: ignore
 from loky.backend import get_context  # type: ignore
 
-from bygg.core.action import Action, CommandStatus
+from bygg.core.action import CommandStatus
 from bygg.core.common_types import JobStatus
 from bygg.core.scheduler import Job, Scheduler
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.status_display import on_check_failed
 
-JobStatusListener = Callable[[str, JobStatus, Action, CommandStatus | None], None]
+JobStatusListener = Callable[[JobStatus, Job], None]
 RunnerStatusListener = Callable[[str], None]
 
 
@@ -58,7 +58,7 @@ class ProcessRunner:
 
             def call_status_listener():
                 for job in scheduled_jobs.keys():
-                    self.job_status_listener(job.name, "running", job.action, None)
+                    self.job_status_listener("running", job)
 
             # If a job fails, we want to stop scheduling new jobs and just wait for the
             # ones that are already running to finish.
@@ -92,24 +92,18 @@ class ProcessRunner:
                                 None,
                             )
                             self.scheduler.job_finished(job)
-                            self.job_status_listener(
-                                job.name, "skipped", job.action, job.status
-                            )
+                            self.job_status_listener("skipped", job)
                             backlog.remove(job)
                             continue
 
                         # Run in-process
                         if job.action.scheduling_type == "in-process":
-                            self.job_status_listener(
-                                job.name, "running", job.action, None
-                            )
+                            self.job_status_listener("running", job)
                             job.status = job.action.command(job.action)
                             self.scheduler.job_finished(job)
                             self.job_status_listener(
-                                job.name,
                                 "finished" if job.status.rc == 0 else "failed",
-                                job.action,
-                                job.status,
+                                job,
                             )
                             backlog.remove(job)
                             continue
@@ -135,20 +129,10 @@ class ProcessRunner:
 
                     self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:
-                        self.job_status_listener(
-                            job_result.name,
-                            "finished",
-                            job_result.action,
-                            job_result.status,
-                        )
+                        self.job_status_listener("finished", job_result)
                     else:
                         self.failed_jobs.append(job_result)
-                        self.job_status_listener(
-                            job_result.name,
-                            "failed",
-                            job_result.action,
-                            job_result.status,
-                        )
+                        self.job_status_listener("failed", job_result)
                         call_status_listener()
                         early_out = True
 
