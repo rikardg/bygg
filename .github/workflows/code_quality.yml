@@ -1,9 +1,10 @@
 name: Code quality
 on:
-  push:
-    branches: ["**"]
   pull_request:
-    branches: ["**"]
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - master
 
 permissions:
   contents: read
