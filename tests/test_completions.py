@@ -52,7 +52,7 @@ args = [
     # No completions after these arguments:
     ("-h ", ""),
     ("--help ", ""),
-    ("-v ", ""),
+    ("-V ", ""),
     ("--version ", ""),
     ("--dump-schema ", ""),
     ("--completions ", ""),
