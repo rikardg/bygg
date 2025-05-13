@@ -19,6 +19,7 @@ class ByggNamespace:
 
     actions: list[str]
     version: bool
+    verbose: bool
     is_restarted_with_env: str | None
     ipc_filename: list[str] | None
     clean: bool
@@ -98,6 +99,12 @@ List available actions:
 
     parser.add_argument(
         "-V", "--version", action="store_true", help="Show version string and exit."
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Enable more verbose output from some commands.",
     )
 
     parser.add_argument(

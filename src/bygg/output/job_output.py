@@ -50,9 +50,26 @@ def output_job_logs(jobs: list[Job]):
     )
     for job in jobs:
         if job.status and (log := job.status.output):
-            output_plain(f'{TS.BOLD}--- Start "{ job.name }" ---{TS.RESET}')
+            output_plain(f'{TS.BOLD}--- Start "{job.name}" ---{TS.RESET}')
             output_plain(
                 highlight_log(log, default_highlight_config) if isatty else log
             )
-            output_plain(f'{TS.BOLD}--- End "{ job.name}" ---{TS.RESET}')
+            output_plain(f'{TS.BOLD}--- End "{job.name}" ---{TS.RESET}')
             output_plain("")
+
+
+def format_job_log(job: Job) -> str:
+    log = job.status.output if job.status else None
+    formatted_log = []
+
+    if not log:
+        formatted_log.append(f"{TS.BOLD}No output from job {job.name}.{TS.RESET}")
+        return ""
+    formatted_log.append(f'{TS.BOLD}--- Start "{job.name}" ---{TS.RESET}')
+    formatted_log.append(
+        highlight_log(log, default_highlight_config) if isatty else log
+    )
+    formatted_log.append(f'{TS.BOLD}--- End "{job.name}" ---{TS.RESET}')
+    formatted_log.append("")
+
+    return "\n".join(formatted_log)

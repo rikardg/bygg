@@ -3,6 +3,7 @@ settings:
 
 actions:
   shorthand_action_yaml: "ls -l"
+  hhgttg: "echo Slartibartfast"
 
   "touch a file":
     message: "I touched a file"

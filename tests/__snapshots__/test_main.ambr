@@ -13,6 +13,17 @@
   bygg >>> Entering directory 'examples/taskrunner'
   '''
 # ---
+# name: test_build_verbose
+  '''
+  OK hhgttg
+  --- Start "hhgttg" ---
+  Slartibartfast
+  
+  --- End "hhgttg" ---
+  
+  
+  '''
+# ---
 # name: test_dump_schema
   '''
   {
@@ -181,6 +192,17 @@
               }
             ],
             "default": null
+          },
+          "verbose": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           }
         },
         "additionalProperties": false,
@@ -241,9 +263,9 @@
 # ---
 # name: test_help[3.11]
   '''
-  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
-              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
-              [--dump-schema] [--completions]
+  usage: bygg [-h] [-V] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY]
+              [-j [JOBS]] [-B] [--check] [--reset] [--remove-cache]
+              [--remove-environments] [--dump-schema] [--completions]
               [actions ...]
   
   A build tool written in Python, where all actions can be written in Python.
@@ -266,6 +288,7 @@
   OPTIONS:
     -h, --help            show this help message and exit
     -V, --version         Show version string and exit.
+    -v, --verbose         Enable more verbose output from some commands.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
@@ -309,9 +332,9 @@
 # ---
 # name: test_help[3.12]
   '''
-  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
-              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
-              [--dump-schema] [--completions]
+  usage: bygg [-h] [-V] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY]
+              [-j [JOBS]] [-B] [--check] [--reset] [--remove-cache]
+              [--remove-environments] [--dump-schema] [--completions]
               [actions ...]
   
   A build tool written in Python, where all actions can be written in Python.
@@ -334,6 +357,7 @@
   OPTIONS:
     -h, --help            show this help message and exit
     -V, --version         Show version string and exit.
+    -v, --verbose         Enable more verbose output from some commands.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
@@ -377,9 +401,9 @@
 # ---
 # name: test_help[3.13]
   '''
-  usage: bygg [-h] [-V] [--clean | -l | --tree | -w] [-C DIRECTORY] [-j [JOBS]]
-              [-B] [--check] [--reset] [--remove-cache] [--remove-environments]
-              [--dump-schema] [--completions]
+  usage: bygg [-h] [-V] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY]
+              [-j [JOBS]] [-B] [--check] [--reset] [--remove-cache]
+              [--remove-environments] [--dump-schema] [--completions]
               [actions ...]
   
   A build tool written in Python, where all actions can be written in Python.
@@ -402,6 +426,7 @@
   OPTIONS:
     -h, --help            show this help message and exit
     -V, --version         Show version string and exit.
+    -v, --verbose         Enable more verbose output from some commands.
   
   Commands that operate on the build setup:
     --clean               Clean the outputs of the specified actions.
@@ -557,6 +582,9 @@
   fail
       `false`
   
+  hhgttg
+      `echo Slartibartfast`
+  
   shorthand action toml, with spaces
       `ls -hal`
   
@@ -708,6 +736,9 @@
   
   fail
       `false`
+  
+  hhgttg
+      `echo Slartibartfast`
   
   shorthand action toml, with spaces
       `ls -hal`

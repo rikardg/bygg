@@ -117,6 +117,7 @@
   list([
     'do\\ something\\ from\\ TOML',
     'fail',
+    'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
@@ -129,6 +130,7 @@
   list([
     'do\\ something\\ from\\ TOML',
     'fail',
+    'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
@@ -141,6 +143,7 @@
   list([
     'do\\ something\\ from\\ TOML',
     'fail',
+    'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',

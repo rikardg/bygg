@@ -2,9 +2,12 @@ from dataclasses import dataclass
 import shutil
 from typing import Literal
 
+from bygg.cmd.argument_parsing import ByggNamespace
+from bygg.cmd.configuration import Byggfile
 from bygg.core.action import Action
-from bygg.core.common_types import CommandStatus, JobStatus, Severity
+from bygg.core.common_types import JobStatus, Severity
 from bygg.core.job import Job
+from bygg.output.job_output import format_job_log
 from bygg.output.output import (
     STATUS_TEXT_FIELD_WIDTH,
     output_error,
@@ -32,51 +35,61 @@ def format_queued_jobs_line() -> str:
     return output
 
 
-def format_result_status(
-    status: JobStatus,
-) -> str:
+def format_result_status(status: JobStatus, field_width: int) -> str:
     match status:
         case "failed":
-            return f"{TS.BOLD}{TS.Fg.GREEN}{'FAILED':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+            return f"{TS.BOLD}{TS.Fg.GREEN}{'FAILED':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
         case "stopped":
-            return f"{TS.BOLD}{TS.Fg.GREEN}{'STOPPED':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+            return f"{TS.BOLD}{TS.Fg.GREEN}{'STOPPED':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
         case "finished":
-            return f"{TS.BOLD}{TS.Fg.GREEN}{'OK':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+            return (
+                f"{TS.BOLD}{TS.Fg.GREEN}{'OK':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
+            )
         case _:
-            return f"{TS.BOLD}{TS.Fg.BLUE}{'OTHER':>{STATUS_TEXT_FIELD_WIDTH}}{TS.Fg.RESET}{TS.NOBOLD}"
+            return (
+                f"{TS.BOLD}{TS.Fg.BLUE}{'OTHER':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
+            )
 
 
 max_name_length = 0
 
 
-def print_job_ended(
-    name: str, job_status: JobStatus, action: Action, status: CommandStatus | None
-):
-    global max_name_length
-    max_name_length = max(len(name), max_name_length)
-    result_status = format_result_status(job_status)
-    status_code_message = f"[{status.rc}] " if status else "?"
-    status_message = status.message if status and status.message else ""
-    message_part = (
-        f"{status_code_message if status and status.rc else ''}{status_message}"
-    )
-    output_with_status_line(
-        format_queued_jobs_line(),
-        f"{result_status} {name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
-    )
+def get_on_job_status(args: ByggNamespace, configuration: Byggfile):
+    def on_job_status(job_status: JobStatus, job: Job):
+        match job_status:
+            case "skipped":
+                pass
+            case "running":
+                running_jobs.add(job.name)
+            case "failed" | "finished" | "stopped":
+                running_jobs.discard(job.name)
+                print_job_ended(job_status, job)
+            case _:
+                raise ValueError(f"Unhandled job status {job_status}")
 
+    def print_job_ended(job_status: JobStatus, job: Job):
+        global max_name_length
+        max_name_length = max(len(job.name), max_name_length)
+        status_code_message = f"[{job.status.rc}] " if job.status else "?"
+        status_message = job.status.message if job.status and job.status.message else ""
+        message_part = f"{status_code_message if job.status and job.status.rc else ''}{status_message}"
 
-def on_job_status(job_status: JobStatus, job: Job):
-    match job_status:
-        case "skipped":
-            pass
-        case "running":
-            running_jobs.add(job.name)
-        case "failed" | "finished" | "stopped":
-            running_jobs.discard(job.name)
-            print_job_ended(job.name, job_status, job.action, job.status)
-        case _:
-            raise ValueError(f"Unhandled job status {job_status}")
+        if args.verbose or configuration.settings.verbose:
+            result_status = format_result_status(job_status, 0)
+            formatted_log = format_job_log(job)
+            log = f"\n{formatted_log}" if formatted_log else ""
+            output_with_status_line(
+                format_queued_jobs_line(),
+                f"{result_status} {job.name}{(' : ' + message_part) if len(message_part) > 0 else ''}{log}",
+            )
+        else:
+            result_status = format_result_status(job_status, STATUS_TEXT_FIELD_WIDTH)
+            output_with_status_line(
+                format_queued_jobs_line(),
+                f"{result_status} {job.name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
+            )
+
+    return on_job_status
 
 
 CheckRule = Literal["check_inputs_outputs", "output_file_missing", "same_output_files"]

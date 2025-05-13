@@ -45,7 +45,10 @@ from bygg.core.scheduler import Scheduler
 from bygg.logging import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import output_error, output_info, output_warning
-from bygg.output.status_display import on_job_status, on_runner_status
+from bygg.output.status_display import (
+    get_on_job_status,
+    on_runner_status,
+)
 from bygg.system_helpers import change_dir
 
 
@@ -59,7 +62,7 @@ def init_bygg_context(
     runner = ProcessRunner(scheduler)
 
     # Set up status listeners
-    runner.job_status_listener = on_job_status
+    runner.job_status_listener = get_on_job_status(args, configuration)
     runner.runner_status_listener = on_runner_status
 
     return ByggContext(

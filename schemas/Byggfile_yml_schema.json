@@ -164,6 +164,17 @@
             }
           ],
           "default": null
+        },
+        "verbose": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "additionalProperties": false,
