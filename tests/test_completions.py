@@ -46,7 +46,8 @@ def completion_tester(monkeypatch, tmp_path):
 
 args = [
     # Complete simple arguments:
-    ("--ver", "--version "),
+    ("--vers", "--version "),
+    ("--verb", "--verbose "),
     ("--cl", "--clean "),
     ("--h", "--help "),
     # No completions after these arguments:

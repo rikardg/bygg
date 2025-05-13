@@ -31,8 +31,11 @@ class Settings:
         """
         if other.default_action is not None:
             self.default_action = other.default_action
+        if other.verbose is not None:
+            self.verbose = other.verbose
 
     default_action: Optional[str] = None
+    verbose: Optional[bool] = None
 
 
 @dataclasses.dataclass

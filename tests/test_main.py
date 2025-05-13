@@ -190,6 +190,26 @@ def test_build_multiple_actions(snapshot, clean_bygg_tree):
     assert "\n".join(sorted(cleaned_result)) == snapshot
 
 
+def test_build_verbose(snapshot, clean_bygg_tree):
+    process = subprocess.run(
+        [
+            "bygg",
+            "-C",
+            examples_dir / "taskrunner",
+            "hhgttg",
+            "--verbose",
+        ],
+        cwd=clean_bygg_tree,
+        capture_output=True,
+        encoding="utf-8",
+    )
+    assert process.returncode == 0
+    cleaned_result = [
+        line for line in process.stdout.split("\n") if not line.startswith("bygg >>>")
+    ]
+    assert "\n".join(cleaned_result) == snapshot
+
+
 def test_check(clean_bygg_tree):
     process = subprocess.run(
         [
