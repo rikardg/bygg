@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import signal
 import sys
 from typing import Callable
@@ -137,7 +138,7 @@ class ProcessRunner:
                         early_out = True
 
     def check_for_missing_output_files(self, job: Job):
-        missing_files: list[str] = []
+        missing_files: list[str | Path] = []
         for filename in job.action.outputs:
             if not os.path.exists(filename):
                 missing_files.append(filename)
@@ -145,7 +146,7 @@ class ProcessRunner:
             on_check_failed(
                 "output_file_missing",
                 job.action,
-                f"Job {TS.BOLD}{job.name}{TS.RESET} didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: {TS.BOLD}{', '.join(missing_files)}{TS.RESET}",
+                f"Job {TS.BOLD}{job.name}{TS.RESET} didn't create the output file{'s' if len(missing_files) > 1 else ''} that it declared: {TS.BOLD}{', '.join([str(missing_file) for missing_file in missing_files])}{TS.RESET}",
                 "error",
             )
 
