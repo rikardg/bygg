@@ -27,9 +27,9 @@ def on_runner_status(message: str):
 running_jobs: set[str] = set()
 
 
-def format_queued_jobs_line() -> str:
+def format_queued_jobs_line(prefix: str) -> str:
     terminal_cols, _ = shutil.get_terminal_size()
-    output = f"{' '.join(running_jobs)}"
+    output = f"{prefix} {' '.join(running_jobs)}"
     if len(output) > terminal_cols:
         output = output[: terminal_cols - 3] + "..."
     return output
@@ -55,7 +55,7 @@ max_name_length = 0
 
 
 def get_on_job_status(args: ByggNamespace, configuration: Byggfile):
-    def on_job_status(job_status: JobStatus, job: Job):
+    def on_job_status(job_status: JobStatus, job: Job, jobs_count: tuple[int, int]):
         match job_status:
             case "skipped":
                 pass
@@ -63,29 +63,32 @@ def get_on_job_status(args: ByggNamespace, configuration: Byggfile):
                 running_jobs.add(job.name)
             case "failed" | "finished" | "stopped":
                 running_jobs.discard(job.name)
-                print_job_ended(job_status, job)
+                print_job_ended(job_status, job, jobs_count)
             case _:
                 raise ValueError(f"Unhandled job status {job_status}")
 
-    def print_job_ended(job_status: JobStatus, job: Job):
+    def print_job_ended(job_status: JobStatus, job: Job, jobs_count: tuple[int, int]):
         global max_name_length
         max_name_length = max(len(job.name), max_name_length)
         status_code_message = f"[{job.status.rc}] " if job.status else "?"
         status_message = job.status.message if job.status and job.status.message else ""
         message_part = f"{status_code_message if job.status and job.status.rc else ''}{status_message}"
 
+        total_job_count_length = len(str(jobs_count[1]))
+        job_count_info = f" ({jobs_count[0]:>{total_job_count_length}}/{jobs_count[1]})"
+
         if args.verbose or configuration.settings.verbose:
             result_status = format_result_status(job_status, 0)
             formatted_log = format_job_log(job)
             log = f"\n{formatted_log}" if formatted_log else ""
             output_with_status_line(
-                format_queued_jobs_line(),
+                format_queued_jobs_line(job_count_info),
                 f"{result_status} {job.name}{(' : ' + message_part) if len(message_part) > 0 else ''}{log}",
             )
         else:
             result_status = format_result_status(job_status, STATUS_TEXT_FIELD_WIDTH)
             output_with_status_line(
-                format_queued_jobs_line(),
+                format_queued_jobs_line(job_count_info),
                 f"{result_status} {job.name:<{max_name_length}}{(' : ' + message_part) if len(message_part) > 0 else ''}",
             )
 
