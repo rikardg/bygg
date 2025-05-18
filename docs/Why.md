@@ -14,8 +14,8 @@ Many reasons!
 If you only need a task runner, there are many others. Just pick one whose
 syntax you like and that integrates well with your workflow. However, Bygg is
 also a task runner, and if the syntax (e.g. using the TOML short-hand action
-syntax) is ok with you, then it gives the possibility to start using the rest
-of the system over time.
+syntax) is ok with you, then it enables you to start using the rest of the
+system over time.
 
 If your build needs are covered by a general tool like Make or one of the many
 tools like it, you are probably fine with them. There are many tools that are
@@ -25,11 +25,12 @@ rules for them, like Meson/Cargo/Gobuild.
 ## Why another one?
 
 One of my use cases was to execute a set of build pipelines in a monorepo with
-parts doing Jinja templating, TypeScript compilation, some Node tools, and then
-compilation for Android and iOS. And of course running tests, creating Docker
-images, etc. In addition, we had to have quite a lot of Python code for other
-related tooling, to cover the gaps and for setting up the repo for different
-customer configurations between builds.
+a variety of tasks including (but not limited to) Jinja templating, TypeScript
+compilation, executing some Node tools, optimising graphical assets and
+compilation for Android and iOS. And of course regular associated tasks like
+running tests, creating Docker images, etc. In addition, we had to have quite a
+lot of Python code for other related tooling, to cover the gaps and for setting
+up the repo for different customer configurations between builds.
 
 ## Background
 
@@ -41,10 +42,13 @@ This was mainly due to a few factors, I think:
 - Make has no good way of compartmentalising code. Yes, we can split out parts
   into separate files, but the namespace is still shared.
 - Using functions is possible, but not really convenient due to the syntax.
-  Variables need to be double-escaped if they're supposed to be evaluated first
-  in the generated rule, for example.
+  Variables need to be double-escaped if they're not supposed to be evaluated
+  until inside the generated rule, for example.
 
 I also encountered certain ... resistance from colleagues to want to work
-with/in Make. I think that is mainly due to that the Makefile syntax is a bit
+with/in the Makefile syntax. I think that is mainly due to that is a bit
 archaic, and working with it and Make's peculiarities requires a certain state
-of mind. Using Python could bridge this gap.
+of mind. Using Python could help bridge this gap.
+
+## On hermetic builds
+
