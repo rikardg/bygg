@@ -42,7 +42,7 @@ Bygg requires Python 3.11 or higher.
 
 Install with
 
-`pipx install bygg` (recommended)
+`pipx install bygg` or `uv tool install bygg` (recommended)
 or
 `pip install bygg`
 
@@ -139,12 +139,12 @@ It will output a line that you can then add to `.bashrc` or `.zshrc`.
 _Don't forget to open a new shell instance after you've made changes to the
 settings files._
 
-Note: if you reinstall Bygg with `pipx`, the completions file will probably
-have been removed, but the path to `bygg` will be the same. In this case, just
-run the reinstalled `bygg` once to create the completions file and then restart
-your shell. If the completions still don't work, you might have to compare the
-output of `bygg --completions` with the settings in the shell configuration
-file per above.
+Note: if you reinstall Bygg with `pipx` or `uv`, the completions file will
+probably have been removed, but the path to `bygg` will be the same. In this
+case, just run the reinstalled `bygg` once (no arguments needed) to create the
+completions file and then restart your shell. If the completions still don't
+work, you might have to compare the output of `bygg --completions` with the
+settings in the shell configuration file per above.
 
 ### Notes
 
@@ -231,6 +231,12 @@ Bygg's virtual environment since it manages its own virtual environments:
 
 ```shell
 pipx install nox
+```
+
+or
+
+```shell
+uv tool install nox
 ```
 
 or
