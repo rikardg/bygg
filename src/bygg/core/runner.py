@@ -14,7 +14,7 @@ from bygg.core.scheduler import Job, Scheduler
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.status_display import on_check_failed
 
-JobStatusListener = Callable[[JobStatus, Job], None]
+JobStatusListener = Callable[[JobStatus, Job, tuple], None]
 RunnerStatusListener = Callable[[str], None]
 
 
@@ -41,6 +41,8 @@ class ProcessRunner:
         self.failed_jobs = []
 
     def start(self, max_workers: int = 1) -> bool:
+        total_job_count = len(self.scheduler.job_graph)
+
         self.runner_status_listener(
             f"Starting process runner with {max_workers} threads"
         )
@@ -59,7 +61,17 @@ class ProcessRunner:
 
             def call_status_listener():
                 for job in scheduled_jobs.keys():
-                    self.job_status_listener("running", job)
+                    self.job_status_listener(
+                        "running",
+                        job,
+                        (len(self.scheduler.finished_jobs), total_job_count),
+                    )
+
+            def get_job_count_tuple():
+                return (
+                    len(self.scheduler.finished_jobs) + len(self.failed_jobs),
+                    total_job_count,
+                )
 
             # If a job fails, we want to stop scheduling new jobs and just wait for the
             # ones that are already running to finish.
@@ -93,18 +105,27 @@ class ProcessRunner:
                                 None,
                             )
                             self.scheduler.job_finished(job)
-                            self.job_status_listener("skipped", job)
+                            self.job_status_listener(
+                                "skipped",
+                                job,
+                                get_job_count_tuple(),
+                            )
                             backlog.remove(job)
                             continue
 
                         # Run in-process
                         if job.action.scheduling_type == "in-process":
-                            self.job_status_listener("running", job)
+                            self.job_status_listener(
+                                "running",
+                                job,
+                                get_job_count_tuple(),
+                            )
                             job.status = job.action.command(job.action)
                             self.scheduler.job_finished(job)
                             self.job_status_listener(
                                 "finished" if job.status.rc == 0 else "failed",
                                 job,
+                                get_job_count_tuple(),
                             )
                             backlog.remove(job)
                             continue
@@ -130,10 +151,18 @@ class ProcessRunner:
 
                     self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:
-                        self.job_status_listener("finished", job_result)
+                        self.job_status_listener(
+                            "finished",
+                            job_result,
+                            get_job_count_tuple(),
+                        )
                     else:
                         self.failed_jobs.append(job_result)
-                        self.job_status_listener("failed", job_result)
+                        self.job_status_listener(
+                            "failed",
+                            job_result,
+                            get_job_count_tuple(),
+                        )
                         call_status_listener()
                         early_out = True
 
