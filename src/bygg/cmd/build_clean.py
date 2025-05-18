@@ -6,7 +6,13 @@ import time
 from bygg.cmd.datastructures import ByggContext
 from bygg.core.runner import get_job_count_limit
 from bygg.output.job_output import output_job_logs
-from bygg.output.output import output_error, output_info, output_ok, output_warning
+from bygg.output.output import (
+    output_error,
+    output_info,
+    output_ok,
+    output_plain,
+    output_warning,
+)
 from bygg.output.status_display import failed_checks, output_check_results
 
 
@@ -64,7 +70,8 @@ def build(
             return (False, input_files)
 
     except KeyboardInterrupt:
-        output_warning("\nBuild was interrupted by user.")
+        output_plain("")
+        output_warning("Build was interrupted by user.")
         return (False, input_files)
     except KeyError as e:
         output_error(f"Error: Action '{e}' not found.")
@@ -98,6 +105,7 @@ def clean(ctx: ByggContext, action: str):
                     pass
         ctx.scheduler.shutdown()
     except KeyboardInterrupt:
+        output_plain("")
         output_warning("Build was interrupted by user.")
         return False
     except KeyError as e:
