@@ -15,6 +15,8 @@ class TerminalStyle:
     BLINK = "\033[5m" if isatty else ""
     INVERTED = "\033[7m" if isatty else ""
     STRIKETHROUGH = "\033[9m" if isatty else ""
+    HIDE_CURSOR = "\033[?25l" if isatty else ""
+    SHOW_CURSOR = "\033[?25h" if isatty else ""
 
     class Fg:
         """Foreground Text Color"""
