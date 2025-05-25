@@ -4,6 +4,8 @@ import stat
 import time
 
 from bygg.cmd.datastructures import ByggContext
+from bygg.core.common_types import RunnerInstruction
+from bygg.core.job import Job
 from bygg.core.runner import get_job_count_limit
 from bygg.output.job_output import output_job_logs
 from bygg.output.output import (
@@ -46,28 +48,43 @@ def build(
         t1 = time.time()
         output_info(f"Building action '{action}':")
 
-        ctx.scheduler.start_run(
-            action,
-            always_make=always_make,
-            check=check,
-        )
+        start_count = 0
+        runner_instruction: RunnerInstruction | None = "restart_build"
 
-        # Collect for --watch. Needs to be done here when the graph is built up and
-        # before build has started.
-        for job_name in ctx.scheduler.job_graph.get_all_jobs():
-            build_action = ctx.scheduler.build_actions.get(job_name)
-            if build_action:
-                input_files.update(build_action.inputs)
+        while runner_instruction == "restart_build":
+            start_count += 1
+            if start_count > 17:
+                output_error("Too many restarts. Aborting.")
+                return (False, input_files)
 
-        status = ctx.runner.start(max_workers)
-        ctx.scheduler.shutdown()
+            ctx.scheduler.start_run(
+                action,
+                always_make=always_make,
+                check=check,
+            )
 
-        if status:
-            output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
-        else:
-            output_error(f"Action '{action}' failed after {time.time() - t1:.2f} s.")
-            output_job_logs(ctx.runner.failed_jobs)
-            return (False, input_files)
+            # Collect for --watch. Needs to be done here when the graph is built up and
+            # before build has started.
+            for job_name in ctx.scheduler.job_graph.get_all_jobs():
+                build_action = ctx.scheduler.build_actions.get(job_name)
+                if build_action:
+                    input_files.update(build_action.inputs)
+
+            exit_reasons = ctx.runner.start(max_workers)
+            ctx.scheduler.shutdown()
+            runner_instruction = process_exit_reasons(exit_reasons)
+
+            if runner_instruction is None:
+                output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
+            elif runner_instruction == "restart_build":
+                output_info("Restarting build.")
+                pass
+            else:
+                output_error(
+                    f"Action '{action}' failed after {time.time() - t1:.2f} s."
+                )
+                output_job_logs(ctx.runner.failed_jobs)
+                return (False, input_files)
 
     except KeyboardInterrupt:
         output_plain("")
@@ -83,6 +100,22 @@ def build(
         return (output_check_results(), input_files)
 
     return (True, input_files)
+
+
+def process_exit_reasons(exit_reasons: list[Job]) -> RunnerInstruction | None:
+    if not exit_reasons:
+        return None
+
+    distilled_exit_reasons = {
+        r.status.runner_instruction
+        for r in exit_reasons
+        if r.status and r.status.runner_instruction
+    }
+
+    if "restart_build" in distilled_exit_reasons:
+        return "restart_build"
+
+    return "exit_job_failed"
 
 
 def clean(ctx: ByggContext, action: str):

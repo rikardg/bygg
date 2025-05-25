@@ -41,3 +41,32 @@
     'files/out',
   ])
 # ---
+# name: test_list[restart_build]
+  '''
+  Available actions:
+  
+  restart_once
+      No description
+  
+  
+  '''
+# ---
+# name: test_list[restart_build].1
+  list([
+    '.gitignore',
+    'Byggfile.py',
+  ])
+# ---
+# name: test_list[restart_build].2
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'restart_status.txt',
+  ])
+# ---
+# name: test_list[restart_build].3
+  list([
+    '.gitignore',
+    'Byggfile.py',
+  ])
+# ---
