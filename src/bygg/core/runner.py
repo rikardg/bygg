@@ -40,7 +40,7 @@ class ProcessRunner:
         self.runner_status_listener = lambda *args: None
         self.failed_jobs = []
 
-    def start(self, max_workers: int = 1) -> bool:
+    def start(self, max_workers: int = 1) -> list[Job]:
         total_job_count = len(self.scheduler.job_graph)
 
         self.runner_status_listener(
@@ -75,11 +75,11 @@ class ProcessRunner:
 
             # If a job fails, we want to stop scheduling new jobs and just wait for the
             # ones that are already running to finish.
-            early_out = False
+            exit_reasons: list[Job] = []
 
             while True:
                 if (
-                    not early_out
+                    not exit_reasons
                     and len(backlog) < 2 * max_workers
                     and (jobs := self.scheduler.get_ready_jobs())
                 ):
@@ -88,9 +88,9 @@ class ProcessRunner:
                 if (
                     len(scheduled_jobs) == 0
                     and len(backlog) == 0
-                    and (self.scheduler.run_status() == "finished" or early_out)
+                    and (self.scheduler.run_status() == "finished" or exit_reasons)
                 ):
-                    return not early_out
+                    return exit_reasons
 
                 # Keep the scheduled queue relatively short; no need to schedule much
                 # more than we have workers
@@ -151,6 +151,8 @@ class ProcessRunner:
 
                     self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:
+                        if job_result.status.runner_instruction:
+                            exit_reasons.append(job_result)
                         self.job_status_listener(
                             "finished",
                             job_result,
@@ -164,7 +166,7 @@ class ProcessRunner:
                             get_job_count_tuple(),
                         )
                         call_status_listener()
-                        early_out = True
+                        exit_reasons.append(job_result)
 
     def check_for_missing_output_files(self, job: Job):
         missing_files: list[str | Path] = []
