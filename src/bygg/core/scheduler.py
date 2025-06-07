@@ -207,6 +207,7 @@ class Scheduler:
             new_job = Job(action)
             self.running_jobs[new_job.name] = new_job
             job_list.append(new_job)
+            self.store_input_digests(new_job)
 
         if self.check_inputs_outputs_set is not None:
             # Check that no job has outputs that are inputs to an earlier job
@@ -238,17 +239,29 @@ class Scheduler:
 
         if job.status and job.status.rc == 0:
             self.job_graph.remove_node(job.name)
-            inputs_digest, _ = calculate_dependency_digest(job.action.dependency_files)
-            outputs_digest, _ = calculate_dependency_digest(job.action.outputs)
-            dynamic_digest = (
-                calculate_digest([dd])
-                if job.action.dynamic_dependency
-                and (dd := job.action.dynamic_dependency())
-                else None
-            )
-
-            self.cache.set_digests(
-                job.name, inputs_digest, outputs_digest, dynamic_digest
-            )
+            self.store_output_digest(job)
         else:
             self.cache.remove_digests(job.name)
+
+    def store_input_digests(self, job: Job):
+        inputs_digest, _ = calculate_dependency_digest(job.action.dependency_files)
+        dynamic_digest = (
+            calculate_digest([dd])
+            if job.action.dynamic_dependency and (dd := job.action.dynamic_dependency())
+            else None
+        )
+        self.cache.set_digests(job.name, inputs_digest, "", dynamic_digest)
+
+    def store_output_digest(self, job: Job):
+        stored_digest = self.cache.get_digests(job.name)
+        assert stored_digest is not None, (
+            "At this point, the digest should already be in the cache since the job was started, or it's a bug"
+        )
+
+        outputs_digest, _ = calculate_dependency_digest(job.action.outputs)
+        self.cache.set_digests(
+            job.name,
+            stored_digest.inputs_digest,
+            outputs_digest,
+            stored_digest.dynamic_digest,
+        )
