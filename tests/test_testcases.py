@@ -16,6 +16,7 @@ testcases_dir = Path("testcases")
 
 testcases: list[TestcaseParameters] = [
     TestcaseParameters("action_set", ["testfiles_static"]),
+    TestcaseParameters("restart_build", ["restart_once"]),
 ]
 
 
