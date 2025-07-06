@@ -59,7 +59,7 @@ class CustomLogFormatter(logging.Formatter):
 
 
 def setup_logging():
-    debug = str.lower(os.environ.get("DEBUG_BYGG", ""))
+    debug = str.lower(os.environ.get("BYGG_DEBUG", ""))
 
     if not debug:
         logging.getLogger("bygg").disabled = True
