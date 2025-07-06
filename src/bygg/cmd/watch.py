@@ -4,7 +4,7 @@ import time
 from watchdog.events import DirModifiedEvent, FileModifiedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
-from bygg.logging import logger
+from bygg.logutils import logger
 
 
 class FileEventHandler(FileSystemEventHandler):

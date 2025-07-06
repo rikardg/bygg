@@ -5,7 +5,7 @@ A build tool written in Python, where all actions can be written in Python.
 # PYTHON_ARGCOMPLETE_OK
 
 from bygg.cmd.dispatcher import bygg
-from bygg.logging import logger, setup_logging
+from bygg.logutils import logger, setup_logging
 from bygg.output.output import (
     TerminalStyle as TS,
 )
