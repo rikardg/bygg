@@ -111,10 +111,10 @@ class Action(ActionContext):
 
     def __repr__(self):
         return f"""Action(name={self.name}, inputs=({
-                ', '.join([str(i) for i in self.inputs])}), outputs=({
-                ', '.join([str(o) for o in self.outputs])}), dependencies=({
-                ', '.join(self.dependencies)}) is_entrypoint={
-            self.is_entrypoint})"""
+            ", ".join([str(i) for i in self.inputs])
+        }), outputs=({", ".join([str(o) for o in self.outputs])}), dependencies=({
+            ", ".join(self.dependencies)
+        }) is_entrypoint={self.is_entrypoint})"""
 
     def __str__(self):
         return self.__repr__()
