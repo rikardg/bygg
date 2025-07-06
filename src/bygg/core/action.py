@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional
 
 from bygg.core.common_types import CommandStatus
-from bygg.logging import logger
+from bygg.logutils import logger
 
 if TYPE_CHECKING:
     from bygg.core.scheduler import Scheduler

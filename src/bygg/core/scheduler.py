@@ -6,7 +6,7 @@ from bygg.core.cache import Cache
 from bygg.core.dag import Dag, create_dag
 from bygg.core.digest import calculate_dependency_digest, calculate_digest
 from bygg.core.job import Job
-from bygg.logging import logger
+from bygg.logutils import logger
 from bygg.output.status_display import on_check_failed
 
 

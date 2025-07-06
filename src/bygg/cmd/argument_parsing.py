@@ -7,7 +7,7 @@ from typing import Any, Literal, TypeAlias
 from argcomplete.completers import BaseCompleter
 
 from bygg.cmd.completions import ByggfileDirectoriesCompleter
-from bygg.logging import logger
+from bygg.logutils import logger
 
 MaintenanceCommand: TypeAlias = Literal["remove_cache", "remove_environments"]
 

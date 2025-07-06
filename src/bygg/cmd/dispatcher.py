@@ -42,7 +42,7 @@ from bygg.cmd.tree import print_tree, tree_collect_for_environment
 from bygg.cmd.watch import do_watch
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
-from bygg.logging import logger
+from bygg.logutils import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import output_error, output_info, output_warning
 from bygg.output.status_display import (

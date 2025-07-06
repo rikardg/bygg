@@ -2,7 +2,7 @@ from bygg.cmd.argument_parsing import MaintenanceCommand
 from bygg.cmd.configuration import Byggfile
 from bygg.cmd.environments import remove_environments
 from bygg.core.cache import Cache
-from bygg.logging import logger
+from bygg.logutils import logger
 from bygg.output.output import output_info
 
 
