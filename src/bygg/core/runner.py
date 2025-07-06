@@ -5,9 +5,6 @@ import sys
 from typing import Callable
 import warnings
 
-from loky import Future, ProcessPoolExecutor, wait  # type: ignore
-from loky.backend import get_context  # type: ignore
-
 from bygg.core.action import CommandStatus
 from bygg.core.common_types import JobStatus
 from bygg.core.scheduler import Job, Scheduler
@@ -41,6 +38,9 @@ class ProcessRunner:
         self.failed_jobs = []
 
     def start(self, max_workers: int = 1) -> list[Job]:
+        from loky import Future, ProcessPoolExecutor, wait  # type: ignore
+        from loky.backend import get_context  # type: ignore
+
         total_job_count = len(self.scheduler.job_graph)
 
         self.runner_status_listener(
