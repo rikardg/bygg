@@ -39,9 +39,9 @@ class CustomLogFormatter(logging.Formatter):
         color_filename_width = filename_width + len(TS.Fg.WHITE)
 
         filename = (
-            f"{record.filename + ':' + str(record.lineno) :<{filename_width}}"
+            f"{record.filename + ':' + str(record.lineno):<{filename_width}}"
             if self.no_colors
-            else f"{TS.Fg.CYAN}{record.filename + ':' + TS.Fg.WHITE + str(record.lineno) :<{color_filename_width}}{TS.RESET}"
+            else f"{TS.Fg.CYAN}{record.filename + ':' + TS.Fg.WHITE + str(record.lineno):<{color_filename_width}}{TS.RESET}"
         )
 
         message = record.getMessage()
