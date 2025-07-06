@@ -1,6 +1,7 @@
 # Development
 mypy==1.15.0
 pip==25.1.1
+pyinstrument==5.0.3
 pyright==1.1.400
 pytest==8.3.5
 pytest-mock==3.14.0
