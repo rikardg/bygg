@@ -10,7 +10,6 @@ from typing import Optional, TypeAlias
 
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
-from bygg.cmd.build_clean import build, clean
 from bygg.cmd.completions import (
     EntrypointCompleter,
     do_completion,
@@ -362,6 +361,8 @@ def run_or_collect_in_environment(
         return (subprocess_data, False)
 
     # Build or clean handled below. These are the only commands handled here.
+    from bygg.cmd.build_clean import build, clean
+
     if ctx.bygg_namespace.clean:
         status = clean(ctx, action)
     else:
@@ -511,6 +512,8 @@ def subprocess_dispatcher(parser, args_namespace):
     if action and action not in ctx.scheduler.build_actions or not action:
         write_ipc_data(ctx, args)
         sys.exit(DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE)
+
+    from bygg.cmd.build_clean import build, clean
 
     if args.clean:
         status = clean(ctx, action)
