@@ -39,7 +39,6 @@ from bygg.cmd.environments import (
 from bygg.cmd.list_actions import list_collect_for_environment, print_actions
 from bygg.cmd.maintenance import perform_maintenance
 from bygg.cmd.tree import print_tree, tree_collect_for_environment
-from bygg.cmd.watch import do_watch
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
 from bygg.logutils import logger
@@ -106,6 +105,9 @@ def bygg():
                 files_to_watch = extract_input_files(environment_data_list)
                 if not args.watch or len(files_to_watch) == 0:
                     break
+
+                from bygg.cmd.watch import do_watch
+
                 output_info("Watching for changes")
                 do_watch(files_to_watch)
         return rc
