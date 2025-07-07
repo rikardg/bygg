@@ -347,3 +347,14 @@ def test_reset_reset(snapshot, clean_bygg_tree, example: ExampleParameters):
     assert not Path(
         clean_bygg_tree / examples_dir / example.name / DEFAULT_DB_FILE
     ).exists()
+
+
+# Rudimentary test to at least run the watch code
+def test_watch():
+    with pytest.raises(subprocess.TimeoutExpired):
+        subprocess.run(
+            ["bygg", "-C", examples_dir / "taskrunner", "succeed", "--watch"],
+            capture_output=True,
+            encoding="utf-8",
+            timeout=2,
+        )
