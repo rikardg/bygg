@@ -63,7 +63,7 @@ def get_on_job_status(args: ByggNamespace, configuration: Byggfile):
                 pass
             case "running":
                 running_jobs.add(job.name)
-            case "failed" | "finished" | "stopped":
+            case "failed" | "finished" | "stopped" | "trim_only":
                 running_jobs.discard(job.name)
                 print_job_ended(job_status, job, jobs_count)
             case _:
