@@ -85,6 +85,8 @@ def scheduler_branching_actions(scheduler_fixture):
 clean_bygg_tree_exclusions = (
     "__pycache__",
     ".bygg",
+    ".jj",
+    ".mypy_cache",
     ".nox",
     ".venv*",
     "foo",
