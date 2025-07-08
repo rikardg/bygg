@@ -28,3 +28,48 @@
     'Byggfile.py',
   ])
 # ---
+# name: test_list[trim]
+  '''
+  Available actions:
+  
+  trim
+      No description
+  
+  
+  '''
+# ---
+# name: test_list[trim].1
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+  ])
+# ---
+# name: test_list[trim].2
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+  ])
+# ---
+# name: test_list[trim].3
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+  ])
+# ---
