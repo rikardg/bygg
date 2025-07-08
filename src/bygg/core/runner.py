@@ -1,6 +1,10 @@
+from collections import deque
+import glob
 import os
 from pathlib import Path
+import shutil
 import signal
+import stat
 import sys
 from typing import Callable
 import warnings
@@ -8,6 +12,7 @@ import warnings
 from bygg.core.action import CommandStatus
 from bygg.core.common_types import JobStatus
 from bygg.core.scheduler import Job, Scheduler
+from bygg.logutils import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.status_display import on_check_failed
 
@@ -97,6 +102,8 @@ class ProcessRunner:
                 batch_size = max_workers * 2
                 if len(scheduled_jobs) < batch_size:
                     for job in backlog:
+                        if job.action.trim_globs:
+                            perform_trimming(self.scheduler, job)
                         # Skip jobs with no command or ones that are clean
                         if job.action.command is None:
                             job.status = CommandStatus(
@@ -204,3 +211,47 @@ def get_job_count_limit():
         count = os.cpu_count()
         assert count is not None
         return count
+
+
+def perform_trimming(scheduler: Scheduler, job: Job):
+    action = job.action
+    assert action.trim_globs
+
+    dependencies_outputs: set[str] = set()
+
+    for dep in recursive_dependencies(scheduler, action.name):
+        dependencies_outputs.update(dep.outputs)
+
+    globbed_files: set[str] = set()
+    for trim_glob in action.trim_globs:
+        globbed_files.update(glob.glob(trim_glob, recursive=True))
+
+    trimlist = globbed_files - dependencies_outputs
+    logger.debug("Trimming for job '%s': %s ", action.name, trimlist)
+
+    for to_trim in trimlist:
+        try:
+            s = os.stat(to_trim)
+            if stat.S_ISREG(s.st_mode):
+                os.unlink(to_trim)
+            elif stat.S_ISDIR(s.st_mode):
+                shutil.rmtree(to_trim)
+        except FileNotFoundError:
+            pass
+
+
+def recursive_dependencies(scheduler: Scheduler, action_name: str):
+    "Generator for the recursive dependencies of a given action."
+    action = scheduler.build_actions.get(action_name)
+    if action is None:
+        return
+
+    queue = deque([action])
+    while len(queue) > 0:
+        a = queue.popleft()
+        yield a
+        for dependency in a.dependencies:
+            dependency_action = scheduler.build_actions.get(dependency)
+            if not dependency_action:
+                raise ValueError(f"Action '{dependency}' not found")
+            queue.append(dependency_action)
