@@ -50,16 +50,19 @@ class ByggHelpFormatter(argparse.RawDescriptionHelpFormatter):
         )
 
     def _fill_text(self, text, width, indent):
-        # Assuming main description starts with a newline
-        if text.startswith("\n"):
-            return "\n".join(
-                [
-                    "\n".join(textwrap.wrap(line, width=width))
-                    for line in text.splitlines(keepends=True)
-                ]
-            )
-        # Group descriptions
-        return argparse.HelpFormatter._fill_text(self, text, width, indent)
+        return fill_help_text(text, width, indent)
+
+
+def fill_help_text(text: str, width: int, indent: str) -> str:
+    return "\n".join(
+        textwrap.fill(
+            line,
+            width=width,
+            initial_indent=indent,
+            subsequent_indent=indent + "  " if line.startswith("- ") else indent,
+        )
+        for line in text.strip().splitlines(keepends=True)
+    )
 
 
 def create_argument_parser(entrypoint_completions: BaseCompleter):
