@@ -22,6 +22,7 @@ class ActionContext:
     outputs: set[str]
     dependencies: set[str]
     dynamic_dependency: Optional[DynamicDependency]
+    trim_globs: Optional[set[str]]
     is_entrypoint: bool
     scheduling_type: SchedulingType
 
@@ -47,6 +48,14 @@ class Action(ActionContext):
         An iterable of action names that this action depends on. Default is None.
     dynamic_dependency : DynamicDependency, optional
         A dynamic dependency of the action. Default is None.
+    trim_globs : Iterable[str], optional
+        The purpose of trim_globs is to be able to remove files that should no longer
+        exist, e.g. because they belong to a previous configuration of the source tree.
+
+        Trimming will be performed before the action has run. The list of outputs from
+        all the action's dependencies will be collected and subtracted from the file
+        list of the evaluated glob(s). Any files or directories that remain will be
+        deleted.
     is_entrypoint : bool, optional
         Whether this action is an entrypoint to the build graph. Default is False.
     command : Command, optional
@@ -76,6 +85,7 @@ class Action(ActionContext):
         outputs: Optional[Iterable[str]] = None,
         dependencies: Optional[Iterable[str]] = None,
         dynamic_dependency: Optional[DynamicDependency] = None,
+        trim_globs: Optional[Iterable[str]] = None,
         is_entrypoint: bool = False,
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
@@ -88,6 +98,7 @@ class Action(ActionContext):
         self.outputs = {*outputs} if outputs else set()
         self.dependencies = {*dependencies} if dependencies else set()
         self.dynamic_dependency = dynamic_dependency
+        self.trim_globs = {*trim_globs} if trim_globs else set()
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
@@ -128,6 +139,7 @@ def action(
     outputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
+    trim_globs: Optional[Iterable[str]] = None,
     scheduling_type: SchedulingType = "processpool",
     is_entrypoint: bool = False,
 ):
@@ -149,6 +161,14 @@ def action(
         An iterable of dependency actions, by default None
     dynamic_dependency : DynamicDependency, optional
         A dynamic dependency, by default None
+    trim_globs : Iterable[str], optional
+        The purpose of trim_globs is to be able to remove files that should no longer
+        exist, e.g. because they belong to a previous configuration of the source tree.
+
+        Trimming will be performed before the action has run. The list of outputs from
+        all the action's dependencies will be collected and subtracted from the file
+        list of the evaluated glob(s). Any files or directories that remain will be
+        deleted.
     is_entrypoint : bool, optional
         Whether the action is an entrypoint, by default False
     scheduling_type : SchedulingType, optional
@@ -172,6 +192,7 @@ def action(
             outputs=outputs,
             dependencies=dependencies,
             dynamic_dependency=dynamic_dependency,
+            trim_globs=trim_globs,
             is_entrypoint=is_entrypoint,
             scheduling_type=scheduling_type,
             command=func,
@@ -187,6 +208,7 @@ def action_set(
     file_pairs: Iterable[tuple[str, str]],
     extra_inputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str]] = None,
+    trim_globs: Optional[Iterable[str]] = None,
     is_entrypoint: bool = False,
     scheduling_type: SchedulingType = "processpool",
     description: str | None = None,
@@ -208,6 +230,8 @@ def action_set(
         Extra input files, by default None
     dependencies : Iterable[str], optional
         Dependencies for actions, by default None
+    trim_globs : Iterable[str], optional
+        Trim argument for the top-most action.
     is_entrypoint : bool, optional
         Whether the top-most action should be an entrypoint, by default False
     scheduling_type : SchedulingType, optional
@@ -241,6 +265,7 @@ def action_set(
             base_name,
             f"Action set {base_name}",
             dependencies=action_list,
+            trim_globs=trim_globs,
             is_entrypoint=is_entrypoint,
             scheduling_type=scheduling_type,
             description=description,

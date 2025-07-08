@@ -139,6 +139,11 @@ class Scheduler:
             logger.debug("Job '%s' is dirty (no previous result)", job_name)
             return True
 
+        if action.trim_globs:
+            # An action with trimming globs will always be sent to the runner
+            logger.debug("Job '%s' is dirty (has trim_globs)", job_name)
+            return True
+
         outputs_digest, files_were_missing = calculate_dependency_digest(action.outputs)
         if files_were_missing or cached_digests.outputs_digest != outputs_digest:
             # The output has changed, so we need to rebuild
