@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Self
+
+# import inspect
+from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Protocol, Self
 
 from bygg.core.common_types import CommandStatus
 from bygg.logutils import logger
@@ -31,6 +33,14 @@ class WorkChannel:
         self.current_jobs = set()
 
 
+class DynamicTrim(Protocol):
+    """Return file paths to trim"""
+
+    def __call__(self) -> Iterable[str]:
+        """Return file paths to trim."""
+        ...
+
+
 @dataclass
 class ActionContext:
     name: str
@@ -39,6 +49,7 @@ class ActionContext:
     outputs: set[str]
     dependencies: set[str]
     dynamic_dependency: Optional[DynamicDependency]
+    trim: Optional[Iterable[str] | DynamicTrim]
     is_entrypoint: bool
     scheduling_type: SchedulingType
 
@@ -64,6 +75,16 @@ class Action(ActionContext):
         An iterable of action names that this action depends on. Default is None.
     dynamic_dependency : DynamicDependency, optional
         A dynamic dependency of the action. Default is None.
+    trim : Iterable[str] | DynamicTrim, optional
+        The purpose of trim_globs is to be able to remove files that should no longer
+        exist, e.g. because they belong to a previous configuration of the source tree.
+        - Trimming will be performed before the action has run.
+        - The list of outputs from all the action's dependencies will be collected and
+          subtracted from the file list of the evaluated trim list.
+        - Directories that contain such output files will also be subtracted.
+        - Paths will be normalised using os.path.normpath before comparison.
+        - Any files or directories that remain will be deleted.
+        See utils.py for utility functions for git controlled files.
     is_entrypoint : bool, optional
         Whether this action is an entrypoint to the build graph. Default is False.
     command : Command, optional
@@ -95,6 +116,7 @@ class Action(ActionContext):
         outputs: Optional[Iterable[str | Path]] = None,
         dependencies: Optional[Iterable[str | Self]] = None,
         dynamic_dependency: Optional[DynamicDependency] = None,
+        trim: Optional[Iterable[str] | DynamicTrim] = None,
         is_entrypoint: bool = False,
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
@@ -110,6 +132,7 @@ class Action(ActionContext):
             d.name if isinstance(d, Action) else d for d in (dependencies or [])
         }
         self.dynamic_dependency = dynamic_dependency
+        self.trim = trim
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
@@ -151,6 +174,7 @@ def action(
     outputs: Optional[Iterable[str | Path]] = None,
     dependencies: Optional[Iterable[str | Action]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
+    trim: Optional[Callable[[], Iterable[str]]] = None,
     scheduling_type: SchedulingType = "processpool",
     work_channel: Optional[WorkChannel] = None,
     is_entrypoint: bool = False,
@@ -173,6 +197,16 @@ def action(
         An iterable of dependency actions, by default None
     dynamic_dependency : DynamicDependency, optional
         A dynamic dependency, by default None
+    trim : Iterable[str] | DynamicTrim, optional
+        The purpose of trim_globs is to be able to remove files that should no longer
+        exist, e.g. because they belong to a previous configuration of the source tree.
+        - Trimming will be performed before the action has run.
+        - The list of outputs from all the action's dependencies will be collected and
+          subtracted from the file list of the evaluated trim list.
+        - Directories that contain such output files will also be subtracted.
+        - Paths will be normalised using os.path.normpath before comparison.
+        - Any files or directories that remain will be deleted.
+        See utils.py for utility functions for git controlled files.
     is_entrypoint : bool, optional
         Whether the action is an entrypoint, by default False
     scheduling_type : SchedulingType, optional
@@ -196,6 +230,7 @@ def action(
             outputs=outputs,
             dependencies=dependencies,
             dynamic_dependency=dynamic_dependency,
+            trim=trim,
             is_entrypoint=is_entrypoint,
             scheduling_type=scheduling_type,
             work_channel=work_channel,

@@ -16,6 +16,7 @@ class Scheduler:
 
     job_graph: Dag
     ready_jobs: set[str]
+    trim_only_jobs: set[str]
     running_jobs: dict[str, Job]
     finished_jobs: dict[str, Job]
 
@@ -29,6 +30,7 @@ class Scheduler:
         self.build_actions = {}
         self.job_graph = create_dag()
         self.ready_jobs = set()
+        self.trim_only_jobs = set()
         self.running_jobs = {}
         self.finished_jobs = {}
         self.started = False
@@ -41,6 +43,7 @@ class Scheduler:
     def prepare_run(self, entrypoint: str, check=False):
         self.job_graph.clear()
         self.ready_jobs = set()
+        self.trim_only_jobs = set()
         self.running_jobs = {}
         self.finished_jobs = {}
 
@@ -113,7 +116,7 @@ class Scheduler:
             return "finished"
         return "running"
 
-    def check_dirty(self, job_name: str) -> bool:
+    def check_dirty(self, job_name: str) -> bool | Literal["trim_only"]:
         """Check if a job needs to be built."""
         if self.always_make:
             return True
@@ -171,6 +174,11 @@ class Scheduler:
             logger.debug("Job '%s' is dirty (inputs changed)", job_name)
             return True
 
+        if action.trim:
+            # An action with trimming globs will always be sent to the runner, but with a status indicating that
+            logger.debug("Job '%s' is dirty (has trim_globs)", job_name)
+            return "trim_only"
+
         logger.debug("Job '%s' is clean", job_name)
         return False
 
@@ -189,10 +197,13 @@ class Scheduler:
             )
             dirty_jobs = []
             for job in new_jobs:
-                if self.check_dirty(job):
-                    dirty_jobs.append(job)
-                else:
-                    self.skip_job(job)
+                match self.check_dirty(job):
+                    case True:
+                        dirty_jobs.append(job)
+                    case "trim_only":
+                        self.trim_only_jobs.add(job)
+                    case False:
+                        self.skip_job(job)
             self.ready_jobs.update(dirty_jobs)
 
         if len(self.ready_jobs) == 0:
@@ -205,7 +216,8 @@ class Scheduler:
             else min(batch_size, len(self.ready_jobs))
         ):
             action = self.build_actions[self.ready_jobs.pop()]
-            new_job = Job(action)
+            trim_only = action.name in self.trim_only_jobs
+            new_job = Job(action, trim_only)
             self.running_jobs[new_job.name] = new_job
             job_list.append(new_job)
             self.store_input_digests(new_job)
