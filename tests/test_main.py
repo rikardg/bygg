@@ -6,6 +6,7 @@ import sys
 
 import pytest
 
+from bygg.cmd.argument_parsing import fill_help_text
 from bygg.core.cache import DEFAULT_DB_FILE
 
 
@@ -21,6 +22,45 @@ def test_help(snapshot, clean_bygg_tree, python_version):
     )
     assert process.returncode == 0
     assert process.stdout == snapshot
+
+
+@dataclass
+class HelpText:
+    name: str
+    text: str
+
+
+help_texts = [
+    HelpText(
+        "basic",
+        "This is a basic help text.",
+    ),
+    HelpText(
+        "multiline",
+        """
+This is a multiline help text.
+
+Line 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Line 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+""",
+    ),
+    HelpText(
+        "lists",
+        """
+This is a multiline help text with lists.
+
+- Line 2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+- Line 3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+""",
+    ),
+]
+
+
+@pytest.mark.parametrize("help_text", help_texts, ids=lambda x: x.name)
+def test_help_formatting(snapshot, help_text):
+    assert fill_help_text(help_text.text, 80, "") == snapshot
+    assert fill_help_text(help_text.text, 80, "  ") == snapshot
 
 
 @dataclass
