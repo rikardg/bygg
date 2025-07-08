@@ -25,7 +25,7 @@ def update_help_snapshots(session):
 def tests(session):
     session.install("-r", "requirements.txt", "-r", "requirements-dev.txt")
     session.install(".")
-    session.run("pytest", "-vv", "-m", "not help")
+    session.run("pytest", "-n", "auto", "-vv", "-m", "not help")
     # The help test needs separate snapshots for each Python version, and the snapshot
     # package for pytest (syrupy) will report the snapshots for the Python version not
     # running currently as unused. Run the help test with the --snapshot-warn-unused
