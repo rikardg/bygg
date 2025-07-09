@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional
 
@@ -62,7 +60,9 @@ class Action(ActionContext):
         provided, else None.
     """
 
-    scheduler: Scheduler | None = None
+    # Set when Scheduler is initialised. Quotes around the type because of circular
+    # import shenanigans.
+    scheduler: "Scheduler | None" = None
     _current_environment: str | None = None
 
     command: Command | None
