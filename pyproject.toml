@@ -66,9 +66,10 @@ SETUPTOOLS_SCM_PRETEND_VERSION = "0.0.0.dev0"
 
 [tool.ruff]
 exclude = ["_version.py"]
+target-version = "py311"
 
 [tool.ruff.lint]
-extend-select = ["I", "UP006"]
+extend-select = ["I", "UP006", "UP"]
 ignore = ["E501"]
 
 [tool.ruff.lint.isort]
