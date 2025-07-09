@@ -5,7 +5,6 @@ from typing import Optional
 import pytest
 
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
-from bygg.cmd.completions import EntrypointCompleter
 from bygg.cmd.configuration import Byggfile
 from bygg.cmd.datastructures import ByggContext, SubProcessIpcData
 from bygg.cmd.tree import print_tree, tree_collect_for_environment
@@ -24,7 +23,7 @@ class ArgparseFixtureData:
 @pytest.fixture
 def create_byggcontext():
     def instantiate_context(scheduler: Scheduler, argv: Optional[list[str]] = None):
-        parser = create_argument_parser(EntrypointCompleter())
+        parser = create_argument_parser()
         args = parser.parse_args(argv or [])
         return ByggContext(
             ProcessRunner(scheduler),

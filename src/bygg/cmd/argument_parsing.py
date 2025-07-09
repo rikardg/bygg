@@ -4,9 +4,7 @@ import shutil
 import textwrap
 from typing import Any, Literal, TypeAlias
 
-from argcomplete.completers import BaseCompleter
-
-from bygg.cmd.completions import ByggfileDirectoriesCompleter
+from bygg.cmd.completions import ByggfileDirectoriesCompleter, EntrypointCompleter
 from bygg.logutils import logger
 
 MaintenanceCommand: TypeAlias = Literal["remove_cache", "remove_environments"]
@@ -65,7 +63,7 @@ def fill_help_text(text: str, width: int, indent: str) -> str:
     )
 
 
-def create_argument_parser(entrypoint_completions: BaseCompleter):
+def create_argument_parser():
     logger.info("Creating argument parser")
 
     parser = argparse.ArgumentParser(
@@ -98,7 +96,7 @@ List available actions:
         default=None,
         help="Entrypoint actions to operate on.",
     )
-    arg.completer = entrypoint_completions
+    arg.completer = EntrypointCompleter()
 
     parser.add_argument(
         "-V", "--version", action="store_true", help="Show version string and exit."
