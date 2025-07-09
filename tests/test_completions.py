@@ -102,3 +102,25 @@ def test_actions_completions(completion_tester, arg, snapshot, clean_bygg_tree):
         with change_dir(dir):
             testresult = completion_tester("")
             assert sorted(testresult.split("\x0b")) == snapshot
+
+
+@pytest.mark.parametrize("arg", actions_completions, ids=lambda x: str(x.name))
+def test_actions_completions_bygg_dev(
+    completion_tester, arg, snapshot, clean_bygg_tree, monkeypatch
+):
+    monkeypatch.setenv("BYGG_DEV", "1")
+    dir = str(arg)
+    with change_dir(clean_bygg_tree):
+        testcase = f"-C {dir} "
+        testresult = completion_tester(testcase)
+        assert sorted(testresult.split("\x0b")) == snapshot
+
+    with change_dir(clean_bygg_tree):
+        testcase = f"--directory {dir} "
+        testresult = completion_tester(testcase)
+        assert sorted(testresult.split("\x0b")) == snapshot
+
+    with change_dir(clean_bygg_tree):
+        with change_dir(dir):
+            testresult = completion_tester("")
+            assert sorted(testresult.split("\x0b")) == snapshot

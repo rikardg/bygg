@@ -183,7 +183,13 @@ List available actions:
     # Analyse and verify:
     analyse_group = parser.add_argument_group(
         "Analyse and verify",
-        "Arguments in this group will add more analysis to the build process. Actions will be built and the analysis result will be reported.",
+        """
+Arguments in this group will add more analysis to the build process. Actions will be built and the analysis result will be reported.
+
+There are also two environment variables available:
+- BYGG_DEBUG enables debug logging.
+- BYGG_DEV treats all actions as entry points, which allows for running them directly from the command line.
+""",
     )
     analyse_group.add_argument(
         "--check",

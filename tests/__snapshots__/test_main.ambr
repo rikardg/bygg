@@ -309,6 +309,11 @@
     Arguments in this group will add more analysis to the build process. Actions
     will be built and the analysis result will be reported.
   
+    There are also two environment variables available:
+    - BYGG_DEBUG enables debug logging.
+    - BYGG_DEV treats all actions as entry points, which allows for running them
+      directly from the command line.
+  
     --check               Perform various checks on the action tree. Implies -B
   
   Maintenance:
@@ -378,6 +383,11 @@
     Arguments in this group will add more analysis to the build process. Actions
     will be built and the analysis result will be reported.
   
+    There are also two environment variables available:
+    - BYGG_DEBUG enables debug logging.
+    - BYGG_DEV treats all actions as entry points, which allows for running them
+      directly from the command line.
+  
     --check               Perform various checks on the action tree. Implies -B
   
   Maintenance:
@@ -445,6 +455,11 @@
   Analyse and verify:
     Arguments in this group will add more analysis to the build process. Actions
     will be built and the analysis result will be reported.
+  
+    There are also two environment variables available:
+    - BYGG_DEBUG enables debug logging.
+    - BYGG_DEV treats all actions as entry points, which allows for running them
+      directly from the command line.
   
     --check               Perform various checks on the action tree. Implies -B
   

@@ -1,5 +1,6 @@
 import argparse
 from dataclasses import dataclass, field
+import os
 from typing import Optional
 
 from bygg.cmd.argument_parsing import ByggNamespace
@@ -63,8 +64,9 @@ NO_DESCRIPTION = "No description"
 
 
 def get_entrypoints(ctx: ByggContext, environment_name: str) -> list[EntryPoint]:
+    show_all = os.environ.get("BYGG_DEV")
     return [
         EntryPoint(x.name, x.description or NO_DESCRIPTION)
         for x in ctx.scheduler.build_actions.values()
-        if x.is_entrypoint and x.environment == environment_name
+        if (x.is_entrypoint or show_all) and x.environment == environment_name
     ]
