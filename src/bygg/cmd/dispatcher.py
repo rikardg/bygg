@@ -11,7 +11,6 @@ from typing import Optional, TypeAlias
 from bygg.cmd.argument_parsing import ByggNamespace, create_argument_parser
 from bygg.cmd.argument_unparsing import unparse_args
 from bygg.cmd.completions import (
-    EntrypointCompleter,
     do_completion,
     generate_shell_completions,
     is_completing,
@@ -89,7 +88,7 @@ DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE = 127
 
 def bygg():
     """Entry point for the Bygg command line interface."""
-    parser = create_argument_parser(EntrypointCompleter())
+    parser = create_argument_parser()
     args = parser.parse_args()
     if not args.is_restarted_with_env:
         do_completion(parser)
