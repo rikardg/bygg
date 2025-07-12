@@ -88,6 +88,8 @@ clean_bygg_tree_exclusions = (
     ".jj",
     ".mypy_cache",
     ".nox",
+    ".pytest_cache",
+    ".ruff_cache",
     ".venv*",
     "foo",
     "bar",
