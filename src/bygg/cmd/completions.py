@@ -113,7 +113,7 @@ def do_completion(parser: argparse.ArgumentParser):
 
 
 def is_completing():
-    return os.environ.get("_ARGCOMPLETE") == "1"
+    return os.environ.get("_ARGCOMPLETE") is not None
 
 
 def generate_shell_completions(print_and_exit: bool):
