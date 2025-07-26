@@ -1,173 +1,5 @@
 # serializer version: 1
-# name: test_actions_completions[checks]
-  list([
-    'all_checks',
-    'check_inputs_outputs',
-    'output_file_missing',
-    'same_output_files',
-  ])
-# ---
-# name: test_actions_completions[checks].1
-  list([
-    'all_checks',
-    'check_inputs_outputs',
-    'output_file_missing',
-    'same_output_files',
-  ])
-# ---
-# name: test_actions_completions[checks].2
-  list([
-    'all_checks',
-    'check_inputs_outputs',
-    'output_file_missing',
-    'same_output_files',
-  ])
-# ---
-# name: test_actions_completions[environments]
-  list([
-    'action1',
-    'action1_python_entrypoint_python',
-    'action2',
-    'clean_environments',
-    'default_action',
-  ])
-# ---
-# name: test_actions_completions[environments].1
-  list([
-    'action1',
-    'action1_python_entrypoint_python',
-    'action2',
-    'clean_environments',
-    'default_action',
-  ])
-# ---
-# name: test_actions_completions[environments].2
-  list([
-    'action1',
-    'action1_python_entrypoint_python',
-    'action2',
-    'clean_environments',
-    'default_action',
-  ])
-# ---
-# name: test_actions_completions[failing_jobs]
-  list([
-    'all',
-    'gcc',
-    'go',
-    'make',
-    'npm',
-  ])
-# ---
-# name: test_actions_completions[failing_jobs].1
-  list([
-    'all',
-    'gcc',
-    'go',
-    'make',
-    'npm',
-  ])
-# ---
-# name: test_actions_completions[failing_jobs].2
-  list([
-    'all',
-    'gcc',
-    'go',
-    'make',
-    'npm',
-  ])
-# ---
-# name: test_actions_completions[only_python]
-  list([
-    'hello',
-    'hi',
-  ])
-# ---
-# name: test_actions_completions[only_python].1
-  list([
-    'hello',
-    'hi',
-  ])
-# ---
-# name: test_actions_completions[only_python].2
-  list([
-    'hello',
-    'hi',
-  ])
-# ---
-# name: test_actions_completions[parametric]
-  list([
-    'setup',
-    'sort',
-  ])
-# ---
-# name: test_actions_completions[parametric].1
-  list([
-    'setup',
-    'sort',
-  ])
-# ---
-# name: test_actions_completions[parametric].2
-  list([
-    'setup',
-    'sort',
-  ])
-# ---
-# name: test_actions_completions[taskrunner]
-  list([
-    'do\\ something\\ from\\ TOML',
-    'fail',
-    'hhgttg',
-    'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
-    'shorthand_action_toml',
-    'shorthand_action_yaml',
-    'succeed',
-    'touch\\ a\\ file',
-  ])
-# ---
-# name: test_actions_completions[taskrunner].1
-  list([
-    'do\\ something\\ from\\ TOML',
-    'fail',
-    'hhgttg',
-    'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
-    'shorthand_action_toml',
-    'shorthand_action_yaml',
-    'succeed',
-    'touch\\ a\\ file',
-  ])
-# ---
-# name: test_actions_completions[taskrunner].2
-  list([
-    'do\\ something\\ from\\ TOML',
-    'fail',
-    'hhgttg',
-    'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
-    'shorthand_action_toml',
-    'shorthand_action_yaml',
-    'succeed',
-    'touch\\ a\\ file',
-  ])
-# ---
-# name: test_actions_completions[trivial]
-  list([
-    'transform',
-  ])
-# ---
-# name: test_actions_completions[trivial].1
-  list([
-    'transform',
-  ])
-# ---
-# name: test_actions_completions[trivial].2
-  list([
-    'transform',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[checks]
+# name: test_actions_completions[--directory-checks-BYGG_DEV_set]
   list([
     'all_checks',
     'check_inputs_outputs',
@@ -181,35 +13,15 @@
     'same_output_files',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[checks].1
+# name: test_actions_completions[--directory-checks-BYGG_DEV_unset]
   list([
     'all_checks',
     'check_inputs_outputs',
-    'circular_A',
-    'circular_B',
-    'circular_C',
-    'no_outputs_A',
     'output_file_missing',
-    'same_output_file_A',
-    'same_output_file_B',
     'same_output_files',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[checks].2
-  list([
-    'all_checks',
-    'check_inputs_outputs',
-    'circular_A',
-    'circular_B',
-    'circular_C',
-    'no_outputs_A',
-    'output_file_missing',
-    'same_output_file_A',
-    'same_output_file_B',
-    'same_output_files',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[environments]
+# name: test_actions_completions[--directory-environments-BYGG_DEV_set]
   list([
     'action1',
     'action1_python',
@@ -221,31 +33,16 @@
     'default_action_python',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[environments].1
+# name: test_actions_completions[--directory-environments-BYGG_DEV_unset]
   list([
     'action1',
-    'action1_python',
     'action1_python_entrypoint_python',
     'action2',
-    'action2_python',
     'clean_environments',
     'default_action',
-    'default_action_python',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[environments].2
-  list([
-    'action1',
-    'action1_python',
-    'action1_python_entrypoint_python',
-    'action2',
-    'action2_python',
-    'clean_environments',
-    'default_action',
-    'default_action_python',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[failing_jobs]
+# name: test_actions_completions[--directory-failing_jobs-BYGG_DEV_set]
   list([
     'all',
     'gcc',
@@ -254,7 +51,7 @@
     'npm',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[failing_jobs].1
+# name: test_actions_completions[--directory-failing_jobs-BYGG_DEV_unset]
   list([
     'all',
     'gcc',
@@ -263,34 +60,19 @@
     'npm',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[failing_jobs].2
-  list([
-    'all',
-    'gcc',
-    'go',
-    'make',
-    'npm',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[only_python]
+# name: test_actions_completions[--directory-only_python-BYGG_DEV_set]
   list([
     'hello',
     'hi',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[only_python].1
+# name: test_actions_completions[--directory-only_python-BYGG_DEV_unset]
   list([
     'hello',
     'hi',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[only_python].2
-  list([
-    'hello',
-    'hi',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[parametric]
+# name: test_actions_completions[--directory-parametric-BYGG_DEV_set]
   list([
     'setup',
     'setup_test_files',
@@ -598,7 +380,126 @@
     't/l2f9.txt.in',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[parametric].1
+# name: test_actions_completions[--directory-parametric-BYGG_DEV_unset]
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[--directory-taskrunner-BYGG_DEV_set]
+  list([
+    'do\\ something\\ from\\ TOML',
+    'do\\ something\\ more',
+    'fail',
+    'hhgttg',
+    'ls',
+    'shorthand\\ action\\ toml,\\ with\\ spaces',
+    'shorthand\\ action\\ yaml,\\ with\\ spaces',
+    'shorthand_action_toml',
+    'shorthand_action_yaml',
+    'succeed',
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[--directory-taskrunner-BYGG_DEV_unset]
+  list([
+    'do\\ something\\ from\\ TOML',
+    'fail',
+    'hhgttg',
+    'shorthand\\ action\\ toml,\\ with\\ spaces',
+    'shorthand\\ action\\ yaml,\\ with\\ spaces',
+    'shorthand_action_toml',
+    'shorthand_action_yaml',
+    'succeed',
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[--directory-trivial-BYGG_DEV_set]
+  list([
+    'dynamic',
+    'testfile\\ 1',
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[--directory-trivial-BYGG_DEV_unset]
+  list([
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[-C-checks-BYGG_DEV_set]
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'circular_A',
+    'circular_B',
+    'circular_C',
+    'no_outputs_A',
+    'output_file_missing',
+    'same_output_file_A',
+    'same_output_file_B',
+    'same_output_files',
+  ])
+# ---
+# name: test_actions_completions[-C-checks-BYGG_DEV_unset]
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'output_file_missing',
+    'same_output_files',
+  ])
+# ---
+# name: test_actions_completions[-C-environments-BYGG_DEV_set]
+  list([
+    'action1',
+    'action1_python',
+    'action1_python_entrypoint_python',
+    'action2',
+    'action2_python',
+    'clean_environments',
+    'default_action',
+    'default_action_python',
+  ])
+# ---
+# name: test_actions_completions[-C-environments-BYGG_DEV_unset]
+  list([
+    'action1',
+    'action1_python_entrypoint_python',
+    'action2',
+    'clean_environments',
+    'default_action',
+  ])
+# ---
+# name: test_actions_completions[-C-failing_jobs-BYGG_DEV_set]
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[-C-failing_jobs-BYGG_DEV_unset]
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[-C-only_python-BYGG_DEV_set]
+  list([
+    'hello',
+    'hi',
+  ])
+# ---
+# name: test_actions_completions[-C-only_python-BYGG_DEV_unset]
+  list([
+    'hello',
+    'hi',
+  ])
+# ---
+# name: test_actions_completions[-C-parametric-BYGG_DEV_set]
   list([
     'setup',
     'setup_test_files',
@@ -906,7 +807,126 @@
     't/l2f9.txt.in',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[parametric].2
+# name: test_actions_completions[-C-parametric-BYGG_DEV_unset]
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[-C-taskrunner-BYGG_DEV_set]
+  list([
+    'do\\ something\\ from\\ TOML',
+    'do\\ something\\ more',
+    'fail',
+    'hhgttg',
+    'ls',
+    'shorthand\\ action\\ toml,\\ with\\ spaces',
+    'shorthand\\ action\\ yaml,\\ with\\ spaces',
+    'shorthand_action_toml',
+    'shorthand_action_yaml',
+    'succeed',
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[-C-taskrunner-BYGG_DEV_unset]
+  list([
+    'do\\ something\\ from\\ TOML',
+    'fail',
+    'hhgttg',
+    'shorthand\\ action\\ toml,\\ with\\ spaces',
+    'shorthand\\ action\\ yaml,\\ with\\ spaces',
+    'shorthand_action_toml',
+    'shorthand_action_yaml',
+    'succeed',
+    'touch\\ a\\ file',
+  ])
+# ---
+# name: test_actions_completions[-C-trivial-BYGG_DEV_set]
+  list([
+    'dynamic',
+    'testfile\\ 1',
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[-C-trivial-BYGG_DEV_unset]
+  list([
+    'transform',
+  ])
+# ---
+# name: test_actions_completions[cwd-checks-BYGG_DEV_set]
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'circular_A',
+    'circular_B',
+    'circular_C',
+    'no_outputs_A',
+    'output_file_missing',
+    'same_output_file_A',
+    'same_output_file_B',
+    'same_output_files',
+  ])
+# ---
+# name: test_actions_completions[cwd-checks-BYGG_DEV_unset]
+  list([
+    'all_checks',
+    'check_inputs_outputs',
+    'output_file_missing',
+    'same_output_files',
+  ])
+# ---
+# name: test_actions_completions[cwd-environments-BYGG_DEV_set]
+  list([
+    'action1',
+    'action1_python',
+    'action1_python_entrypoint_python',
+    'action2',
+    'action2_python',
+    'clean_environments',
+    'default_action',
+    'default_action_python',
+  ])
+# ---
+# name: test_actions_completions[cwd-environments-BYGG_DEV_unset]
+  list([
+    'action1',
+    'action1_python_entrypoint_python',
+    'action2',
+    'clean_environments',
+    'default_action',
+  ])
+# ---
+# name: test_actions_completions[cwd-failing_jobs-BYGG_DEV_set]
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[cwd-failing_jobs-BYGG_DEV_unset]
+  list([
+    'all',
+    'gcc',
+    'go',
+    'make',
+    'npm',
+  ])
+# ---
+# name: test_actions_completions[cwd-only_python-BYGG_DEV_set]
+  list([
+    'hello',
+    'hi',
+  ])
+# ---
+# name: test_actions_completions[cwd-only_python-BYGG_DEV_unset]
+  list([
+    'hello',
+    'hi',
+  ])
+# ---
+# name: test_actions_completions[cwd-parametric-BYGG_DEV_set]
   list([
     'setup',
     'setup_test_files',
@@ -1214,7 +1234,13 @@
     't/l2f9.txt.in',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[taskrunner]
+# name: test_actions_completions[cwd-parametric-BYGG_DEV_unset]
+  list([
+    'setup',
+    'sort',
+  ])
+# ---
+# name: test_actions_completions[cwd-taskrunner-BYGG_DEV_set]
   list([
     'do\\ something\\ from\\ TOML',
     'do\\ something\\ more',
@@ -1229,13 +1255,11 @@
     'touch\\ a\\ file',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[taskrunner].1
+# name: test_actions_completions[cwd-taskrunner-BYGG_DEV_unset]
   list([
     'do\\ something\\ from\\ TOML',
-    'do\\ something\\ more',
     'fail',
     'hhgttg',
-    'ls',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
     'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
@@ -1244,41 +1268,15 @@
     'touch\\ a\\ file',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[taskrunner].2
-  list([
-    'do\\ something\\ from\\ TOML',
-    'do\\ something\\ more',
-    'fail',
-    'hhgttg',
-    'ls',
-    'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
-    'shorthand_action_toml',
-    'shorthand_action_yaml',
-    'succeed',
-    'touch\\ a\\ file',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[trivial]
-  list([
-    'dynamic',
-    'foo',
-    'testfile\\ 1',
-    'testfile\\ 2',
-    'transform',
-  ])
-# ---
-# name: test_actions_completions_bygg_dev[trivial].1
+# name: test_actions_completions[cwd-trivial-BYGG_DEV_set]
   list([
     'dynamic',
     'testfile\\ 1',
     'transform',
   ])
 # ---
-# name: test_actions_completions_bygg_dev[trivial].2
+# name: test_actions_completions[cwd-trivial-BYGG_DEV_unset]
   list([
-    'dynamic',
-    'testfile\\ 1',
     'transform',
   ])
 # ---

@@ -85,42 +85,37 @@ def test_directory_completions(completion_tester, arg, snapshot, monkeypatch):
 actions_completions = [p for p in Path("examples").iterdir() if p.is_dir()]
 
 
-@pytest.mark.parametrize("arg", actions_completions, ids=lambda x: str(x.name))
-def test_actions_completions(completion_tester, arg, snapshot, clean_bygg_tree):
-    dir = str(arg)
-    with change_dir(clean_bygg_tree):
-        testcase = f"-C {dir} "
-        testresult = completion_tester(testcase)
-        assert sorted(testresult.split("\x0b")) == snapshot
-
-    with change_dir(clean_bygg_tree):
-        testcase = f"--directory {dir} "
-        testresult = completion_tester(testcase)
-        assert sorted(testresult.split("\x0b")) == snapshot
-
-    with change_dir(clean_bygg_tree):
-        with change_dir(dir):
-            testresult = completion_tester("")
-            assert sorted(testresult.split("\x0b")) == snapshot
-
-
-@pytest.mark.parametrize("arg", actions_completions, ids=lambda x: str(x.name))
-def test_actions_completions_bygg_dev(
-    completion_tester, arg, snapshot, clean_bygg_tree, monkeypatch
+@pytest.mark.parametrize(
+    "bygg_dev", [False, True], ids=["BYGG_DEV_unset", "BYGG_DEV_set"]
+)
+@pytest.mark.parametrize("example_dir", actions_completions, ids=lambda x: str(x.name))
+@pytest.mark.parametrize(
+    "testcase_template",
+    ["-C {dir} ", "--directory {dir} ", ""],
+    ids=["-C", "--directory", "cwd"],
+)
+def test_actions_completions(
+    completion_tester,
+    example_dir,
+    snapshot,
+    clean_bygg_tree,
+    monkeypatch,
+    bygg_dev,
+    testcase_template,
 ):
-    monkeypatch.setenv("BYGG_DEV", "1")
-    dir = str(arg)
-    with change_dir(clean_bygg_tree):
-        testcase = f"-C {dir} "
+    if bygg_dev:
+        monkeypatch.setenv("BYGG_DEV", "1")
+
+    # Empty template means no -C or --directory argument
+    should_chdir = len(testcase_template) == 0
+    testcase = (
+        testcase_template
+        if should_chdir
+        else testcase_template.format(dir=str(example_dir))
+    )
+
+    with change_dir(
+        (clean_bygg_tree / example_dir) if should_chdir else clean_bygg_tree
+    ):
         testresult = completion_tester(testcase)
         assert sorted(testresult.split("\x0b")) == snapshot
-
-    with change_dir(clean_bygg_tree):
-        testcase = f"--directory {dir} "
-        testresult = completion_tester(testcase)
-        assert sorted(testresult.split("\x0b")) == snapshot
-
-    with change_dir(clean_bygg_tree):
-        with change_dir(dir):
-            testresult = completion_tester("")
-            assert sorted(testresult.split("\x0b")) == snapshot

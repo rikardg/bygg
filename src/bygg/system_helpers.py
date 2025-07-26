@@ -7,9 +7,11 @@ import contextlib
 import errno
 import os
 import pty
+import select
 import shlex
 import signal
 import subprocess
+import time
 from typing import Generator
 
 
@@ -44,7 +46,7 @@ class ProcessGenerator:
         self.value = yield from self.generator
 
 
-def subprocess_tty(cmd, encoding="utf-8", timeout=10, **kwargs):
+def subprocess_tty_old(cmd, encoding="utf-8", timeout=10, **kwargs):
     """
     Wrapper around subprocess.Popen that sets up the process as if it were running in a
     TTY and returns a generator that yields the stdout of the process line by line.
@@ -97,6 +99,70 @@ def subprocess_tty(cmd, encoding="utf-8", timeout=10, **kwargs):
             if e.errno != errno.EIO:  # EIO also means EOF
                 raise
         finally:
+            if p.poll() is None:
+                p.send_signal(signal.SIGINT)
+                try:
+                    p.wait(timeout)
+                except subprocess.TimeoutExpired:
+                    p.terminate()
+                    try:
+                        p.wait(timeout)
+                    except subprocess.TimeoutExpired:
+                        p.kill()
+                        raise
+            p.wait()
+            generator.returncode = p.returncode
+
+    generator.generator = subprocess_iterator()
+    return generator
+
+
+def subprocess_tty(cmd, encoding="utf-8", timeout=10, **kwargs):
+    generator = ProcessGenerator()
+
+    def subprocess_iterator():
+        m, s = pty.openpty()
+        p = subprocess.Popen(cmd, stdout=s, stderr=s, **kwargs)
+        os.close(s)
+
+        # Give the subprocess a moment to start and write output
+        time.sleep(2)
+
+        try:
+            buffer = b""
+            while True:
+                # Wait for data to be available or for the process to exit
+                rlist, _, _ = select.select([m], [], [], 0.1)
+                if m in rlist:
+                    try:
+                        data = os.read(m, 1024)
+                        if not data:
+                            break  # EOF
+                        buffer += data
+                        while b"\n" in buffer:
+                            line, buffer = buffer.split(b"\n", 1)
+                            yield (line + b"\n").decode(encoding)
+                    except OSError as e:
+                        if e.errno != errno.EIO:
+                            raise
+                        break
+                elif p.poll() is not None:
+                    # Process exited, read any remaining data
+                    while True:
+                        try:
+                            data = os.read(m, 1024)
+                            if not data:
+                                break
+                            buffer += data
+                        except OSError as e:
+                            if e.errno != errno.EIO:
+                                raise
+                            break
+                    if buffer:
+                        yield buffer.decode(encoding)
+                    break
+        finally:
+            os.close(m)
             if p.poll() is None:
                 p.send_signal(signal.SIGINT)
                 try:
