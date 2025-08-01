@@ -1,4 +1,5 @@
 import os
+import sys
 
 import pytest
 
@@ -42,12 +43,20 @@ def test_ExitCode():
 shell_command = "echo 'foo\nbar\nbaz'"
 
 
+@pytest.mark.skipif(
+    sys.platform == "darwin",
+    reason="This test is problematic on macOS. See #337. ",
+)
 def test_call(capsys, snapshot):
     call(shell_command)
     captured = capsys.readouterr()
     assert captured.out == snapshot
 
 
+@pytest.mark.skipif(
+    sys.platform == "darwin",
+    reason="This test is problematic on macOS. See #337. ",
+)
 def test_subprocess_tty_print(capsys, snapshot):
     subprocess_tty_print(shell_command.split(" "))
     captured = capsys.readouterr()
