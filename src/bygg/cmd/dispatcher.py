@@ -319,7 +319,7 @@ def run_or_collect_in_environment(
         logger.info("Running-collecting: setting up environment %s", environment_name)
         environment = ctx.configuration.environments.get(environment_name, None)
         assert environment
-        setup_environment(environment)
+        setup_environment(ctx, environment)
         subprocess_bygg_path = should_restart_with(environment)
 
         logger.info("Running action: should restart with %s", subprocess_bygg_path)

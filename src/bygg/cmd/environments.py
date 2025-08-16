@@ -45,7 +45,7 @@ def should_restart_with(environment: Environment) -> str | None:
     return None
 
 
-def setup_environment(environment: Environment):
+def setup_environment(ctx: ByggContext, environment: Environment):
     venv_path = Path(
         environment.venv_directory if environment.venv_directory else ".venv"
     )
@@ -80,6 +80,10 @@ def setup_environment(environment: Environment):
         output_error("Error while creating virtual environment:")
         output_plain(process.stdout)
         sys.exit(1)
+
+    if ctx.configuration.settings.verbose:
+        output_plain(process.stdout)
+        output_info("End environment setup output")
 
     with open(environment_hash_file, "w") as f:
         f.write(environment_hash)
