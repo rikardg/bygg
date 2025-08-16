@@ -108,6 +108,9 @@ class ByggCompletionFinder(CompletionFinder):
 
 
 def do_completion(parser: argparse.ArgumentParser):
+    if "--is_restarted_with_env" in sys.argv:
+        return
+
     completer = ByggCompletionFinder()
     completer(parser)
 

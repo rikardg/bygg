@@ -89,10 +89,9 @@ DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE = 127
 def bygg():
     """Entry point for the Bygg command line interface."""
     parser = create_argument_parser()
+    do_completion(parser)
     args = parser.parse_args()
     if not args.is_restarted_with_env:
-        do_completion(parser)
-
         # Build and potentially watch:
         rc = 0
         while True:
