@@ -417,7 +417,9 @@
 # name: test_actions_completions[--directory-trivial-BYGG_DEV_set]
   list([
     'dynamic',
+    'foo',
     'testfile\\ 1',
+    'testfile\\ 2',
     'transform',
   ])
 # ---
@@ -844,7 +846,9 @@
 # name: test_actions_completions[-C-trivial-BYGG_DEV_set]
   list([
     'dynamic',
+    'foo',
     'testfile\\ 1',
+    'testfile\\ 2',
     'transform',
   ])
 # ---
@@ -1271,7 +1275,9 @@
 # name: test_actions_completions[cwd-trivial-BYGG_DEV_set]
   list([
     'dynamic',
+    'foo',
     'testfile\\ 1',
+    'testfile\\ 2',
     'transform',
   ])
 # ---
