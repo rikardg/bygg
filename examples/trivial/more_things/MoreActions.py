@@ -15,3 +15,9 @@ def foo(ctx: ActionContext):
     print("foo called")
     print(ctx.message)
     return CommandStatus(0, "foo", None)
+
+
+@action("another_entrypoint", is_entrypoint=True)
+def another_entrypoint(ctx: ActionContext):
+    """This is another entrypoint from another Python file"""
+    return CommandStatus(0, "another_entrypoint", None)

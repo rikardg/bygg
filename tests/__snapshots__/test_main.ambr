@@ -707,6 +707,9 @@
   '''
   Available actions:
   
+  another_entrypoint
+      This is another entrypoint from another Python file
+  
   transform (default)
       No description
   
@@ -862,6 +865,9 @@
   '''
   bygg >>> Entering directory 'examples/trivial'
   Available actions:
+  
+  another_entrypoint
+      This is another entrypoint from another Python file
   
   transform (default)
       No description
