@@ -1,9 +1,9 @@
 from pathlib import Path
+import shlex
+import subprocess
 
 import pytest
 
-from bygg.cmd.completions import ByggCompletionFinder
-from bygg.cmd.dispatcher import create_argument_parser
 from bygg.system_helpers import change_dir
 
 
@@ -27,16 +27,15 @@ def completion_tester(monkeypatch, tmp_path):
         monkeypatch.setenv("COMP_LINE", prefixed_testcase)
         monkeypatch.setenv("COMP_POINT", str(len(prefixed_testcase)))
         monkeypatch.setenv("_ARGCOMPLETE_STDOUT_FILENAME", str(outfile))
-        # Patch os.fdopen to raise NotImplementedError; this causes argcomplete to use
-        # stderr for debug output instead of opening file descriptor 9, which causes pytest
-        # to get its knickers in a twist.
-        monkeypatch.setattr("os.fdopen", open_raise)
 
-        parser = create_argument_parser()
-        completer = ByggCompletionFinder()
+        subprocess.run(
+            shlex.split(prefixed_testcase),
+            capture_output=True,
+            encoding="utf-8",
+        )
 
-        with open(outfile, "w", encoding="utf-8"):
-            completer(parser, exit_method=dummy_exit_method)
+        if not outfile.exists():
+            return ""
 
         with open(outfile, "r", encoding="utf-8") as f:
             return f.read()
