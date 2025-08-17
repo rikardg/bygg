@@ -416,6 +416,7 @@
 # ---
 # name: test_actions_completions[--directory-trivial-BYGG_DEV_set]
   list([
+    'another_entrypoint',
     'dynamic',
     'foo',
     'testfile\\ 1',
@@ -425,6 +426,7 @@
 # ---
 # name: test_actions_completions[--directory-trivial-BYGG_DEV_unset]
   list([
+    'another_entrypoint',
     'transform',
   ])
 # ---
@@ -845,6 +847,7 @@
 # ---
 # name: test_actions_completions[-C-trivial-BYGG_DEV_set]
   list([
+    'another_entrypoint',
     'dynamic',
     'foo',
     'testfile\\ 1',
@@ -854,6 +857,7 @@
 # ---
 # name: test_actions_completions[-C-trivial-BYGG_DEV_unset]
   list([
+    'another_entrypoint',
     'transform',
   ])
 # ---
@@ -1274,6 +1278,7 @@
 # ---
 # name: test_actions_completions[cwd-trivial-BYGG_DEV_set]
   list([
+    'another_entrypoint',
     'dynamic',
     'foo',
     'testfile\\ 1',
@@ -1283,6 +1288,7 @@
 # ---
 # name: test_actions_completions[cwd-trivial-BYGG_DEV_unset]
   list([
+    'another_entrypoint',
     'transform',
   ])
 # ---
