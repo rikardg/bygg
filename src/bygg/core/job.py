@@ -4,11 +4,13 @@ from bygg.core.common_types import CommandStatus
 
 class Job:
     name: str
+    trim_only: bool
     action: Action
     status: CommandStatus | None
 
-    def __init__(self, action: Action):
+    def __init__(self, action: Action, trim_only: bool):
         self.name = action.name
+        self.trim_only = trim_only
         self.action = action
         self.status = None
 

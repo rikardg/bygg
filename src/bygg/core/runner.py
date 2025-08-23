@@ -105,15 +105,17 @@ class ProcessRunner:
                         if job.action.trim_globs:
                             perform_trimming(self.scheduler, job)
                         # Skip jobs with no command or ones that are clean
-                        if job.action.command is None:
+                        if job.action.command is None or job.trim_only:
                             job.status = CommandStatus(
                                 0,
-                                f"{'No command, skipping'}",
+                                "Trim only"
+                                if job.trim_only
+                                else "No command, skipping",
                                 None,
                             )
                             self.scheduler.job_finished(job)
                             self.job_status_listener(
-                                "skipped",
+                                "trim_only" if job.trim_only else "skipped",
                                 job,
                                 get_job_count_tuple(),
                             )
