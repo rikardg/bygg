@@ -15,7 +15,6 @@ class Scheduler:
     build_actions: dict[str, Action]
 
     job_graph: Dag
-    dirty_jobs: set[str]
     ready_jobs: set[str]
     running_jobs: dict[str, Job]
     finished_jobs: dict[str, Job]
@@ -29,7 +28,6 @@ class Scheduler:
         self.cache = Cache()
         self.build_actions = {}
         self.job_graph = create_dag()
-        self.dirty_jobs = set()
         self.ready_jobs = set()
         self.running_jobs = {}
         self.finished_jobs = {}
