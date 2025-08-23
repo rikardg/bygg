@@ -18,7 +18,7 @@ from bygg.core.action import Action
 from bygg.core.digest import calculate_string_digest
 from bygg.logutils import logger
 from bygg.output.output import output_error, output_info, output_plain
-from bygg.util import create_shell_command
+from bygg.util.util import create_shell_command
 
 
 def calculate_environment_hash(environment: Environment) -> str:
