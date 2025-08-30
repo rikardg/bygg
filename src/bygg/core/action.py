@@ -151,6 +151,7 @@ def action(
     outputs: Optional[Iterable[str]] = None,
     dependencies: Optional[Iterable[str | Action]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
+    trim: Optional[Callable[[], Iterable[str]]] = None,
     scheduling_type: SchedulingType = "processpool",
     is_entrypoint: bool = False,
 ):
@@ -172,6 +173,16 @@ def action(
         An iterable of dependency actions, by default None
     dynamic_dependency : DynamicDependency, optional
         A dynamic dependency, by default None
+    trim : Iterable[str] | DynamicTrim, optional
+        The purpose of trim_globs is to be able to remove files that should no longer
+        exist, e.g. because they belong to a previous configuration of the source tree.
+        - Trimming will be performed before the action has run.
+        - The list of outputs from all the action's dependencies will be collected and
+          subtracted from the file list of the evaluated trim list.
+        - Directories that contain such output files will also be subtracted.
+        - Paths will be normalised using os.path.normpath before comparison.
+        - Any files or directories that remain will be deleted.
+        See utils.py for utility functions for git controlled files.
     is_entrypoint : bool, optional
         Whether the action is an entrypoint, by default False
     scheduling_type : SchedulingType, optional
@@ -195,6 +206,7 @@ def action(
             outputs=outputs,
             dependencies=dependencies,
             dynamic_dependency=dynamic_dependency,
+            trim=trim,
             is_entrypoint=is_entrypoint,
             scheduling_type=scheduling_type,
             command=func,
