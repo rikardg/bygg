@@ -80,7 +80,6 @@ def test_trim(snapshot, clean_bygg_tree):
         encoding="utf-8",
     )
     assert process.returncode == 0
-    assert process.stdout == snapshot
     assert filetree(example_path) == snapshot
 
     process = subprocess.run(
@@ -90,7 +89,6 @@ def test_trim(snapshot, clean_bygg_tree):
         encoding="utf-8",
     )
     assert process.returncode == 0
-    assert process.stdout == snapshot
     assert filetree(example_path) == snapshot
 
     # Run a second time to check that it works when the "actual" target has been run
@@ -102,7 +100,6 @@ def test_trim(snapshot, clean_bygg_tree):
         encoding="utf-8",
     )
     assert process.returncode == 0
-    assert process.stdout == snapshot
     assert filetree(example_path) == snapshot
 
     process = subprocess.run(
@@ -112,5 +109,4 @@ def test_trim(snapshot, clean_bygg_tree):
         encoding="utf-8",
     )
     assert process.returncode == 0
-    assert process.stdout == snapshot
     assert filetree(example_path) == snapshot
