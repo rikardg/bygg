@@ -73,3 +73,63 @@
     'files/out',
   ])
 # ---
+# name: test_trim
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+    'files/out/trimmableB.txt',
+    'files/trimmableA.txt',
+  ])
+# ---
+# name: test_trim.1
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+  ])
+# ---
+# name: test_trim.2
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+    'files/out/trimmableB.txt',
+    'files/trimmableA.txt',
+  ])
+# ---
+# name: test_trim.3
+  list([
+    '.gitignore',
+    'Byggfile.py',
+    'files',
+    'files/a.txt',
+    'files/b.txt',
+    'files/c.txt',
+    'files/out',
+    'files/out/a.txt',
+    'files/out/b.txt',
+    'files/out/c.txt',
+  ])
+# ---

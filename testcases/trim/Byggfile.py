@@ -44,4 +44,8 @@ def trim(ctx: ActionContext):
     outputs=["files/trimmableA.txt", "files/out/trimmableB.txt"],
 )
 def create_trimmable(ctx: ActionContext):
+    for output_file in ctx.outputs:
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        with open(output_file, "w") as f:
+            f.write("trimmable")
     return CommandStatus(0)
