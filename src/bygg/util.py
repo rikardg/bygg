@@ -108,3 +108,34 @@ def filenames_from_pattern(
         output_files,
         unmatched_input_files,
     )
+
+
+def is_git_repo(path: Optional[str] = None) -> bool:
+    """Check if the given path is inside a git repository. Path defaults to the current
+    working directory."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            cwd=path,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return result.returncode == 0
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return False
+
+
+def get_git_tracked_files(path: Optional[str] = None) -> set[str]:
+    """Get the files tracked by git. Path defaults to the current working directory."""
+    if not is_git_repo(path):
+        return set()
+    result = subprocess.run(
+        ["git", "ls-tree", "HEAD", "--name-only", "-r", "-z"],
+        cwd=path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    if result.returncode == 0:
+        return set(result.stdout.rstrip("\0").split("\0"))
+    return set()
