@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional
+from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Self
 
 from bygg.core.common_types import CommandStatus
 from bygg.logutils import logger
@@ -74,7 +74,7 @@ class Action(ActionContext):
         message: str | None = None,
         inputs: Optional[Iterable[str]] = None,
         outputs: Optional[Iterable[str]] = None,
-        dependencies: Optional[Iterable[str]] = None,
+        dependencies: Optional[Iterable[str | Self]] = None,
         dynamic_dependency: Optional[DynamicDependency] = None,
         is_entrypoint: bool = False,
         command: Command | None = None,
@@ -86,7 +86,9 @@ class Action(ActionContext):
         self.message = message
         self.inputs = {*inputs} if inputs else set()
         self.outputs = {*outputs} if outputs else set()
-        self.dependencies = {*dependencies} if dependencies else set()
+        self.dependencies = {
+            d.name if isinstance(d, Action) else d for d in (dependencies or [])
+        }
         self.dynamic_dependency = dynamic_dependency
         self.is_entrypoint = is_entrypoint
         self.command = command
