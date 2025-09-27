@@ -46,6 +46,9 @@ def calculate_file_digest(file: str | Path) -> str | None:
             )
         return file_digest(real_path)
 
+    if os.path.isdir(real_path):
+        return "directory"
+
 
 def calculate_dependency_digest(filenames: set[str] | set[Path]) -> tuple[str, bool]:
     """
