@@ -81,10 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12
+      - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: install
         run: ./bootstrap.py
       - uses: pypa/gh-action-pip-audit@v1.0.8
