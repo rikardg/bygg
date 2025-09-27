@@ -47,6 +47,21 @@ def test_calculate_file_digest_non_existing(tmp_path):
     assert map(lambda x: x is None, digests2)
 
 
+def test_calculate_directory_digest_existing(tmp_path):
+    directory = tmp_path / "digest_directory"
+    directory.mkdir()
+
+    digest = calculate_file_digest(str(directory))
+    assert digest == "directory"
+
+
+def test_calculate_directory_digest_non_existing(tmp_path):
+    directory = tmp_path / "digest_directory"
+
+    digest = calculate_file_digest(str(directory))
+    assert digest is None
+
+
 def test_calculate_dependency_digest_existing(tmp_path):
     files = set(tmp_path / filename for filename in ["file1", "file2", "file3"])
 
