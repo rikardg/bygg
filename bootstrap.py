@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
+
 from pathlib import Path
 import shutil
 import sys
+
+# Add src to path since we want to import from bygg but it is not installed yet:
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from src.bygg.system_helpers import call
 
