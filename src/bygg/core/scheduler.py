@@ -142,7 +142,10 @@ class Scheduler:
         outputs_digest, files_were_missing = calculate_dependency_digest(action.outputs)
         if files_were_missing or cached_digests.outputs_digest != outputs_digest:
             # The output has changed, so we need to rebuild
-            logger.debug("Job '%s' is dirty (output changed)", job_name)
+            if files_were_missing:
+                logger.debug("Job '%s' is dirty (output had missing files)", job_name)
+            else:
+                logger.debug("Job '%s' is dirty (output digest changed)", job_name)
             return True
 
         inputs_digest, files_were_missing = calculate_dependency_digest(
