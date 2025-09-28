@@ -128,7 +128,7 @@ def action(
     message: Optional[str] = None,
     inputs: Optional[Iterable[str]] = None,
     outputs: Optional[Iterable[str]] = None,
-    dependencies: Optional[Iterable[str]] = None,
+    dependencies: Optional[Iterable[str | Action]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
     scheduling_type: SchedulingType = "processpool",
     is_entrypoint: bool = False,
@@ -167,7 +167,7 @@ def action(
     """
 
     def create_action(func: Callable):
-        Action(
+        return Action(
             name,
             message=message,
             inputs=inputs,
@@ -188,7 +188,7 @@ def action_set(
     message: Optional[str] = None,
     file_pairs: Iterable[tuple[str, str]],
     extra_inputs: Optional[Iterable[str]] = None,
-    dependencies: Optional[Iterable[str]] = None,
+    dependencies: Optional[Iterable[str | Action]] = None,
     is_entrypoint: bool = False,
     scheduling_type: SchedulingType = "processpool",
     description: str | None = None,
