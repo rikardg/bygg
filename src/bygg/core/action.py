@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+
+# import inspect
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Self
 
 from bygg.core.common_types import CommandStatus
@@ -167,6 +169,8 @@ def action(
     """
 
     def create_action(func: Callable):
+        # print(f"module::function: {func.__qualname__}::{func.__name__}")
+        # print(f"file: {inspect.getfile(func)}")
         return Action(
             name,
             message=message,

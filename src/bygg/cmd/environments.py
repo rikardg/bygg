@@ -167,22 +167,60 @@ def load_python_build_file(build_file: str, environment_name: str):
         sys.path.insert(0, str(os.path.realpath('.')))
 
         """
-
     if os.path.isfile(build_file):
         with open(build_file, "r") as f:
-            Action._current_environment = environment_name
-            logger.info(
-                "Loading Python file %s for environment %s",
-                build_file,
-                environment_name,
-            )
-            exec(textwrap.dedent(preamble) + f.read(), globals())
-            logger.info(
-                "Back from loading Python file %s for environment %s",
-                build_file,
-                environment_name,
-            )
-            Action._current_environment = None
+            content = f.read()
+
+        Action._current_environment = environment_name
+        logger.info(
+            "Loading Python file %s for environment %s",
+            build_file,
+            environment_name,
+        )
+
+        # Compile with proper filename for inspect.getfile() support
+        full_content = textwrap.dedent(preamble) + content
+        absolute_path = os.path.abspath(build_file)
+        compiled_code = compile(full_content, absolute_path, "exec")
+
+        # Create globals with proper __file__ setting
+        build_globals = globals().copy()
+        build_globals["__file__"] = absolute_path
+
+        exec(compiled_code, build_globals)
+
+        logger.info(
+            "Back from loading Python file %s for environment %s",
+            build_file,
+            environment_name,
+        )
+        Action._current_environment = None
+
+
+# def load_python_build_file(build_file: str, environment_name: str):
+#     # modify load path to make the current directory importable
+#     preamble = """\
+#         import os
+#         import sys
+#         sys.path.insert(0, str(os.path.realpath('.')))
+
+#         """
+
+#     if os.path.isfile(build_file):
+#         with open(build_file, "r") as f:
+#             Action._current_environment = environment_name
+#             logger.info(
+#                 "Loading Python file %s for environment %s",
+#                 build_file,
+#                 environment_name,
+#             )
+#             exec(textwrap.dedent(preamble) + f.read(), globals())
+#             logger.info(
+#                 "Back from loading Python file %s for environment %s",
+#                 build_file,
+#                 environment_name,
+#             )
+#             Action._current_environment = None
 
 
 def get_environment_for_action(ctx: ByggContext, action_name: str) -> str | None:
