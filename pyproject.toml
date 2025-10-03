@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-requirements-txt", "hatch-vcs"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -8,17 +8,23 @@ source = "vcs"
 [tool.hatch.build.hooks.vcs]
 version-file = "_version.py"
 
-[tool.hatch.metadata.hooks.requirements_txt]
-files = ["requirements.txt"]
-
 [project]
 name = "bygg"
-dynamic = ["dependencies", "version"]
+dynamic = ["version"]
+dependencies = [
+  "argcomplete>=3.6.2",
+  "dacite>=1.9.2",
+  "dc-schema>=0.0.8",
+  "dill>=0.4.0",
+  "loky>=3.5.5",
+  "PyYAML>=6.0.2",
+  "watchdog>=6.0.0",
+]
 
 # Replace the line above with the next two lines to use a static version number, e.g. if you don't
 # have the full git repo available:
 
-# dynamic = ["dependencies"]
+# dynamic = []
 # version = "0.0.0.dev0"
 
 authors = [{ name = "Rikard Gillemyr", email = "rikard.gillemyr@gmail.com" }]
@@ -66,6 +72,21 @@ ignore = ["E501"]
 [tool.ruff.lint.isort]
 order-by-type = true
 force-sort-within-sections = true
+
+[dependency-groups]
+dev = [
+  "mypy>=1.16.1",
+  "pip>=25.2",
+  "pyinstrument>=5.0.3",
+  "pyright>=1.1.402",
+  "pytest>=8.4.1",
+  "pytest-mock>=3.14.1",
+  "pytest-xdist>=3.8.0",
+  "ruff>=0.12.2",
+  "setuptools>=80.9.0",
+  "syrupy>=4.9.1",
+  "types-PyYAML>=6.0.12.20250516",
+]
 
 [tool.uv]
 reinstall-package = ["bygg"]
