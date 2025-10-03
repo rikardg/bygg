@@ -5,4 +5,5 @@
 __pycache__/
 **/action_digests.json
 _version.py
+dist/
 src/bygg/_bygg_completions.sh
