@@ -115,7 +115,10 @@ def print_actions(ctx: ByggContext, environment_data: dict[str, SubProcessIpcDat
             output.append(f"~~ {environment_name} ~~")
 
         output += list_actions_B(
-            [EntryPoint(name, descr) for name, descr in data.list.actions.items()],
+            [
+                EntryPoint(name, descr.strip())
+                for name, descr in data.list.actions.items()
+            ],
             data.list.default_action,
         )
     print("\n".join(output))
