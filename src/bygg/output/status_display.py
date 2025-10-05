@@ -38,7 +38,9 @@ def format_queued_jobs_line(prefix: str) -> str:
 def format_result_status(status: JobStatus, field_width: int) -> str:
     match status:
         case "failed":
-            return f"{TS.BOLD}{TS.Fg.GREEN}{'FAILED':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
+            return (
+                f"{TS.BOLD}{TS.Fg.RED}{'FAILED':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
+            )
         case "stopped":
             return f"{TS.BOLD}{TS.Fg.GREEN}{'STOPPED':>{field_width}}{TS.Fg.RESET}{TS.NOBOLD}"
         case "finished":
