@@ -14,6 +14,22 @@ SchedulingType = Literal["in-process", "processpool"]
 DynamicDependency = Callable[[], str | None]
 
 
+class WorkChannel:
+    """A WorkChannel is a semaphore that limits the number of concurrent jobs. Create an
+    instance with a unique name and a job limit, then assign it to the Action objects
+    that should be limited by it."""
+
+    name: str
+    width: int
+    current_jobs: set[str]
+
+    def __init__(self, name: str, width: int = 1):
+        self.name = name
+        self.width = width
+        assert self.width > 0, "Work channel width less than 1 makes no sense"
+        self.current_jobs = set()
+
+
 @dataclass
 class ActionContext:
     name: str
@@ -55,6 +71,8 @@ class Action(ActionContext):
         The scheduling type for the action. Default is "processpool". Use "in-process"
         for small Python functions that finish quickly so that they can be run in the
         main process.
+    work_channel: WorkChannel, optional
+        A WorkChannel that the action should run in. Default is None.
     description : str, optional
         A description of the action. Default is the docstring of the command if
         provided, else None.
@@ -79,6 +97,7 @@ class Action(ActionContext):
         is_entrypoint: bool = False,
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
+        work_channel: Optional[WorkChannel] = None,
         description: str | None = None,
         environment: Optional[str] = None,
     ):
@@ -93,6 +112,7 @@ class Action(ActionContext):
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
+        self.work_channel = work_channel
 
         self.description = (
             description.strip()
@@ -131,6 +151,7 @@ def action(
     dependencies: Optional[Iterable[str | Action]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
     scheduling_type: SchedulingType = "processpool",
+    work_channel: Optional[WorkChannel] = None,
     is_entrypoint: bool = False,
 ):
     """Decorator to define a Bygg action.
@@ -176,6 +197,7 @@ def action(
             dynamic_dependency=dynamic_dependency,
             is_entrypoint=is_entrypoint,
             scheduling_type=scheduling_type,
+            work_channel=work_channel,
             command=func,
         )
 
