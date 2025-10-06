@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import signal
 import sys
 from typing import Callable
 import warnings
@@ -49,13 +48,8 @@ class ProcessRunner:
             f"Starting process runner with {max_workers} threads"
         )
 
-        def init_worker():
-            """Ignore CTRL+C in the worker process."""
-            signal.signal(signal.SIGINT, signal.SIG_IGN)
-
         with ProcessPoolExecutor(
             max_workers=max_workers,
-            initializer=init_worker,
             context=get_context("fork"),
         ) as pool:
             scheduled_jobs: dict[Job, Future] = {}
