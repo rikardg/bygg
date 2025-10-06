@@ -53,7 +53,7 @@ class ProcessRunner:
 
         with ProcessPoolExecutor(
             max_workers=max_workers,
-            initializer=init_worker,
+            # initializer=init_worker,
             context=get_context("fork"),
         ) as pool:
             scheduled_jobs: dict[Job, Future] = {}
