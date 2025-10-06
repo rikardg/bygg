@@ -5,9 +5,10 @@ import sys
 from typing import Callable
 import warnings
 
-from bygg.core.action import CommandStatus
+from bygg.core.action import CommandStatus, WorkChannel
 from bygg.core.common_types import JobStatus
 from bygg.core.scheduler import Job, Scheduler
+from bygg.logutils import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.status_display import on_check_failed
 
@@ -59,6 +60,47 @@ class ProcessRunner:
             scheduled_jobs: dict[Job, Future] = {}
             backlog: list[Job] = []
 
+            # Jobs can be deferred because their channel is full. We then need the
+            # runner to iterate over running jobs before adding them back to the
+            # backlog.
+            deferred_backlog: list[Job] = []
+            # Keep active WorkChannel objects here since the objects don't survive the
+            # serialisation pass intact.
+            work_channels: dict[str, WorkChannel] = {}
+
+            def manage_work_channel_add(job: Job) -> bool:
+                if work_channel := job.action.work_channel:
+                    logger.debug(
+                        "Job %s is in work channel %s", job.name, work_channel.name
+                    )
+
+                    if work_channel.name not in work_channels:
+                        work_channels[work_channel.name] = work_channel
+
+                    if len(work_channel.current_jobs) >= work_channel.width:
+                        logger.debug(
+                            "Work channel %s is full with %s",
+                            work_channel.name,
+                            work_channel.current_jobs,
+                        )
+                        backlog.remove(job)
+                        deferred_backlog.append(job)
+                        return True
+                    else:
+                        logger.debug(
+                            "Work channel %s has room for job %s",
+                            work_channel.name,
+                            job.name,
+                        )
+                        work_channel.current_jobs.add(job.name)
+                return False
+
+            def manage_work_channel_remove(job: Job):
+                if job.action.work_channel:
+                    work_channel = work_channels.get(job.action.work_channel.name)
+                    if work_channel and job.name in work_channel.current_jobs:
+                        work_channel.current_jobs.remove(job.name)
+
             def call_status_listener():
                 for job in scheduled_jobs.keys():
                     self.job_status_listener(
@@ -84,6 +126,9 @@ class ProcessRunner:
                     and (jobs := self.scheduler.get_ready_jobs())
                 ):
                     backlog += jobs
+
+                backlog += deferred_backlog
+                deferred_backlog = []
 
                 if (
                     len(scheduled_jobs) == 0
@@ -113,6 +158,10 @@ class ProcessRunner:
                             backlog.remove(job)
                             continue
 
+                        deferred = manage_work_channel_add(job)
+                        if deferred:
+                            continue
+
                         # Run in-process
                         if job.action.scheduling_type == "in-process":
                             self.job_status_listener(
@@ -121,6 +170,9 @@ class ProcessRunner:
                                 get_job_count_tuple(),
                             )
                             job.status = job.action.command(job.action)
+
+                            manage_work_channel_remove(job)
+
                             self.scheduler.job_finished(job)
                             self.job_status_listener(
                                 "finished" if job.status.rc == 0 else "failed",
@@ -128,6 +180,7 @@ class ProcessRunner:
                                 get_job_count_tuple(),
                             )
                             backlog.remove(job)
+
                             continue
 
                         # Schedule job to be run on the worker processes
@@ -148,6 +201,8 @@ class ProcessRunner:
                     del scheduled_jobs[job_result]
 
                     self.check_for_missing_output_files(job_result)
+
+                    manage_work_channel_remove(job_result)
 
                     self.scheduler.job_finished(job_result)
                     if job_result.status is not None and job_result.status.rc == 0:

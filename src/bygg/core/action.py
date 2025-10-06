@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Self
+# import inspect
+from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Protocol, Self
 
 from bygg.core.common_types import CommandStatus
 from bygg.logutils import logger
@@ -12,6 +14,21 @@ SchedulingType = Literal["in-process", "processpool"]
 # Function that returns a string that is included in the dependency digest. Returning
 # None causes the value to be ignored.
 DynamicDependency = Callable[[], str | None]
+
+
+class WorkChannel:
+    """Set up a WorkChannel and assign it to Actions so that no more than width jobs can
+    run at the same time."""
+
+    name: str
+    width: int
+    current_jobs: set[str]
+
+    def __init__(self, name: str, width: int = 1):
+        self.name = name
+        self.width = width
+        assert self.width > 0, "Work channel width less than 1 makes no sense"
+        self.current_jobs = set()
 
 
 @dataclass
@@ -55,6 +72,8 @@ class Action(ActionContext):
         The scheduling type for the action. Default is "processpool". Use "in-process"
         for small Python functions that finish quickly so that they can be run in the
         main process.
+    work_channel: WorkChannel, optional
+        A WorkChannel that the action should run in. Default is None.
     description : str, optional
         A description of the action. Default is the docstring of the command if
         provided, else None.
@@ -79,6 +98,7 @@ class Action(ActionContext):
         is_entrypoint: bool = False,
         command: Command | None = None,
         scheduling_type: SchedulingType = "processpool",
+        work_channel: Optional[WorkChannel] = None,
         description: str | None = None,
         environment: Optional[str] = None,
     ):
@@ -93,6 +113,7 @@ class Action(ActionContext):
         self.is_entrypoint = is_entrypoint
         self.command = command
         self.scheduling_type = scheduling_type
+        self.work_channel = work_channel
 
         self.description = (
             description
