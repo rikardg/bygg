@@ -99,7 +99,7 @@ def print_actions(ctx: ByggContext, environment_data: dict[str, SubProcessIpcDat
         environment_data.items(),
         key=lambda x: (0, x[0]) if x[0] == DEFAULT_ENVIRONMENT_NAME else (1, x[0]),
     ):
-        if not data.list:
+        if not data.list or not data.list.actions:
             continue
 
         if display_environment_names:
