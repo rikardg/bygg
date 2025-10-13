@@ -8,7 +8,14 @@ def hello(ctx: ActionContext):
     return CommandStatus(0, "And goodbye.", None)
 
 
-Action("hello", command=hello, is_entrypoint=True)
+Action(
+    "hello",
+    command=hello,
+    is_entrypoint=True,
+    description="""
+    An action that says 'Hello'.
+    """,
+)
 
 
 @action("hi", is_entrypoint=True)

@@ -95,7 +95,7 @@ class Action(ActionContext):
         self.scheduling_type = scheduling_type
 
         self.description = (
-            description
+            description.strip()
             if description is not None
             else command.__doc__
             if command is not None and command.__doc__ is not None
