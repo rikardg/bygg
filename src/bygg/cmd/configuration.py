@@ -12,9 +12,8 @@ from bygg.output.output import output_plain
 
 PYTHON_INPUTFILE = "Byggfile.py"
 TOML_INPUTFILE = "Byggfile.toml"
-YAML_INPUTFILE = "Byggfile.yml"
 
-BYGGFILE_SUFFIXES = (".toml", ".yml", ".py")
+BYGGFILE_SUFFIXES = (".toml", ".py")
 
 DEFAULT_ENVIRONMENT_NAME = "_BYGG_DEFAULT_NULL_ENVIRONMENT"
 
@@ -41,7 +40,7 @@ class Settings:
 @dataclasses.dataclass
 class ActionItem:
     """
-    This is a representation of the Action class used for deserialising from YAML.
+    This is a representation of the Action class used for deserialising from TOML.
     The name of the action is the key in the dictionary in the config file.
 
     Parameters
@@ -59,7 +58,7 @@ class ActionItem:
     is_entrypoint : bool, optional
         Whether this action is an entrypoint. Entrypoints are actions that can be
         executed directly from the command line. If not set, this is treated as true by
-        default in Byggfile.yml and false when used from Python. Default is None.
+        default in Byggfile.toml and false when used from Python. Default is None.
     environment : str, optional
         The environment for the action. Default is to run in the ambient environment.
     shell : str, optional
@@ -137,7 +136,7 @@ def get_config_files() -> list[Path]:
     Checks if a static config file (a Byggfile that is not written in Python) is present
     in the current directory.
     """
-    return [p for p in [Path(TOML_INPUTFILE), Path(YAML_INPUTFILE)] if p.is_file()]
+    return [p for p in [Path(TOML_INPUTFILE)] if p.is_file()]
 
 
 def read_config_files() -> Byggfile:
@@ -169,17 +168,6 @@ def read_config_files() -> Byggfile:
                             dacite.from_dict(
                                 config=dacite_config,
                                 data=tomllib.load(toml_file),
-                                data_class=Byggfile,
-                            )
-                        )
-                case ".yml":
-                    import yaml
-
-                    with cf.open("r", encoding="utf-8") as yaml_file:
-                        byggfile_objects.append(
-                            dacite.from_dict(
-                                config=dacite_config,
-                                data=yaml.safe_load(yaml_file),
                                 data_class=Byggfile,
                             )
                         )

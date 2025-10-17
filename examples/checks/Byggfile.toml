@@ -1,0 +1,74 @@
+[settings]
+default_action = "all_checks"
+
+[actions.all_checks]
+description = """
+Run all test actions declared in this file. Should trigger all tested checks when run with
+--check.
+"""
+dependencies = [
+  "check_inputs_outputs",
+  "output_file_missing",
+  "same_output_files"
+]
+
+[actions.circular_A]
+is_entrypoint = false
+outputs = ["foo"]
+shell = """
+touch foo
+"""
+
+[actions.circular_B]
+is_entrypoint = false
+dependencies = ["circular_A"]
+inputs = ["foo"]
+outputs = ["bar"]
+shell = """
+touch bar
+"""
+
+[actions.circular_C]
+is_entrypoint = false
+dependencies = ["circular_B"]
+inputs = ["bar"]
+outputs = ["foo"]
+
+[actions.check_inputs_outputs]
+description = """
+Example where a later action has the input of an earlier one as its output. This should
+trigger check_inputs_outputs when run with --check.
+"""
+dependencies = ["circular_C"]
+
+[actions.output_file_missing]
+description = """
+Example that doesn't create the outputs that it declares. This should trigger
+output_file_missing when run with --check.
+"""
+dependencies = ["no_outputs_A"]
+inputs = ["no_outputs_A"]
+outputs = ["no_outputs"]
+shell = "true"
+
+[actions.no_outputs_A]
+is_entrypoint = false
+outputs = ["no_outputs_A"]
+shell = "true"
+
+[actions.same_output_files]
+description = """
+Example where several actions create the same outputs. This should trigger same_output_files
+when run with --check.
+"""
+dependencies = ["same_output_file_A", "same_output_file_B"]
+
+[actions.same_output_file_A]
+is_entrypoint = false
+outputs = ["same_output_file_A.txt", "common_output_file.txt"]
+shell = "true"
+
+[actions.same_output_file_B]
+is_entrypoint = false
+outputs = ["same_output_file_B.txt", "common_output_file.txt"]
+shell = "true"

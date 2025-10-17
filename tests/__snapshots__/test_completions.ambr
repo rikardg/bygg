@@ -394,9 +394,7 @@
     'hhgttg',
     'ls',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])
@@ -407,9 +405,7 @@
     'fail',
     'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])
@@ -825,9 +821,7 @@
     'hhgttg',
     'ls',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])
@@ -838,9 +832,7 @@
     'fail',
     'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])
@@ -1256,9 +1248,7 @@
     'hhgttg',
     'ls',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])
@@ -1269,9 +1259,7 @@
     'fail',
     'hhgttg',
     'shorthand\\ action\\ toml,\\ with\\ spaces',
-    'shorthand\\ action\\ yaml,\\ with\\ spaces',
     'shorthand_action_toml',
-    'shorthand_action_yaml',
     'succeed',
     'touch\\ a\\ file',
   ])

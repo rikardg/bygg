@@ -173,7 +173,7 @@ def test_schema_dump_is_uptodate():
     )
     assert process.returncode == 0
 
-    with open("schemas/Byggfile_yml_schema.json", "r", encoding="utf-8") as f:
+    with open("schemas/Byggfile_schema.json", "r", encoding="utf-8") as f:
         schema = f.read()
 
     assert process.stdout == schema
@@ -213,9 +213,9 @@ def test_build_multiple_actions(snapshot, clean_bygg_tree):
             "bygg",
             "-C",
             examples_dir / "taskrunner",
-            "shorthand_action_yaml",
+            "shorthand_action_toml",
             "touch a file",
-            "shorthand action yaml, with spaces",
+            "shorthand action toml, with spaces",
         ],
         cwd=clean_bygg_tree,
         capture_output=True,

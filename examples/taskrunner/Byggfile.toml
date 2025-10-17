@@ -1,12 +1,34 @@
+[settings]
+default_action = "touch a file"
+
+[actions]
+shorthand_action_toml = "ls -l"
+hhgttg = "echo Slartibartfast"
+"shorthand action toml, with spaces" = "ls -hal"
+
+[actions."touch a file"]
+message = "I touched a file"
+shell = "touch foo"
+dependencies = ["ls", "do something more"]
+
+[actions.ls]
+is_entrypoint = false
+shell = "ls -hal"
+
+[actions."do something more"]
+is_entrypoint = false
+message = "I did something more"
+shell = """
+echo "foo"
+ls -hal ..
+echo "bar"
+"""
+
 [actions."do something from TOML"]
 description = "A test action in a TOML file"
 message = "I did something from TOML"
 shell = "touch something_from_toml.txt"
 dependencies = ["ls", "do something more"]
-
-[actions]
-shorthand_action_toml = "ls -l"
-"shorthand action toml, with spaces" = "ls -hal"
 
 [actions.succeed]
 shell = "true"

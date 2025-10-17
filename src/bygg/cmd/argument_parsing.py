@@ -228,7 +228,7 @@ There are also two environment variables available:
     meta_group.add_argument(
         "--dump-schema",
         action="store_true",
-        help="Generate a JSON Schema for the Byggfile.yml files. The schema will be printed to stdout.",
+        help="Generate a JSON Schema for the Byggfile.toml files. The schema will be printed to stdout.",
     )
     meta_group.add_argument(
         "--completions",
