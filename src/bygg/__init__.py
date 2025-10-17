@@ -1,4 +1,4 @@
-from .core.action import Action, ActionContext, action, action_set
+from .core.action import Action, ActionContext, action
 from .core.common_types import CommandStatus
 
 __all__ = [
@@ -6,5 +6,4 @@ __all__ = [
     "ActionContext",
     "CommandStatus",
     "action",
-    "action_set",
 ]
