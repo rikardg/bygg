@@ -8,7 +8,7 @@ if shutil.which("uv"):
 nox.options.error_on_external_run = True
 nox.options.stop_on_first_error
 
-python_versions = ["3.11", "3.12", "3.13"]
+python_versions = ["3.11", "3.12", "3.13", "3.14"]
 
 
 # Not a test, but utility functionality for updating the help snapshots across all

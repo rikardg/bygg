@@ -482,6 +482,79 @@
   
   '''
 # ---
+# name: test_help[3.14]
+  '''
+  usage: bygg [-h] [-V] [-v] [--clean | -l | --tree | -w] [-C DIRECTORY]
+              [-j [JOBS]] [-B] [--check] [--reset] [--remove-cache]
+              [--remove-environments] [--dump-schema] [--completions]
+              [actions ...]
+  
+  A build tool written in Python, where all actions can be written in Python.
+  
+  Build the default action:
+   bygg
+  
+  Build ACTION:
+   bygg ACTION
+  
+  Clean ACTION:
+   bygg ACTION --clean
+  
+  List available actions:
+   bygg --list
+  
+  POSITIONAL ARGUMENTS:
+    actions               Entrypoint actions to operate on.
+  
+  OPTIONS:
+    -h, --help            show this help message and exit
+    -V, --version         Show version string and exit.
+    -v, --verbose         Enable more verbose output from some commands.
+  
+  Commands that operate on the build setup:
+    --clean               Clean the outputs of the specified actions.
+    -l, --list            List available actions.
+    --tree                Display the dependency tree starting from the specified
+                          action(s).
+    -w, --watch           Watch the input files and rebuild when they change.
+  
+  Make-like arguments:
+    -C, --directory DIRECTORY
+                          Change to the specified directory.
+    -j, --jobs [JOBS]     Specify the number of jobs to run simultaneously. None
+                          means to use the number of available cores.
+    -B, --always-make     Always build all actions.
+  
+  Analyse and verify:
+    Arguments in this group will add more analysis to the build process. Actions
+    will be built and the analysis result will be reported.
+  
+    There are also two environment variables available:
+    - BYGG_DEBUG enables debug logging.
+    - BYGG_DEV treats all actions as entry points, which allows for running them
+      directly from the command line.
+  
+    --check               Perform various checks on the action tree. Implies -B
+  
+  Maintenance:
+    These commands operate on Bygg's build state. When given a maintenance
+    command, Bygg will just perform the maintenance and exit; it will neither
+    build anything nor perform any other actions.
+  
+    --reset               Remove the cache and the Python environments. Same as
+                          giving --remove-cache and --remove-environments.
+    --remove-cache        Remove the build cache.
+    --remove-environments
+                          Remove the Python environments.
+  
+  Meta arguments:
+    --dump-schema         Generate a JSON Schema for the Byggfile.yml files. The
+                          schema will be printed to stdout.
+    --completions         Output instructions for how to set up shell completions
+                          via the shell's startup script.
+  
+  '''
+# ---
 # name: test_help_formatting[basic]
   'This is a basic help text.'
 # ---
