@@ -91,7 +91,7 @@ respectively. See the `examples/` directory for worked examples.
 
 ### Environments
 
-Bygg can manage virtual environments. See `examples/environments/Byggfile.yml`
+Bygg can manage virtual environments. See `examples/environments/Byggfile.toml`
 for an example.
 
 Python files and the actions declared therein will run in the environment that
@@ -108,21 +108,20 @@ are not intrinsically aware of virtual environments.
 
 ### Settings files
 
-There is also support for declaring actions, environments and settings in YAML
-and TOML files called `Byggfile.yml` and `Byggfile.toml`, respectively. This is
-intended primarily for configuring static settings like which virtual
-environment to use and their respective entrypoints, but can also be used for
-declaring static actions. See `examples/taskrunner/Byggfile.toml`,
-`examples/taskrunner/Byggfile.yml` and `examples/environments/Byggfile.yml`.
+There is also support for declaring actions, environments and settings in TOML
+files called `Byggfile.toml`. This is intended primarily for configuring static
+settings like which virtual environment to use and their respective entrypoints,
+but can also be used for declaring static actions. See
+`examples/taskrunner/Byggfile.toml` and `examples/environments/Byggfile.toml`.
 
-The evaluation order is TOML -> YAML -> Python. Actions and settings declared
-later will override earlier ones.
+The evaluation order is TOML -> Python. Actions and settings declared later will
+override earlier ones.
 
 ## Shell tab completions
 
 Bygg has support for Bash and Zsh tab completions of arguments and entrypoint
 actions. The completions will be loaded from the files that exist out of
-`Byggfile.toml`, `Byggfile.yml` and `Byggfile.py`, in that order.
+`Byggfile.toml` and `Byggfile.py`, in that order.
 
 Any environments declared in the static config files will be installed as
 needed and their respective Byggfiles will be evaluated to collect entrypoint

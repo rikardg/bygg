@@ -1,0 +1,10 @@
+[settings]
+default_action = "sort"
+
+[actions.sort]
+description = "Sort all test files. Also sets up test files if needed."
+dependencies = ["sort_test_files"]
+
+[actions.setup]
+description = "Set up test files."
+dependencies = ["setup_test_files"]

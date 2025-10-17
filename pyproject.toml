@@ -17,7 +17,6 @@ dependencies = [
   "dc-schema>=0.0.8",
   "dill>=0.4.0",
   "loky>=3.5.5",
-  "PyYAML>=6.0.2",
   "watchdog>=6.0.0",
 ]
 
@@ -85,7 +84,6 @@ dev = [
   "ruff>=0.12.2",
   "setuptools>=80.9.0",
   "syrupy>=4.9.1",
-  "types-PyYAML>=6.0.12.20250516",
 ]
 
 [tool.uv]

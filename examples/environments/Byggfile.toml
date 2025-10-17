@@ -1,0 +1,77 @@
+[settings]
+default_action = "default_action"
+
+[actions.clean_environments]
+description = "Clean all environments"
+message = "Cleaning"
+shell = """
+rm -Rf .venv .venv1 .venv2
+"""
+
+[actions.default_action]
+description = "The default action. Runs in the base environment."
+message = "Running in base env"
+dependencies = ["default_action_python"]
+environment = "base"
+
+[actions.action1]
+description = "Action that runs in env1."
+message = "Running in env1"
+dependencies = ["action1_python"]
+environment = "env1"
+
+[actions.action2]
+description = "Action that runs in env2."
+message = "Running in env2"
+dependencies = ["action2_python"]
+environment = "env2"
+
+[environments.env1]
+name = "Environment 1"
+byggfile = "Byggfile1.py"
+inputs = ["requirements1.txt"]
+venv_directory = ".venv1"
+shell = """
+if command -v uv > /dev/null 2>&1; then
+  uv venv .venv1
+  VIRTUAL_ENV=.venv1 uv pip install -r requirements1.txt
+  VIRTUAL_ENV=.venv1 uv pip install -e ../../
+else
+  python3 -m venv .venv1
+  .venv1/bin/pip install -r requirements1.txt
+  .venv1/bin/pip install -e ../../
+fi
+"""
+
+[environments.env2]
+byggfile = "Byggfile2.py"
+inputs = ["requirements2.txt"]
+venv_directory = ".venv2"
+shell = """
+if command -v uv > /dev/null 2>&1; then
+  uv venv .venv2
+  VIRTUAL_ENV=.venv2 uv pip install -r requirements2.txt
+  VIRTUAL_ENV=.venv2 uv pip install -e ../../
+else
+  python3 -m venv .venv2
+  .venv2/bin/pip install -r requirements2.txt
+  .venv2/bin/pip install -e ../../
+fi
+"""
+
+[environments.base]
+name = "Base environment"
+byggfile = "Byggfile.py"
+inputs = ["requirements.txt"]
+venv_directory = ".venv"
+shell = """
+if command -v uv > /dev/null 2>&1; then
+  uv venv .venv
+  VIRTUAL_ENV=.venv uv pip install -r requirements.txt
+  VIRTUAL_ENV=.venv uv pip install -e ../../
+else
+  python3 -m venv .venv
+  .venv/bin/pip install -r requirements.txt
+  .venv/bin/pip install -e ../../
+fi
+"""
