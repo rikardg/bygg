@@ -1,3 +1,7 @@
+"$schema" = "file://schemas/Byggfile_schema.json"
+# Could also be e.g.:
+# "$schema" = "https://raw.githubusercontent.com/rikardg/bygg/refs/heads/master/schemas/Byggfile_schema.json"
+
 [settings]
 verbose = true
 

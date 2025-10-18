@@ -216,6 +216,19 @@ def dump_schema():
     # See https://github.com/Peter554/dc_schema/issues/6 .
     schema["additionalProperties"] = False
 
+    # $schema handling
+
+    # From https://jj-vcs.github.io/jj/latest/config-schema.json:
+    # "`taplo` and the corresponding VS Code plugins only support version draft-04 of
+    # JSON Schema, see
+    # <https://taplo.tamasfe.dev/configuration/developing-schemas.html>. draft-07 is
+    # mostly compatible with it, newer versions may not be."
+    schema["$schema"] = "http://json-schema.org/draft-04/schema"
+    schema["properties"]["$schema"] = {
+        "type": "string",
+        "description": "JSON Schema reference for validation",
+    }
+
     classes_to_properties = {
         "ActionItem": "actions",
         "Environment": "environments",
