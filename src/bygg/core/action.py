@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Callable, Iterable, Literal, Optional, Self
 
 from bygg.core.common_types import CommandStatus
@@ -90,8 +91,8 @@ class Action(ActionContext):
         self,
         name: str,
         message: str | None = None,
-        inputs: Optional[Iterable[str]] = None,
-        outputs: Optional[Iterable[str]] = None,
+        inputs: Optional[Iterable[str | Path]] = None,
+        outputs: Optional[Iterable[str | Path]] = None,
         dependencies: Optional[Iterable[str | Self]] = None,
         dynamic_dependency: Optional[DynamicDependency] = None,
         is_entrypoint: bool = False,
@@ -103,8 +104,8 @@ class Action(ActionContext):
     ):
         self.name = name
         self.message = message
-        self.inputs = {*inputs} if inputs else set()
-        self.outputs = {*outputs} if outputs else set()
+        self.inputs = {str(i) for i in inputs} if inputs else set()
+        self.outputs = {str(o) for o in outputs} if outputs else set()
         self.dependencies = {
             d.name if isinstance(d, Action) else d for d in (dependencies or [])
         }
@@ -146,8 +147,8 @@ def action(
     name: str,
     *,
     message: Optional[str] = None,
-    inputs: Optional[Iterable[str]] = None,
-    outputs: Optional[Iterable[str]] = None,
+    inputs: Optional[Iterable[str | Path]] = None,
+    outputs: Optional[Iterable[str | Path]] = None,
     dependencies: Optional[Iterable[str | Action]] = None,
     dynamic_dependency: Optional[DynamicDependency] = None,
     scheduling_type: SchedulingType = "processpool",
