@@ -23,6 +23,7 @@ class ByggNamespace:
     clean: bool
     list_actions: bool
     tree: bool
+    render_tree: bool
     watch: bool
     jobs: int | None
     always_make: bool
@@ -143,6 +144,12 @@ List available actions:
         "--tree",
         action="store_true",
         help="Display the dependency tree starting from the specified action(s).",
+    )
+    build_setup_group.add_argument(
+        "--render-tree",
+        action="store_true",
+        dest="render_tree",
+        help="Output the dependency tree in DOT format for graphical rendering.",
     )
     build_setup_group.add_argument(
         "-w",

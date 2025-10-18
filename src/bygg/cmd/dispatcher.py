@@ -25,6 +25,7 @@ from bygg.cmd.configuration import (
 from bygg.cmd.datastructures import (
     ByggContext,
     SubProcessIpcData,
+    SubProcessIpcDataRenderTree,
     SubProcessIpcDataTree,
     get_entrypoints,
 )
@@ -36,6 +37,10 @@ from bygg.cmd.environments import (
 )
 from bygg.cmd.list_actions import list_collect_for_environment, print_actions
 from bygg.cmd.maintenance import perform_maintenance
+from bygg.cmd.render_tree import (
+    print_render_tree,
+    render_tree_collect_for_environment,
+)
 from bygg.cmd.tree import print_tree, tree_collect_for_environment
 from bygg.core.runner import ProcessRunner
 from bygg.core.scheduler import Scheduler
@@ -203,7 +208,11 @@ def parent_dispatcher(
     logger.info("Actions to be built: %s", actions_to_build)
 
     only_collect = (
-        not actions_to_build or args.list_actions or args.tree or is_completing()
+        not actions_to_build
+        or args.list_actions
+        or args.tree
+        or args.render_tree
+        or is_completing()
     )
 
     # We have nothing to build, but other things to do
@@ -236,6 +245,34 @@ def parent_dispatcher(
                 not_found_actions = [
                     f"'{a}'"
                     for a in (filter(lambda x: x in tree_actions, actions_to_build))
+                ]
+                output_error(
+                    f"Error: The following action{'s' if len(not_found_actions) > 1 else ''} could not be found: {TS.BOLD}{', '.join(not_found_actions)}{TS.NOBOLD}."
+                )
+                sys.exit(1)
+            sys.exit(0)
+
+        if args.render_tree:
+            if not actions_to_build:
+                output_error(
+                    "The --render-tree command requires at least one action to be specified."
+                )
+                output_error(
+                    "No actions were specified and no default action is defined."
+                )
+                print_actions(ctx, environment_data)
+                sys.exit(1)
+            render_tree_actions = set(actions_to_build)
+            for v in environment_data.values():
+                if v.render_tree:
+                    render_tree_actions = render_tree_actions - v.found_actions
+                    print_render_tree(v.render_tree, actions_to_build)
+            if render_tree_actions:
+                not_found_actions = [
+                    f"'{a}'"
+                    for a in (
+                        filter(lambda x: x in render_tree_actions, actions_to_build)
+                    )
                 ]
                 output_error(
                     f"Error: The following action{'s' if len(not_found_actions) > 1 else ''} could not be found: {TS.BOLD}{', '.join(not_found_actions)}{TS.NOBOLD}."
@@ -352,6 +389,11 @@ def run_or_collect_in_environment(
         tree_collect_for_environment(ctx, environment_name)
         if not is_completing()
         else SubProcessIpcDataTree({})
+    )
+    subprocess_data.render_tree = (
+        render_tree_collect_for_environment(ctx, environment_name)
+        if not is_completing()
+        else SubProcessIpcDataRenderTree({})
     )
 
     # Our work here is done, or, we had nothing to do
@@ -502,6 +544,7 @@ def subprocess_dispatcher(parser, args_namespace):
 
     ctx.ipc_data.list = list_collect_for_environment(ctx, environment_name)
     ctx.ipc_data.tree = tree_collect_for_environment(ctx, environment_name)
+    ctx.ipc_data.render_tree = render_tree_collect_for_environment(ctx, environment_name)
 
     if is_completing():
         write_ipc_data(ctx, args)

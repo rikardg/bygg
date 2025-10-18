@@ -1,0 +1,25 @@
+# serializer version: 1
+# name: test_render_tree_branching_actions
+  '''
+  digraph bygg {
+    "action1" -> "action2";
+    "action1" -> "action3";
+    "action2" -> "action4";
+    "action3" -> "action4";
+  }
+  
+  '''
+# ---
+# name: test_render_tree_four_nonbranching_actions
+  '''
+  digraph bygg {
+    "action1" -> "action2";
+    "action2" -> "action3";
+    "action3" -> "action4";
+  }
+  
+  '''
+# ---
+# name: test_render_tree_single_action
+  ''
+# ---

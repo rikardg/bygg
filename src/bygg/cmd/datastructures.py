@@ -26,6 +26,13 @@ class SubProcessIpcDataTree:
 
 
 @dataclass
+class SubProcessIpcDataRenderTree:
+    """Holds the data for --render-tree from a subprocess."""
+
+    actions: dict[str, list[str]]
+
+
+@dataclass
 class SubProcessIpcData:
     """Holds the results for metadata from a subprocess."""
 
@@ -33,6 +40,7 @@ class SubProcessIpcData:
     found_actions: set[str] = field(default_factory=set)
     list: Optional[SubProcessIpcDataList] = None
     tree: Optional[SubProcessIpcDataTree] = None
+    render_tree: Optional[SubProcessIpcDataRenderTree] = None
     return_code: int = 0
     found_input_files: set[str] = field(default_factory=set)
     failed_jobs: dict[str, CommandStatus] = field(default_factory=dict)
