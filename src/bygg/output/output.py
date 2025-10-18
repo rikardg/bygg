@@ -69,14 +69,14 @@ def output_with_status_line(bottom: str | None, scroll: str | None):
     Only prints the latter if the terminal is not a tty.
     """
     if not isatty:
-        print(scroll)
+        print(scroll, file=sys.stderr)
         return
 
-    print(TerminalStyle.CLEARLINE, end="")
+    print(TerminalStyle.CLEARLINE, end="", file=sys.stderr)
 
     if scroll is not None:
-        print(scroll)
-    print(bottom if bottom is not None else "", end="\r")
+        print(scroll, file=sys.stderr)
+    print(bottom if bottom is not None else "", end="\r", file=sys.stderr)
 
 
 STATUS_TEXT_FIELD_WIDTH = 8
@@ -87,27 +87,31 @@ bygg_prefix_string = f"{TerminalStyle.Fg.BRIGHT_CYAN}{'bygg >>>':<{STATUS_TEXT_F
 
 def output_info(s: str):
     print(
-        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_CYAN}{s}{TerminalStyle.Fg.RESET}"
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_CYAN}{s}{TerminalStyle.Fg.RESET}",
+        file=sys.stderr,
     )
 
 
 def output_warning(s: str):
     print(
-        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_YELLOW}{s}{TerminalStyle.Fg.RESET}"
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_YELLOW}{s}{TerminalStyle.Fg.RESET}",
+        file=sys.stderr,
     )
 
 
 def output_error(s: str):
     print(
-        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_RED}{s}{TerminalStyle.Fg.RESET}"
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_RED}{s}{TerminalStyle.Fg.RESET}",
+        file=sys.stderr,
     )
 
 
 def output_ok(s: str):
     print(
-        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_GREEN}{s}{TerminalStyle.Fg.RESET}"
+        f"{bygg_prefix_string} {TerminalStyle.Fg.BRIGHT_GREEN}{s}{TerminalStyle.Fg.RESET}",
+        file=sys.stderr,
     )
 
 
 def output_plain(s: str):
-    print(s)
+    print(s, file=sys.stderr)

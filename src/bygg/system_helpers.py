@@ -130,9 +130,11 @@ def subprocess_tty_print(cmd, encoding="utf-8", timeout=10, **kwargs):
     int
         The status code from the subprocess.
     """
+    import sys
+
     proc = subprocess_tty(cmd, encoding, timeout, **kwargs)
     for line in proc:
-        print(line.rstrip())
+        print(line.rstrip(), file=sys.stderr)
     return proc.returncode
 
 
