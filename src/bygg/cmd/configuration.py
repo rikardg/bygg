@@ -164,10 +164,13 @@ def read_config_files() -> Byggfile:
                     import tomllib
 
                     with cf.open("rb") as toml_file:
+                        data = tomllib.load(toml_file)
+                        # We don't care about the $schema property
+                        data.pop("$schema", None)
                         byggfile_objects.append(
                             dacite.from_dict(
                                 config=dacite_config,
-                                data=tomllib.load(toml_file),
+                                data=data,
                                 data_class=Byggfile,
                             )
                         )
