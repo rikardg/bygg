@@ -105,7 +105,8 @@ def clean_bygg_tree(tmp_path):
         clean_path,
         ignore=shutil.ignore_patterns(*clean_bygg_tree_exclusions),
     )
-    return clean_path
+    yield clean_path
+    shutil.rmtree(clean_path)
 
 
 @pytest.fixture(autouse=True)
