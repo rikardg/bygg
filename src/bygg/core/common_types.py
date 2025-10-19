@@ -14,6 +14,14 @@ class CommandStatus:
     runner_instruction: RunnerInstruction | None = None  # instruction to the runner
 
 
-JobStatus = Literal["queued", "running", "finished", "failed", "stopped", "skipped"]
+JobStatus = Literal[
+    "queued",
+    "running",
+    "finished",
+    "failed",
+    "stopped",
+    "skipped",
+    "trim_only",
+]
 
 Severity = Literal["error", "warning", "info"]

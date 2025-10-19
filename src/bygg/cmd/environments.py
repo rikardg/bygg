@@ -1,3 +1,4 @@
+import importlib.util
 import os
 from pathlib import Path
 import shutil
@@ -18,7 +19,7 @@ from bygg.core.action import Action
 from bygg.core.digest import calculate_string_digest
 from bygg.logutils import logger
 from bygg.output.output import output_error, output_info, output_plain
-from bygg.util import create_shell_command
+from bygg.util.util import create_shell_command
 
 
 def calculate_environment_hash(environment: Environment) -> str:
@@ -160,6 +161,67 @@ def register_actions_from_configuration(
 
 
 def load_python_build_file(build_file: str, environment_name: str):
+    if os.path.isfile(build_file):
+        # Add current dir to path
+        sys.path.insert(0, os.path.realpath("."))
+
+        Action._current_environment = environment_name
+        logger.info(
+            "Loading Python file %s for environment %s", build_file, environment_name
+        )
+
+        spec = importlib.util.spec_from_file_location("__bygg_build__", build_file)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        logger.info(
+            "Back from loading Python file %s for environment %s",
+            build_file,
+            environment_name,
+        )
+        Action._current_environment = None
+
+
+def load_python_build_file_compile(build_file: str, environment_name: str):
+    # modify load path to make the current directory importable
+    preamble = """\
+        import os
+        import sys
+        sys.path.insert(0, str(os.path.realpath('.')))
+
+        """
+    if os.path.isfile(build_file):
+        with open(build_file, "r") as f:
+            content = f.read()
+
+        Action._current_environment = environment_name
+        logger.info(
+            "Loading Python file %s for environment %s",
+            build_file,
+            environment_name,
+        )
+
+        # Compile with proper filename for inspect.getfile() support
+        full_content = textwrap.dedent(preamble) + content
+        absolute_path = os.path.abspath(build_file)
+        compiled_code = compile(full_content, absolute_path, "exec")
+
+        # Create globals with proper __file__ setting
+        build_globals = globals().copy()
+        build_globals["__file__"] = absolute_path
+
+        exec(compiled_code, build_globals)
+
+        logger.info(
+            "Back from loading Python file %s for environment %s",
+            build_file,
+            environment_name,
+        )
+        Action._current_environment = None
+
+
+def load_python_build_file_exec(build_file: str, environment_name: str):
     # modify load path to make the current directory importable
     preamble = """\
         import os
