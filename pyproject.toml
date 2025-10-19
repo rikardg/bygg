@@ -61,6 +61,9 @@ markers = [
   "focus: Marker for test(s) to focus on currently.",
 ]
 
+[tool.pytest_env]
+SETUPTOOLS_SCM_PRETEND_VERSION = "0.0.0.dev0"
+
 [tool.ruff]
 exclude = ["_version.py"]
 
@@ -79,6 +82,7 @@ dev = [
   "pyinstrument>=5.0.3",
   "pyright>=1.1.402",
   "pytest>=8.4.1",
+  "pytest-env>=1.2.0",
   "pytest-mock>=3.14.1",
   "pytest-xdist>=3.8.0",
   "ruff>=0.12.2",
