@@ -74,7 +74,7 @@ jobs:
           pyright examples/
       - name: Type check with mypy
         run: |
-          .venv/bin/pip install -e .
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0.dev0 .venv/bin/pip install -e .
           .venv/bin/python3 mypy.py
 
   audit:
