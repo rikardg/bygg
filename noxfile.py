@@ -1,8 +1,11 @@
+import os
 import shutil
 
 import nox
 
-if shutil.which("uv"):
+# Only auto-detect uv backend outside of CI to allow testing both backends
+# In CI, the -db/--default-backend flag controls which backend is used
+if shutil.which("uv") and not os.environ.get("CI"):
     nox.options.default_venv_backend = "uv"
 
 nox.options.error_on_external_run = True

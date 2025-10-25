@@ -12,15 +12,14 @@ permissions:
 jobs:
   declare_variables:
     runs-on: ubuntu-latest
+    outputs:
+      python_versions: ${{ steps.python_versions.outputs.python_versions }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - id: read_mise_toml
-        run: python3 -c "import json ; import tomllib; print(f'PYTHON_VERSION={ json.dumps(tomllib.loads(open('.mise.toml').read())['tools']['python'])}')" >> "$GITHUB_OUTPUT"
-    outputs:
-      python_versions: ${{ steps.read_mise_toml.outputs.PYTHON_VERSION }}
+      - id: python_versions
+        run: |
+          VERSIONS=$(cat .python-versions | jq -R -s -c 'split("\n")[:-1]')
+          echo "python_versions=$VERSIONS" >> $GITHUB_OUTPUT
 
   nox:
     needs: declare_variables
@@ -35,16 +34,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: jdx/mise-action@v2
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install Python
+        run: uv python install ${{ matrix.python_version }}
       - name: Test with nox
-        run: |
-          mise use python@${{ matrix.python_version }}
-          mise x -- python3 -m pip install --upgrade pip
-          mise x -- pip install nox
-          if [ ${{ matrix.nox_env_manager }} = "uv" ]; then
-            mise x -- pip install uv
-          fi
-          mise x -- nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }}
+        run: uv tool run nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }}
 
   mypy_pyright_ruff:
     needs: declare_variables
@@ -55,12 +50,13 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
-      - uses: jdx/mise-action@v2
-      - name: Install dependencies
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+      - name: Install Python and dependencies
         run: |
-          mise use python@${{ matrix.python_version }}
-          mise x -- python3 -m venv .venv
-          .venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+          uv python install ${{ matrix.python_version }}
+          uv venv --python ${{ matrix.python_version }}
+          uv pip install -r requirements.txt -r requirements-dev.txt
       - name: Run Ruff
         run: ".venv/bin/ruff check src/ tests/ examples/"
       - name: Type check with Pyright
@@ -74,7 +70,7 @@ jobs:
           pyright examples/
       - name: Type check with mypy
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0.dev0 .venv/bin/pip install -e .
+          SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0.dev0 uv pip install -e .
           .venv/bin/python3 mypy.py
 
   audit:
