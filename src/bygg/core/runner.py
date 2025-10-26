@@ -5,9 +5,10 @@ import sys
 from typing import Callable
 import warnings
 
-from bygg.core.action import CommandStatus, WorkChannel
-from bygg.core.common_types import JobStatus
-from bygg.core.scheduler import Job, Scheduler
+from bygg.core.action import WorkChannel
+from bygg.core.common_types import CommandStatus, JobStatus
+from bygg.core.job import Job
+from bygg.core.scheduler import Scheduler
 from bygg.logutils import logger
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.status_display import on_check_failed

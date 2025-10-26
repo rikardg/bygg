@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import re
 
-from bygg.core.scheduler import Job
+from bygg.core.job import Job
 from bygg.output.output import TerminalStyle as TS
 from bygg.output.output import isatty, output_plain
 
