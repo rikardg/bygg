@@ -31,15 +31,14 @@ jobs:
         nox_env_manager: ["virtualenv", "uv"]
       fail-fast: false
     runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
         uses: astral-sh/setup-uv@v7
-      - name: Install Python
-        run: uv python install ${{ matrix.python_version }}
+        with:
+          python-version: ${{ matrix.python_version }}
       - name: Test with nox
-        run: uv tool run nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }}
+        run: uv tool run nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }} --verbose
 
   mypy_pyright_ruff:
     needs: declare_variables
@@ -52,10 +51,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install uv
         uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python_version }}
       - name: Install Python and dependencies
         run: |
-          uv python install ${{ matrix.python_version }}
-          uv venv --python ${{ matrix.python_version }}
+          uv venv
           uv pip install -r requirements.txt -r requirements-dev.txt
       - name: Run Ruff
         run: ".venv/bin/ruff check src/ tests/ examples/"
