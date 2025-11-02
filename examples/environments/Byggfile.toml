@@ -32,6 +32,7 @@ byggfile = "Byggfile1.py"
 inputs = ["requirements1.txt"]
 venv_directory = ".venv1"
 shell = """
+set -e
 if command -v uv > /dev/null 2>&1; then
   uv venv .venv1
   VIRTUAL_ENV=.venv1 uv pip install -r requirements1.txt
@@ -48,6 +49,7 @@ byggfile = "Byggfile2.py"
 inputs = ["requirements2.txt"]
 venv_directory = ".venv2"
 shell = """
+set -e
 if command -v uv > /dev/null 2>&1; then
   uv venv .venv2
   VIRTUAL_ENV=.venv2 uv pip install -r requirements2.txt
@@ -65,6 +67,7 @@ byggfile = "Byggfile.py"
 inputs = ["requirements.txt"]
 venv_directory = ".venv"
 shell = """
+set -e
 if command -v uv > /dev/null 2>&1; then
   uv venv .venv
   VIRTUAL_ENV=.venv uv pip install -r requirements.txt
