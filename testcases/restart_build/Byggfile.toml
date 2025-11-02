@@ -1,0 +1,16 @@
+[environments.test]
+name = "restart_build"
+byggfile = "Byggfile.py"
+inputs = []
+venv_directory = ".venv"
+shell = '''
+set -e
+if command -v uv > /dev/null 2>&1; then
+  # Leave uv out of options but to use the Python active in the shell:
+  uv venv --no-project --no-managed-python
+  VIRTUAL_ENV=.venv uv pip install -e ../../
+else
+  python3 -m venv .venv
+  .venv/bin/pip install -e ../../
+fi
+'''

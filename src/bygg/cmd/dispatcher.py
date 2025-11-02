@@ -79,6 +79,10 @@ def print_version():
     output_info(f"bygg {importlib.metadata.version('bygg')}")
 
 
+DISPATCHER_ACTION_RESTART_BUILD = 125
+"""Exit code returned by a subprocess when an action requested that the build be
+restarted."""
+
 DISPATCHER_IS_COMPLETING_EXIT_CODE = 126
 """Exit code returned by a subprocess when completing."""
 
@@ -94,9 +98,19 @@ def bygg():
     if not args.is_restarted_with_env:
         # Build and potentially watch:
         rc = 0
+        start_count = 0
         while True:
             with change_dir(None):  # change back to the starting dir
                 environment_data_list = parent_dispatcher(parser, args)
+
+                if should_restart_build(environment_data_list):
+                    start_count += 1
+                    # Arbitrary number
+                    if start_count > 17:
+                        output_error("Too many restarts. Aborting.")
+                        return 1
+                    output_info(f"Restarting build ({start_count})")
+                    continue
 
                 rc = output_status_codes(environment_data_list)
                 files_to_watch = extract_input_files(environment_data_list)
@@ -110,6 +124,16 @@ def bygg():
         return rc
     else:
         subprocess_dispatcher(parser, args)
+
+
+def should_restart_build(
+    environment_data_list: list[dict[str, SubProcessIpcData]],
+) -> bool:
+    return any(
+        v.return_code == DISPATCHER_ACTION_RESTART_BUILD
+        for env in environment_data_list
+        for v in env.values()
+    )
 
 
 def output_status_codes(
@@ -372,6 +396,11 @@ def run_or_collect_in_environment(
             ctx.bygg_namespace.check,
         )
         subprocess_data.found_input_files.update(input_files)
+        if status == "restart_build":
+            output_error(
+                "Build restart mechanism is not available for actions running in the ambient environment"
+            )
+            sys.exit(1)
     if not status:
         subprocess_data.failed_jobs = {
             job.name: job.status
@@ -425,7 +454,8 @@ def spawn_subprocess(
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
             match e:
                 case subprocess.CalledProcessError() if (
-                    e.returncode == DISPATCHER_IS_COMPLETING_EXIT_CODE
+                    e.returncode == DISPATCHER_ACTION_RESTART_BUILD
+                    or e.returncode == DISPATCHER_IS_COMPLETING_EXIT_CODE
                     or e.returncode == DISPATCHER_ACTION_NOT_FOUND_EXIT_CODE
                 ):
                     # NOP
@@ -521,10 +551,14 @@ def subprocess_dispatcher(parser, args_namespace):
         )
         ctx.ipc_data.found_input_files.update(input_files)
 
-    if not status:
+    if not status or status == "exit_job_failed":
         sys.exit(1)
 
     write_ipc_data(ctx, args)
+
+    if status == "restart_build":
+        sys.exit(DISPATCHER_ACTION_RESTART_BUILD)
+
     sys.exit(0)
 
 

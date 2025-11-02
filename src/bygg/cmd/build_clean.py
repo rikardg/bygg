@@ -24,7 +24,7 @@ def build(
     job_count: int | None,
     always_make: bool,
     check: bool,
-) -> tuple[bool, set[str]]:
+) -> tuple[bool | RunnerInstruction, set[str]]:
     """
     actions: The actions to build.
 
@@ -48,43 +48,34 @@ def build(
         t1 = time.time()
         output_info(f"Building action '{action}':")
 
-        start_count = 0
         runner_instruction: RunnerInstruction | None = "restart_build"
 
-        while runner_instruction == "restart_build":
-            start_count += 1
-            if start_count > 17:
-                output_error("Too many restarts. Aborting.")
-                return (False, input_files)
+        ctx.scheduler.start_run(
+            action,
+            always_make=always_make,
+            check=check,
+        )
 
-            ctx.scheduler.start_run(
-                action,
-                always_make=always_make,
-                check=check,
-            )
+        # Collect for --watch. Needs to be done here when the graph is built up and
+        # before build has started.
+        for job_name in ctx.scheduler.job_graph.get_all_jobs():
+            build_action = ctx.scheduler.build_actions.get(job_name)
+            if build_action:
+                input_files.update(build_action.inputs)
 
-            # Collect for --watch. Needs to be done here when the graph is built up and
-            # before build has started.
-            for job_name in ctx.scheduler.job_graph.get_all_jobs():
-                build_action = ctx.scheduler.build_actions.get(job_name)
-                if build_action:
-                    input_files.update(build_action.inputs)
+        exit_reasons = ctx.runner.start(max_workers)
+        ctx.scheduler.shutdown()
+        runner_instruction = process_exit_reasons(exit_reasons)
 
-            exit_reasons = ctx.runner.start(max_workers)
-            ctx.scheduler.shutdown()
-            runner_instruction = process_exit_reasons(exit_reasons)
-
-            if runner_instruction is None:
-                output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
-            elif runner_instruction == "restart_build":
-                output_info("Restarting build.")
-                pass
-            else:
-                output_error(
-                    f"Action '{action}' failed after {time.time() - t1:.2f} s."
-                )
-                output_job_logs(ctx.runner.failed_jobs)
-                return (False, input_files)
+        if runner_instruction is None:
+            output_ok(f"Action '{action}' completed in {time.time() - t1:.2f} s.")
+        elif runner_instruction == "restart_build":
+            output_info("Restarting build.")
+            return (runner_instruction, input_files)
+        else:
+            output_error(f"Action '{action}' failed after {time.time() - t1:.2f} s.")
+            output_job_logs(ctx.runner.failed_jobs)
+            return (False, input_files)
 
     except KeyboardInterrupt:
         output_plain("")
