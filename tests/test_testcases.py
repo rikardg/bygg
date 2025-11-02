@@ -22,6 +22,7 @@ testcases: list[TestcaseParameters] = [
 filetree_ignore = (
     "__pycache__",
     ".bygg",
+    ".venv",
 )
 
 
