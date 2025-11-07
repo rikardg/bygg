@@ -29,6 +29,8 @@ together other systems.
 Bygg tries to get out of your way and be as thin as possible, while still
 providing correctness and minimal rebuilds.
 
+For a brief background as to why Bygg exists, see [Why Bygg?](docs/Why.md).
+
 ### Basics
 
 - Specify actions in pure Python.
@@ -48,7 +50,9 @@ or
 
 or in a virtual environment.
 
-## Usage
+## Usage -- what it looks like
+
+[More in-depth documentation here](docs/Usage.md).
 
 Specify the actions in `Byggfile.py` in your source directory. Either wrap the
 action function using the `@action` decorator, or use the `Action` constructor
