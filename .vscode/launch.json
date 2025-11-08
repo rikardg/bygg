@@ -9,8 +9,8 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/.venv/bin/bygg",
-      "cwd": "${workspaceFolder}/examples/trivial",
-      "args": ["transform"],
+      "cwd": "${workspaceFolder}/testcases/trim",
+      "args": ["trim"],
       "console": "integratedTerminal",
       "justMyCode": true
     }

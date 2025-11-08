@@ -1,5 +1,9 @@
+from collections import deque
+import glob
 import os
 from pathlib import Path
+import shutil
+import stat
 import sys
 from typing import Callable
 import warnings
@@ -140,16 +144,20 @@ class ProcessRunner:
                 batch_size = max_workers * 2
                 if len(scheduled_jobs) < batch_size:
                     for job in backlog:
+                        if job.action.trim:
+                            perform_trimming(self.scheduler, job)
                         # Skip jobs with no command or ones that are clean
-                        if job.action.command is None:
+                        if job.action.command is None or job.trim_only:
                             job.status = CommandStatus(
                                 0,
-                                f"{'No command, skipping'}",
+                                "Trim only"
+                                if job.trim_only
+                                else "No command, skipping",
                                 None,
                             )
                             self.scheduler.job_finished(job)
                             self.job_status_listener(
-                                "skipped",
+                                "trim_only" if job.trim_only else "skipped",
                                 job,
                                 get_job_count_tuple(),
                             )
@@ -257,3 +265,66 @@ def get_job_count_limit():
         count = os.cpu_count()
         assert count is not None
         return count
+
+
+def perform_trimming(scheduler: Scheduler, job: Job):
+    action = job.action
+    assert action.trim
+
+    dependencies_outputs: set[str] = set()
+
+    for dep in recursive_dependencies(scheduler, action.name):
+        dependencies_outputs.update(dep.outputs)
+
+    def get_all_directories(path: str) -> set[str]:
+        dirs = set()
+        current = os.path.dirname(path)
+        while current and current != os.path.dirname(current):
+            dirs.add(current)
+            current = os.path.dirname(current)
+        return dirs
+
+    dependencies_directories = set()
+    for path in dependencies_outputs:
+        dependencies_directories.update(get_all_directories(path))
+
+    globbed_files: set[str] = set()
+
+    if callable(action.trim):
+        trim_set = action.trim()
+        globbed_files.update((os.path.normpath(p) for p in trim_set))
+    else:
+        for trim_glob in action.trim:
+            globbed_files.update(glob.glob(trim_glob, recursive=True))
+
+    globbed_files -= dependencies_outputs
+    globbed_files -= dependencies_directories
+
+    logger.debug("Trimming for job '%s': %s ", action.name, globbed_files)
+
+    for to_trim in globbed_files:
+        try:
+            s = os.stat(to_trim)
+            if stat.S_ISREG(s.st_mode):
+                os.unlink(to_trim)
+            elif stat.S_ISDIR(s.st_mode):
+                shutil.rmtree(to_trim)
+        except FileNotFoundError:
+            pass
+
+
+def recursive_dependencies(scheduler: Scheduler, action_name: str):
+    "Generator for the recursive dependencies of a given action."
+    action = scheduler.build_actions.get(action_name)
+    if action is None:
+        return
+
+    queue = deque([action])
+    while len(queue) > 0:
+        a = queue.popleft()
+        yield a
+        for dependency in a.dependencies:
+            dependency_action = scheduler.build_actions.get(dependency)
+            if not dependency_action:
+                raise ValueError(f"Action '{dependency}' not found")
+            queue.append(dependency_action)
