@@ -33,12 +33,45 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
+      - name: Setup Python + uv (uv case)
+        if: matrix.nox_env_manager == 'uv'
         uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python_version }}
+      - name: Create .prototools file (virtualenv case)
+        if: matrix.nox_env_manager == 'virtualenv'
+        run: echo 'python = "${{ matrix.python_version }}"' > .prototools
+      - name: Setup proto toolchain (virtualenv case)
+        if: matrix.nox_env_manager == 'virtualenv'
+        uses: moonrepo/setup-toolchain@v0
+        with:
+          auto-install: true
+          cache: true
+      - name: Verify Python installation
+        run: |
+          python --version
+          which python
+      - name: Install nox (virtualenv case)
+        if: matrix.nox_env_manager == 'virtualenv'
+        run: python -m pip install nox
+      - name: Verify uv installation (uv case)
+        if: matrix.nox_env_manager == 'uv'
+        run: |
+          uv --version
+          which uv
       - name: Test with nox
-        run: uv tool run nox -P ${{ matrix.python_version }} --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }} --verbose
+        run: |
+          # Extract major.minor version from matrix (e.g., 3.13.9 -> 3.13)
+          PYTHON_VERSION=$(echo "${{ matrix.python_version }}" | cut -d. -f1,2)
+          echo "Python version: $PYTHON_VERSION"
+          echo "Nox session: ${{ matrix.nox_session }}"
+          echo "Environment manager: ${{ matrix.nox_env_manager }}"
+          echo "uv available: $(which uv || echo 'not found')"
+          if [ "${{ matrix.nox_env_manager }}" == "uv" ]; then
+            uv tool run nox -p "$PYTHON_VERSION" --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }} --verbose
+          else
+            python -m nox -p "$PYTHON_VERSION" --session ${{ matrix.nox_session }} -db ${{ matrix.nox_env_manager }} --verbose
+          fi
 
   mypy_pyright_ruff:
     needs: declare_variables
@@ -77,8 +110,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: install
