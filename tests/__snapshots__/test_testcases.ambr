@@ -1,6 +1,7 @@
 # serializer version: 1
 # name: test_list[restart_build]
   '''
+  bygg >>> Setting up environment "restart_build" in .venv
   Available actions:
   
   restart_once
@@ -13,12 +14,14 @@
   list([
     '.gitignore',
     'Byggfile.py',
+    'Byggfile.toml',
   ])
 # ---
 # name: test_list[restart_build].2
   list([
     '.gitignore',
     'Byggfile.py',
+    'Byggfile.toml',
     'restart_status.txt',
   ])
 # ---
@@ -26,5 +29,6 @@
   list([
     '.gitignore',
     'Byggfile.py',
+    'Byggfile.toml',
   ])
 # ---

@@ -21,6 +21,7 @@ name = "Bygg development environment"
 inputs = ["requirements-dev.txt", "requirements.txt"]
 venv_directory = ".venv"
 shell = '''
+set -e
 # Leave uv out of options but to use the Python active in the shell:
 uv venv --no-project --no-managed-python
 uv pip install -r requirements-dev.txt -r requirements.txt
