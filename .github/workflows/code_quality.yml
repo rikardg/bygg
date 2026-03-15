@@ -83,7 +83,7 @@ jobs:
           python-version: "3.13"
       - name: install
         run: ./bootstrap.py
-      - uses: pypa/gh-action-pip-audit@v1.0.8
+      - uses: pypa/gh-action-pip-audit@v1.1.0
         with:
           virtual-environment: .venv/
           inputs: requirements.txt requirements-dev.txt
