@@ -15,7 +15,7 @@ jobs:
     outputs:
       python_versions: ${{ steps.python_versions.outputs.python_versions }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - id: python_versions
         run: |
           VERSIONS=$(cat .python-versions | jq -R -s -c 'split("\n")[:-1]')
@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
@@ -48,7 +48,7 @@ jobs:
       fail-fast: false
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
@@ -76,9 +76,9 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: install
